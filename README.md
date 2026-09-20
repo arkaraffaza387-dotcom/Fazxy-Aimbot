@@ -5,6 +5,7 @@
     Login: Key System (5 KEYS)
     Features: Loading Screen, Compact Mobile UI, Separated Sections, Night Lock, Full ESP, FPS Boost, Rainbow ESP, Fullbright, Enhanced Aimbot
     Mobile Friendly - 100% Tested - ALL FEATURES WORKING - NO BUG
+    STATUS: PATCHED - WAITING FOR v3.8 UPDATE
 --]]
 
 -- Services
@@ -35,7 +36,7 @@ local TeamCheckEnabled = false
 local PredictionEnabled = true
 local PredictionAmount = 5
 local FOVCircleEnabled = false
-local AimbotMode = "Accurate" -- "Accurate", "Smooth", "Instant"
+local AimbotMode = "Accurate"
 
 -- VPN
 local VPNActive = false
@@ -134,11 +135,11 @@ local function Notify(title, message, duration)
     Notif.BorderSizePixel = 2
     Notif.ZIndex = 101
     Notif.Parent = Notifications
-    
+
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = Notif
-    
+
     local Title = Instance.new("TextLabel")
     Title.Size = UDim2.new(1, -16, 0, 22)
     Title.Position = UDim2.new(0, 8, 0, 4)
@@ -150,7 +151,7 @@ local function Notify(title, message, duration)
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.ZIndex = 102
     Title.Parent = Notif
-    
+
     local Msg = Instance.new("TextLabel")
     Msg.Size = UDim2.new(1, -16, 0, 22)
     Msg.Position = UDim2.new(0, 8, 0, 28)
@@ -162,10 +163,10 @@ local function Notify(title, message, duration)
     Msg.TextXAlignment = Enum.TextXAlignment.Left
     Msg.ZIndex = 102
     Msg.Parent = Notif
-    
+
     local TweenIn = TweenService:Create(Notif, TweenInfo.new(0.3), {Position = UDim2.new(0, 0, 0, 0)})
     TweenIn:Play()
-    
+
     task.spawn(function()
         task.wait(duration)
         local TweenOut = TweenService:Create(Notif, TweenInfo.new(0.3), {Position = UDim2.new(0, 0, 0, -55)})
@@ -184,7 +185,7 @@ local function KickPlayer(text)
     KickOverlay.BackgroundTransparency = 0.3
     KickOverlay.ZIndex = 200
     KickOverlay.Parent = ScreenGui
-    
+
     local KickFrame = Instance.new("Frame")
     KickFrame.Size = UDim2.new(0, 350, 0, 100)
     KickFrame.Position = UDim2.new(0.5, -175, 0.5, -50)
@@ -193,11 +194,11 @@ local function KickPlayer(text)
     KickFrame.BorderSizePixel = 3
     KickFrame.ZIndex = 201
     KickFrame.Parent = KickOverlay
-    
+
     local KickCorner = Instance.new("UICorner")
     KickCorner.CornerRadius = UDim.new(0, 12)
     KickCorner.Parent = KickFrame
-    
+
     local KickText = Instance.new("TextLabel")
     KickText.Size = UDim2.new(1, -30, 1, 0)
     KickText.Position = UDim2.new(0, 15, 0, 0)
@@ -208,7 +209,7 @@ local function KickPlayer(text)
     KickText.TextSize = 18
     KickText.ZIndex = 202
     KickText.Parent = KickFrame
-    
+
     task.spawn(function()
         task.wait(2)
         pcall(function()
@@ -226,7 +227,7 @@ local function EnableFullbright()
     OriginalLighting.FogEnd = Lighting.FogEnd
     OriginalLighting.FogStart = Lighting.FogStart
     OriginalLighting.GlobalShadows = Lighting.GlobalShadows
-    
+
     Lighting.Ambient = Color3.fromRGB(255, 255, 255)
     Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
     Lighting.Brightness = 3
@@ -234,8 +235,7 @@ local function EnableFullbright()
     Lighting.FogEnd = 100000
     Lighting.FogStart = 0
     Lighting.GlobalShadows = false
-    
-    -- Remove fog
+
     for _, child in pairs(Lighting:GetChildren()) do
         if child:IsA("Atmosphere") then
             OriginalLighting.Atmosphere = child
@@ -255,7 +255,7 @@ local function DisableFullbright()
         if OriginalLighting.FogEnd then Lighting.FogEnd = OriginalLighting.FogEnd end
         if OriginalLighting.FogStart then Lighting.FogStart = OriginalLighting.FogStart end
         if OriginalLighting.GlobalShadows ~= nil then Lighting.GlobalShadows = OriginalLighting.GlobalShadows end
-        
+
         if OriginalLighting.Atmosphere then
             OriginalLighting.Atmosphere.Density = 0.3
             OriginalLighting.Atmosphere.Haze = 0
@@ -272,7 +272,7 @@ local function HSVToRGB(h, s, v)
     local p = v * (1 - s)
     local q = v * (1 - f * s)
     local t = v * (1 - (1 - f) * s)
-    
+
     i = i % 6
     if i == 0 then r, g, b = v, t, p
     elseif i == 1 then r, g, b = q, v, p
@@ -281,7 +281,7 @@ local function HSVToRGB(h, s, v)
     elseif i == 4 then r, g, b = t, p, v
     elseif i == 5 then r, g, b = v, p, q
     end
-    
+
     return Color3.new(r, g, b)
 end
 
@@ -289,14 +289,13 @@ local function EnableRainbowESP()
     if RainbowConnection then
         RainbowConnection:Disconnect()
     end
-    
+
     RainbowConnection = RunService.RenderStepped:Connect(function(dt)
         if not RainbowESPEnabled then return end
-        
+
         RainbowHue = (RainbowHue + dt * 0.3) % 1
         local rainbowColor = HSVToRGB(RainbowHue, 1, 1)
-        
-        -- Apply to all ESP objects
+
         for _, espData in pairs(ESPObjects) do
             if espData.Box then espData.Box.Color = rainbowColor end
             if espData.Name then espData.Name.Color = rainbowColor end
@@ -310,8 +309,7 @@ local function EnableRainbowESP()
             if espData.SkeletonLeftLeg then espData.SkeletonLeftLeg.Color = rainbowColor end
             if espData.SkeletonRightLeg then espData.SkeletonRightLeg.Color = rainbowColor end
         end
-        
-        -- Apply to Chams
+
         for _, highlightList in pairs(ChamsObjects) do
             for _, highlight in pairs(highlightList) do
                 if highlight then
@@ -338,14 +336,14 @@ local function EnableFPSBoost()
     OriginalSettings.EnvironmentDiffuseScale = Lighting.EnvironmentDiffuseScale
     OriginalSettings.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
     OriginalSettings.Outlines = Lighting.Outlines
-    
+
     Lighting.GlobalShadows = false
     Lighting.FogEnd = 100000
     Lighting.Brightness = 2
     Lighting.EnvironmentDiffuseScale = 0
     Lighting.EnvironmentSpecularScale = 0
     Lighting.Outlines = false
-    
+
     for _, effect in pairs(Lighting:GetChildren()) do
         if effect:IsA("PostEffect") or effect:IsA("BloomEffect") or effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("SunRaysEffect") or effect:IsA("DepthOfFieldEffect") then
             pcall(function()
@@ -353,7 +351,7 @@ local function EnableFPSBoost()
             end)
         end
     end
-    
+
     for _, part in pairs(Workspace:GetDescendants()) do
         if part:IsA("ParticleEmitter") or part:IsA("Fire") or part:IsA("Smoke") or part:IsA("Sparkles") then
             pcall(function()
@@ -361,7 +359,7 @@ local function EnableFPSBoost()
             end)
         end
     end
-    
+
     pcall(function()
         Workspace.Terrain.WaterWaveSize = 0
         Workspace.Terrain.WaterWaveSpeed = 0
@@ -378,7 +376,7 @@ local function DisableFPSBoost()
         if OriginalSettings.EnvironmentDiffuseScale ~= nil then Lighting.EnvironmentDiffuseScale = OriginalSettings.EnvironmentDiffuseScale end
         if OriginalSettings.EnvironmentSpecularScale ~= nil then Lighting.EnvironmentSpecularScale = OriginalSettings.EnvironmentSpecularScale end
         if OriginalSettings.Outlines ~= nil then Lighting.Outlines = OriginalSettings.Outlines end
-        
+
         for _, effect in pairs(Lighting:GetChildren()) do
             if effect:IsA("PostEffect") or effect:IsA("BloomEffect") or effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") or effect:IsA("SunRaysEffect") or effect:IsA("DepthOfFieldEffect") then
                 pcall(function()
@@ -386,7 +384,7 @@ local function DisableFPSBoost()
                 end)
             end
         end
-        
+
         for _, part in pairs(Workspace:GetDescendants()) do
             if part:IsA("ParticleEmitter") or part:IsA("Fire") or part:IsA("Smoke") or part:IsA("Sparkles") then
                 pcall(function()
@@ -403,15 +401,15 @@ local function TeleportToPlayer(targetPlayer)
         Notify("Teleport", "> TARGET INVALID", 2)
         return
     end
-    
+
     local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
     local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    
+
     if not targetRoot or not localRoot then
         Notify("Teleport", "> ROOT NOT FOUND", 2)
         return
     end
-    
+
     pcall(function()
         localRoot.CFrame = CFrame.new(targetRoot.Position + Vector3.new(0, 3, 0))
         Notify("Teleport", "> TO: " .. targetPlayer.Name, 2)
@@ -422,7 +420,7 @@ local function TeleportToMouse()
     if not LocalPlayer.Character then return end
     local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not root then return end
-    
+
     local mouseHit = Mouse.Hit
     if mouseHit then
         pcall(function()
@@ -452,12 +450,12 @@ end
 
 local function UpdateTeleportList()
     if not TeleportListFrame then return end
-    
+
     for _, btn in pairs(TeleportTargetList) do
         if btn then btn:Destroy() end
     end
     TeleportTargetList = {}
-    
+
     local yPos = 0
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
@@ -473,20 +471,20 @@ local function UpdateTeleportList()
             btn.TextSize = 11
             btn.ZIndex = 13
             btn.Parent = TeleportListFrame
-            
+
             local corner = Instance.new("UICorner")
             corner.CornerRadius = UDim.new(0, 3)
             corner.Parent = btn
-            
+
             btn.MouseButton1Click:Connect(function()
                 TeleportToPlayer(player)
             end)
-            
+
             table.insert(TeleportTargetList, btn)
             yPos = yPos + 35
         end
     end
-    
+
     TeleportListFrame.CanvasSize = UDim2.new(0, 0, 0, yPos + 5)
 end
 
@@ -554,14 +552,14 @@ end
 local function CreateESP(player)
     if ESPObjects[player] then return end
     local espData = {}
-    
+
     local boxOutline = Drawing.new("Square")
     boxOutline.Visible = false
     boxOutline.Color = Color3.fromRGB(0, 180, 255)
     boxOutline.Thickness = 2
     boxOutline.Filled = false
     boxOutline.Transparency = 1
-    
+
     local nameTag = Drawing.new("Text")
     nameTag.Visible = false
     nameTag.Color = Color3.fromRGB(0, 180, 255)
@@ -569,7 +567,7 @@ local function CreateESP(player)
     nameTag.Center = true
     nameTag.Outline = true
     nameTag.OutlineColor = Color3.fromRGB(0, 0, 0)
-    
+
     local distTag = Drawing.new("Text")
     distTag.Visible = false
     distTag.Color = Color3.fromRGB(0, 180, 255)
@@ -577,25 +575,25 @@ local function CreateESP(player)
     distTag.Center = true
     distTag.Outline = true
     distTag.OutlineColor = Color3.fromRGB(0, 0, 0)
-    
+
     local healthBg = Drawing.new("Line")
     healthBg.Visible = false
     healthBg.Color = Color3.fromRGB(255, 0, 0)
     healthBg.Thickness = 3
     healthBg.Transparency = 1
-    
+
     local healthBar = Drawing.new("Line")
     healthBar.Visible = false
     healthBar.Color = Color3.fromRGB(0, 180, 255)
     healthBar.Thickness = 3
     healthBar.Transparency = 1
-    
+
     local tracerLine = Drawing.new("Line")
     tracerLine.Visible = false
     tracerLine.Color = TracerColor
     tracerLine.Thickness = 2
     tracerLine.Transparency = 0.5
-    
+
     local headDot = Drawing.new("Circle")
     headDot.Visible = false
     headDot.Color = Color3.fromRGB(255, 0, 0)
@@ -603,43 +601,43 @@ local function CreateESP(player)
     headDot.Radius = 4
     headDot.Filled = true
     headDot.Transparency = 1
-    
+
     local skeletonHead = Drawing.new("Line")
     skeletonHead.Visible = false
     skeletonHead.Color = Color3.fromRGB(0, 180, 255)
     skeletonHead.Thickness = 1
     skeletonHead.Transparency = 1
-    
+
     local skeletonTorso = Drawing.new("Line")
     skeletonTorso.Visible = false
     skeletonTorso.Color = Color3.fromRGB(0, 180, 255)
     skeletonTorso.Thickness = 1
     skeletonTorso.Transparency = 1
-    
+
     local skeletonLeftArm = Drawing.new("Line")
     skeletonLeftArm.Visible = false
     skeletonLeftArm.Color = Color3.fromRGB(0, 180, 255)
     skeletonLeftArm.Thickness = 1
     skeletonLeftArm.Transparency = 1
-    
+
     local skeletonRightArm = Drawing.new("Line")
     skeletonRightArm.Visible = false
     skeletonRightArm.Color = Color3.fromRGB(0, 180, 255)
     skeletonRightArm.Thickness = 1
     skeletonRightArm.Transparency = 1
-    
+
     local skeletonLeftLeg = Drawing.new("Line")
     skeletonLeftLeg.Visible = false
     skeletonLeftLeg.Color = Color3.fromRGB(0, 180, 255)
     skeletonLeftLeg.Thickness = 1
     skeletonLeftLeg.Transparency = 1
-    
+
     local skeletonRightLeg = Drawing.new("Line")
     skeletonRightLeg.Visible = false
     skeletonRightLeg.Color = Color3.fromRGB(0, 180, 255)
     skeletonRightLeg.Thickness = 1
     skeletonRightLeg.Transparency = 1
-    
+
     espData.Box = boxOutline
     espData.Name = nameTag
     espData.Distance = distTag
@@ -653,7 +651,7 @@ local function CreateESP(player)
     espData.SkeletonRightArm = skeletonRightArm
     espData.SkeletonLeftLeg = skeletonLeftLeg
     espData.SkeletonRightLeg = skeletonRightLeg
-    
+
     ESPObjects[player] = espData
 end
 
@@ -675,7 +673,7 @@ local function RemoveESP(player)
         espData.SkeletonRightLeg:Remove()
         ESPObjects[player] = nil
     end
-    
+
     if ChamsObjects[player] then
         for _, highlight in pairs(ChamsObjects[player]) do
             pcall(function()
@@ -692,7 +690,7 @@ end
 local function CreateChams(player)
     if ChamsObjects[player] or not player.Character then return end
     ChamsObjects[player] = {}
-    
+
     for _, part in pairs(player.Character:GetChildren()) do
         if part:IsA("BasePart") or part:IsA("MeshPart") then
             local highlight = Instance.new("Highlight")
@@ -740,26 +738,26 @@ local function UpdateESP()
         end
         return
     end
-    
+
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
             local humanoid = player.Character.Humanoid
             local rootPart = player.Character.HumanoidRootPart
-            
+
             if humanoid.Health > 0 and rootPart then
                 if not ESPObjects[player] then
                     CreateESP(player)
                 end
-                
+
                 local espData = ESPObjects[player]
                 local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-                
+
                 if onScreen then
                     local distance = (rootPart.Position - Camera.CFrame.Position).Magnitude
                     local boxSize = Vector2.new(2000 / distance, 3500 / distance)
                     local boxX = screenPos.X - boxSize.X / 2
                     local boxY = screenPos.Y - boxSize.Y / 2
-                    
+
                     if ESPBoxEnabled then
                         espData.Box.Visible = true
                         espData.Box.Position = Vector2.new(boxX, boxY)
@@ -767,7 +765,7 @@ local function UpdateESP()
                     else
                         espData.Box.Visible = false
                     end
-                    
+
                     if ESPNameEnabled then
                         espData.Name.Visible = true
                         espData.Name.Text = player.Name
@@ -775,7 +773,7 @@ local function UpdateESP()
                     else
                         espData.Name.Visible = false
                     end
-                    
+
                     if ESPDistanceEnabled then
                         espData.Distance.Visible = true
                         espData.Distance.Text = math.floor(distance) .. "m"
@@ -783,15 +781,15 @@ local function UpdateESP()
                     else
                         espData.Distance.Visible = false
                     end
-                    
+
                     if ESPHealthEnabled then
                         local healthPercent = humanoid.Health / humanoid.MaxHealth
                         local healthWidth = boxSize.X
-                        
+
                         espData.HealthBg.Visible = true
                         espData.HealthBg.From = Vector2.new(boxX, boxY + boxSize.Y + 20)
                         espData.HealthBg.To = Vector2.new(boxX + healthWidth, boxY + boxSize.Y + 20)
-                        
+
                         espData.HealthBar.Visible = true
                         espData.HealthBar.From = Vector2.new(boxX, boxY + boxSize.Y + 20)
                         espData.HealthBar.To = Vector2.new(boxX + healthWidth * healthPercent, boxY + boxSize.Y + 20)
@@ -799,7 +797,7 @@ local function UpdateESP()
                         espData.HealthBg.Visible = false
                         espData.HealthBar.Visible = false
                     end
-                    
+
                     if ESPTracerEnabled then
                         espData.Tracer.Visible = true
                         if not RainbowESPEnabled then
@@ -810,7 +808,7 @@ local function UpdateESP()
                     else
                         espData.Tracer.Visible = false
                     end
-                    
+
                     if ESPHeadDotEnabled then
                         local head = player.Character:FindFirstChild("Head")
                         if head then
@@ -825,7 +823,7 @@ local function UpdateESP()
                     else
                         espData.HeadDot.Visible = false
                     end
-                    
+
                     if ESPSkeletonEnabled then
                         local head = player.Character:FindFirstChild("Head")
                         local upperTorso = player.Character:FindFirstChild("UpperTorso") or player.Character:FindFirstChild("Torso")
@@ -834,7 +832,7 @@ local function UpdateESP()
                         local rightArm = player.Character:FindFirstChild("RightUpperArm") or player.Character:FindFirstChild("Right Arm")
                         local leftLeg = player.Character:FindFirstChild("LeftUpperLeg") or player.Character:FindFirstChild("Left Leg")
                         local rightLeg = player.Character:FindFirstChild("RightUpperLeg") or player.Character:FindFirstChild("Right Leg")
-                        
+
                         local function GetScreenPos(part)
                             if part then
                                 local sp, os = Camera:WorldToViewportPoint(part.Position)
@@ -842,7 +840,7 @@ local function UpdateESP()
                             end
                             return nil
                         end
-                        
+
                         local headPos = GetScreenPos(head)
                         local upperTorsoPos = GetScreenPos(upperTorso)
                         local lowerTorsoPos = GetScreenPos(lowerTorso)
@@ -850,7 +848,7 @@ local function UpdateESP()
                         local rightArmPos = GetScreenPos(rightArm)
                         local leftLegPos = GetScreenPos(leftLeg)
                         local rightLegPos = GetScreenPos(rightLeg)
-                        
+
                         if headPos and upperTorsoPos then
                             espData.SkeletonHead.Visible = true
                             espData.SkeletonHead.From = headPos
@@ -858,7 +856,7 @@ local function UpdateESP()
                         else
                             espData.SkeletonHead.Visible = false
                         end
-                        
+
                         if upperTorsoPos and lowerTorsoPos then
                             espData.SkeletonTorso.Visible = true
                             espData.SkeletonTorso.From = upperTorsoPos
@@ -866,7 +864,7 @@ local function UpdateESP()
                         else
                             espData.SkeletonTorso.Visible = false
                         end
-                        
+
                         if upperTorsoPos and leftArmPos then
                             espData.SkeletonLeftArm.Visible = true
                             espData.SkeletonLeftArm.From = upperTorsoPos
@@ -874,7 +872,7 @@ local function UpdateESP()
                         else
                             espData.SkeletonLeftArm.Visible = false
                         end
-                        
+
                         if upperTorsoPos and rightArmPos then
                             espData.SkeletonRightArm.Visible = true
                             espData.SkeletonRightArm.From = upperTorsoPos
@@ -882,7 +880,7 @@ local function UpdateESP()
                         else
                             espData.SkeletonRightArm.Visible = false
                         end
-                        
+
                         if lowerTorsoPos and leftLegPos then
                             espData.SkeletonLeftLeg.Visible = true
                             espData.SkeletonLeftLeg.From = lowerTorsoPos
@@ -890,7 +888,7 @@ local function UpdateESP()
                         else
                             espData.SkeletonLeftLeg.Visible = false
                         end
-                        
+
                         if lowerTorsoPos and rightLegPos then
                             espData.SkeletonRightLeg.Visible = true
                             espData.SkeletonRightLeg.From = lowerTorsoPos
@@ -906,7 +904,7 @@ local function UpdateESP()
                         espData.SkeletonLeftLeg.Visible = false
                         espData.SkeletonRightLeg.Visible = false
                     end
-                    
+
                     if ESPChamsEnabled then
                         if not ChamsObjects[player] then
                             CreateChams(player)
@@ -916,7 +914,7 @@ local function UpdateESP()
                             RemoveChams(player)
                         end
                     end
-                    
+
                     if not RainbowESPEnabled then
                         local healthPercent = humanoid.Health / humanoid.MaxHealth
                         if healthPercent > 0.7 then
@@ -983,43 +981,39 @@ local function IsWallBetween(origin, target, targetCharacter)
     return false
 end
 
--- ENHANCED AIMBOT - Get Closest Target
 local function GetClosestTarget()
     local closestTarget = nil
     local closestDistance = FOVRadius
     local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     local cameraPos = Camera.CFrame.Position
-    
+
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
             if IsSameTeam(player) then continue end
-            
-            -- Get target part
+
             local targetPart = player.Character:FindFirstChild(TargetPart)
             if not targetPart then
                 targetPart = player.Character:FindFirstChild("HumanoidRootPart")
             end
-            
+
             if targetPart then
                 local targetPosition = targetPart.Position
-                
-                -- Enhanced Prediction
+
                 if PredictionEnabled then
                     local velocity = Vector3.new(0, 0, 0)
                     if player.Character:FindFirstChild("HumanoidRootPart") then
                         velocity = player.Character.HumanoidRootPart.AssemblyLinearVelocity
                     end
-                    
-                    -- Hitung prediction berdasarkan jarak
+
                     local distance = (targetPosition - cameraPos).Magnitude
-                    local pingFactor = 1 + (distance / 500) -- Makin jauh, makin banyak prediksi
+                    local pingFactor = 1 + (distance / 500)
                     local timeToTarget = (distance / 300) * (PredictionAmount / 5) * pingFactor
                     targetPosition = targetPosition + velocity * timeToTarget
                 end
-                
+
                 local screenPos, onScreen = Camera:WorldToViewportPoint(targetPosition)
                 local distance = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
-                
+
                 if onScreen and distance < closestDistance then
                     if WallCheckEnabled then
                         if not IsWallBetween(cameraPos, targetPart.Position, player.Character) then
@@ -1037,36 +1031,33 @@ local function GetClosestTarget()
     return closestTarget
 end
 
--- ENHANCED AIMBOT FUNCTION
 local function AimbotFunction()
     if not AimbotEnabled or not IsLoggedIn then return end
-    
+
     AimbotTarget = GetClosestTarget()
-    
+
     if AimbotTarget and AimbotTarget.Character then
         local targetPart = AimbotTarget.Character:FindFirstChild(TargetPart) or AimbotTarget.Character:FindFirstChild("HumanoidRootPart")
-        
+
         if targetPart then
             local targetPos = targetPart.Position
-            
-            -- Enhanced Prediction
+
             if PredictionEnabled then
                 local velocity = Vector3.new(0, 0, 0)
                 if AimbotTarget.Character:FindFirstChild("HumanoidRootPart") then
                     velocity = AimbotTarget.Character.HumanoidRootPart.AssemblyLinearVelocity
                 end
-                
+
                 local distance = (targetPos - Camera.CFrame.Position).Magnitude
                 local pingFactor = 1 + (distance / 500)
                 local timeToTarget = (distance / 300) * (PredictionAmount / 5) * pingFactor
                 targetPos = targetPos + velocity * timeToTarget
             end
-            
+
             local currentPos = Camera.CFrame.Position
             local aimDirection = (targetPos - currentPos).Unit
             local newCFrame = CFrame.new(currentPos, currentPos + aimDirection)
-            
-            -- Enhanced Smoothness based on mode
+
             if AimbotMode == "Instant" then
                 Camera.CFrame = newCFrame
             elseif AimbotMode == "Accurate" then
@@ -1426,11 +1417,11 @@ local function CreateSection(title, yPos)
     SectionFrame.BorderSizePixel = 1
     SectionFrame.ZIndex = 12
     SectionFrame.Parent = ScrollContent
-    
+
     local SectionCorner = Instance.new("UICorner")
     SectionCorner.CornerRadius = UDim.new(0, 4)
     SectionCorner.Parent = SectionFrame
-    
+
     local SectionText = Instance.new("TextLabel")
     SectionText.Size = UDim2.new(1, -10, 1, 0)
     SectionText.Position = UDim2.new(0, 5, 0, 0)
@@ -1632,11 +1623,11 @@ local function CreateAimbotModeButton(text, mode, xPos)
     btn.TextSize = 10
     btn.ZIndex = 13
     btn.Parent = AimbotModeButtons
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 3)
     corner.Parent = btn
-    
+
     btn.MouseButton1Click:Connect(function()
         AimbotMode = mode
         AimbotModeLabel.Text = "> AIMBOT MODE: " .. string.upper(mode)
@@ -1750,11 +1741,11 @@ local function CreateTargetButton(text, part, xPos)
     btn.TextSize = 10
     btn.ZIndex = 13
     btn.Parent = TargetButtons
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 3)
     corner.Parent = btn
-    
+
     btn.MouseButton1Click:Connect(function()
         TargetPart = part
         TargetLabel.Text = "> TARGET_PART: " .. text:upper()
@@ -1970,11 +1961,11 @@ local function CreateTracerColorButton(text, color, name, xPos, yPos)
     btn.TextSize = 10
     btn.ZIndex = 13
     btn.Parent = TracerColorButtons
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 3)
     corner.Parent = btn
-    
+
     btn.MouseButton1Click:Connect(function()
         TracerColor = color
         TracerColorName = name
@@ -2159,25 +2150,25 @@ FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.
 task.spawn(function()
     local totalTime = 10
     local interval = totalTime / 100
-    
+
     for i = 1, 100 do
         task.wait(interval)
-        
+
         LoadingBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
         LoadingPercent.Text = i .. "%"
-        
+
         local messageIndex = math.floor(i / 10) + 1
         if messageIndex > #loadingMessages then messageIndex = #loadingMessages end
         LoadingStatus.Text = loadingMessages[messageIndex]
     end
-    
+
     LoadingPercent.Text = "100%"
     LoadingStatus.Text = "> SYSTEM READY!"
     LoadingBarFill.Size = UDim2.new(1, 0, 1, 0)
-    
+
     task.wait(0.5)
     LoadingScreen.Visible = false
-    
+
     if IsNightLockActive() then
         KickPlayer("* TIDUR UNTUK KESEHATAN MU *")
     else
@@ -2196,38 +2187,78 @@ task.spawn(function()
     end
 end)
 
--- ==================== LOGIN BUTTON ====================
+-- ==================== LOGIN BUTTON (PATCHED SYSTEM) ====================
 LoginButton.MouseButton1Click:Connect(function()
     local key = KeyInput.Text
     local keyData = ValidKeys[key]
-    
+
     if keyData then
-        if keyData.Expiry == 0 then
+        if keyData.Expiry == 0 or os.time() < keyData.Expiry then
+            -- Key is valid BUT system is under patch
             IsLoggedIn = true
             VPNActive = true
-            LoginFrame.Visible = false
-            MainHub.Visible = true
-            ToggleMenuButton.Visible = true
-            MenuVisible = true
             StatusText.Text = "> ACCESS GRANTED..."
-            VPNToggle.Text = "> VPN: ON (ACTIVE)"
-            VPNToggle.BackgroundColor3 = Color3.fromRGB(0, 60, 120)
-            UpdateTeleportList()
-            Notify("Success", "> WELCOME | " .. keyData.Level, 3)
-        elseif os.time() < keyData.Expiry then
-            IsLoggedIn = true
-            VPNActive = true
-            LoginFrame.Visible = false
-            MainHub.Visible = true
-            ToggleMenuButton.Visible = true
-            MenuVisible = true
-            StatusText.Text = "> ACCESS GRANTED..."
-            VPNToggle.Text = "> VPN: ON (ACTIVE)"
-            VPNToggle.BackgroundColor3 = Color3.fromRGB(0, 60, 120)
-            UpdateTeleportList()
-            local timeLeft = keyData.Expiry - os.time()
-            local days = math.floor(timeLeft / 86400)
-            Notify("Success", "> WELCOME | " .. days .. "d left", 3)
+            Notify("Success", "> KEY ACCEPTED", 2)
+
+            task.wait(0.8)
+
+            -- Patch notification sequence
+            Notify("ZetGames-AimLock", "> SYSTEM IS BEING PATCHED...", 2.5)
+            task.wait(1.2)
+            Notify("Update", "> PLEASE WAIT A FEW DAYS", 2.5)
+            task.wait(1.2)
+            Notify("Update", "> UPDATE IN PROGRESS TO v3.8", 2.5)
+            task.wait(2)
+
+            -- Show kick overlay
+            local KickOverlay = Instance.new("Frame")
+            KickOverlay.Size = UDim2.new(1, 0, 1, 0)
+            KickOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            KickOverlay.BackgroundTransparency = 0.2
+            KickOverlay.ZIndex = 250
+            KickOverlay.Parent = ScreenGui
+
+            local KickFrame = Instance.new("Frame")
+            KickFrame.Size = UDim2.new(0, 420, 0, 180)
+            KickFrame.Position = UDim2.new(0.5, -210, 0.5, -90)
+            KickFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 25)
+            KickFrame.BorderColor3 = Color3.fromRGB(255, 150, 0)
+            KickFrame.BorderSizePixel = 3
+            KickFrame.ZIndex = 251
+            KickFrame.Parent = KickOverlay
+
+            local KCorner = Instance.new("UICorner")
+            KCorner.CornerRadius = UDim.new(0, 12)
+            KCorner.Parent = KickFrame
+
+            local KTitle = Instance.new("TextLabel")
+            KTitle.Size = UDim2.new(1, -30, 0, 35)
+            KTitle.Position = UDim2.new(0, 15, 0, 12)
+            KTitle.BackgroundTransparency = 1
+            KTitle.Text = "⚠ SYSTEM PATCHING ⚠"
+            KTitle.TextColor3 = Color3.fromRGB(255, 180, 0)
+            KTitle.Font = Enum.Font.Code
+            KTitle.TextSize = 20
+            KTitle.ZIndex = 252
+            KTitle.Parent = KickFrame
+
+            local KMsg = Instance.new("TextLabel")
+            KMsg.Size = UDim2.new(1, -30, 0, 100)
+            KMsg.Position = UDim2.new(0, 15, 0, 55)
+            KMsg.BackgroundTransparency = 1
+            KMsg.Text = "WAIT FOR UPDATE VERSION 3.8\n\nZetGames-AimLock is being patched.\nPlease wait a few days for update."
+            KMsg.TextColor3 = Color3.fromRGB(255, 255, 255)
+            KMsg.Font = Enum.Font.Code
+            KMsg.TextSize = 13
+            KMsg.TextWrapped = true
+            KMsg.ZIndex = 252
+            KMsg.Parent = KickFrame
+
+            task.wait(3)
+
+            pcall(function()
+                LocalPlayer:Kick("WAIT FOR UPDATE VERSION 3.8\n\nZetGames-AimLock is currently being patched.\nPlease wait a few days for the update to finish.")
+            end)
         else
             StatusText.Text = "> ERROR: KEY EXPIRED"
             Notify("Failed", "> KEY EXPIRED", 2)
@@ -2342,7 +2373,6 @@ NoclipToggle.MouseButton1Click:Connect(function()
     end
 end)
 
--- ENHANCED AIMBOT TOGGLE
 AimbotToggle.MouseButton1Click:Connect(function()
     AimbotEnabled = not AimbotEnabled
     if AimbotEnabled then
@@ -2412,7 +2442,6 @@ ESPToggle.MouseButton1Click:Connect(function()
     end
 end)
 
--- RAINBOW ESP TOGGLE
 RainbowESPToggle.MouseButton1Click:Connect(function()
     RainbowESPEnabled = not RainbowESPEnabled
     if RainbowESPEnabled then
@@ -2599,7 +2628,7 @@ local function MakeDraggable(frame)
     local dragInput = nil
     local dragStart = nil
     local startPos = nil
-    
+
     frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -2607,20 +2636,20 @@ local function MakeDraggable(frame)
             startPos = frame.Position
         end
     end)
-    
+
     frame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-    
+
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-    
+
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
