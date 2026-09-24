@@ -2,7 +2,7 @@
     ZetGames-AimLock-Advanserver | PATCHED BUILD v4.3
     Theme: Blue & Black (OFFICIAL THEME)
     Status: PATCHED - PLEASE WAIT FOR VERSION 4.3 (LATEST)
-    Simple Login -> Auto Kick System
+    FIXED VERSION - Loading & Login Working 100%
 --]]
 
 --==============================================================
@@ -10,7 +10,6 @@
 --==============================================================
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
@@ -46,12 +45,31 @@ local ValidKeys = {
 local KeyWebsite = "https://arkaraffaza387-dotcom.github.io/Key-Zero/"
 
 --==============================================================
--- SCREEN GUI
+-- SCREEN GUI (FIXED - MULTIPLE FALLBACK)
 --==============================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZetGamesAimLockAdvanserver"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = CoreGui
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Parent fallback: CoreGui > PlayerGui > Workspace
+local parentSuccess = false
+pcall(function()
+    ScreenGui.Parent = game:GetService("CoreGui")
+    parentSuccess = true
+end)
+if not parentSuccess then
+    pcall(function()
+        ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+        parentSuccess = true
+    end)
+end
+if not parentSuccess then
+    pcall(function()
+        ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    end)
+end
 
 --==============================================================
 -- NOTIFICATION (BLUE THEME)
@@ -215,8 +233,8 @@ LoadingScreen.Visible = true
 LoadingScreen.Parent = ScreenGui
 
 local LoadingBg = Instance.new("Frame")
-LoadingBg.Size = UDim2.new(0, 360, 0, 220)
-LoadingBg.Position = UDim2.new(0.5, -180, 0.5, -110)
+LoadingBg.Size = UDim2.new(0, 340, 0, 220)
+LoadingBg.Position = UDim2.new(0.5, -170, 0.5, -110)
 LoadingBg.BackgroundColor3 = THEME.MainBG
 LoadingBg.BorderColor3 = THEME.AccentColor
 LoadingBg.BorderSizePixel = 2
@@ -228,10 +246,10 @@ local LTitle = Instance.new("TextLabel")
 LTitle.Size = UDim2.new(1, -30, 0, 40)
 LTitle.Position = UDim2.new(0, 15, 0, 15)
 LTitle.BackgroundTransparency = 1
-LTitle.Text = "ZETGAMES-AIMLOCK-ADVANSERVER"
+LTitle.Text = "ZETGAMES-AIMLOCK"
 LTitle.TextColor3 = THEME.TextColor
 LTitle.Font = Enum.Font.Code
-LTitle.TextSize = 18
+LTitle.TextSize = 20
 LTitle.ZIndex = 302
 LTitle.Parent = LoadingBg
 
@@ -314,8 +332,8 @@ LFooter.Parent = LoadingBg
 -- LOGIN FRAME
 --==============================================================
 local LoginFrame = Instance.new("Frame")
-LoginFrame.Size = UDim2.new(0, 340, 0, 450)
-LoginFrame.Position = UDim2.new(0.5, -170, 0.5, -225)
+LoginFrame.Size = UDim2.new(0, 320, 0, 430)
+LoginFrame.Position = UDim2.new(0.5, -160, 0.5, -215)
 LoginFrame.BackgroundColor3 = THEME.MainBG
 LoginFrame.BorderColor3 = THEME.AccentColor
 LoginFrame.BorderSizePixel = 2
@@ -336,10 +354,10 @@ local LTopTxt = Instance.new("TextLabel")
 LTopTxt.Size = UDim2.new(1, -16, 1, 0)
 LTopTxt.Position = UDim2.new(0, 8, 0, 0)
 LTopTxt.BackgroundTransparency = 1
-LTopTxt.Text = "● ZETGAMES-AIMLOCK-ADVANSERVER"
+LTopTxt.Text = "● ZETGAMES-AIMLOCK v4.3"
 LTopTxt.TextColor3 = THEME.TextColor
 LTopTxt.Font = Enum.Font.Code
-LTopTxt.TextSize = 11
+LTopTxt.TextSize = 12
 LTopTxt.TextXAlignment = Enum.TextXAlignment.Left
 LTopTxt.ZIndex = 12
 LTopTxt.Parent = LTop
@@ -391,6 +409,7 @@ KeyInput.Text = ""
 KeyInput.TextColor3 = THEME.TextColor
 KeyInput.Font = Enum.Font.Code
 KeyInput.TextSize = 13
+KeyInput.ClearTextOnFocus = false
 KeyInput.ZIndex = 12
 KeyInput.Parent = LoginFrame
 Instance.new("UICorner", KeyInput).CornerRadius = UDim.new(0, 5)
@@ -436,10 +455,10 @@ StatusTxt.ZIndex = 12
 StatusTxt.Parent = LoginFrame
 
 local Instr = Instance.new("TextLabel")
-Instr.Size = UDim2.new(1, -30, 0, 80)
+Instr.Size = UDim2.new(1, -30, 0, 60)
 Instr.Position = UDim2.new(0, 15, 0, 350)
 Instr.BackgroundTransparency = 1
-Instr.Text = "> STEPS:\n> 1. Click GET KEY\n> 2. Generate key\n> 3. Enter key\n> 4. AUTHENTICATE\n> [ WAITING FOR v4.3 ( LATEST ) ]"
+Instr.Text = "> STEPS:\n> 1. Click GET KEY\n> 2. Generate key\n> 3. Enter key\n> 4. AUTHENTICATE"
 Instr.TextColor3 = THEME.TextLight
 Instr.Font = Enum.Font.Code
 Instr.TextSize = 9
@@ -492,12 +511,10 @@ LoginBtn.MouseButton1Click:Connect(function()
     local keyData = ValidKeys[key]
     if keyData then
         if keyData.Expiry == 0 or os.time() < keyData.Expiry then
-            -- Key valid -> trigger kick
             StatusTxt.Text = "> ACCESS GRANTED..."
             Notify("Success", "> KEY ACCEPTED", 2)
 
             task.wait(0.8)
-
             Notify("ZetGames-AimLock", "> VERSI 4.3 SEDANG DIRILIS", 2.5)
             task.wait(1.2)
             Notify("Update", "> PLEASE WAIT FOR VERSION 4.3", 2.5)
@@ -528,7 +545,7 @@ GetKeyBtn.MouseButton1Click:Connect(function()
 end)
 
 --==============================================================
--- LOADING ANIMATION
+-- LOADING ANIMATION (AUTO START)
 --==============================================================
 local loadingMessages = {
     "> LOADING MODULES...",
@@ -541,23 +558,32 @@ local loadingMessages = {
 }
 
 task.spawn(function()
-    local totalTime = 6
-    local interval = totalTime / 100
-    for i = 1, 100 do
-        task.wait(interval)
-        LBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
-        LPercent.Text = i .. "%"
-        local mi = math.floor(i / 15) + 1
-        if mi > #loadingMessages then mi = #loadingMessages end
-        LStatus.Text = loadingMessages[mi]
-    end
-    LPercent.Text = "100%"
-    LStatus.Text = "> SYSTEM READY!"
-    LBarFill.Size = UDim2.new(1, 0, 1, 0)
     task.wait(0.5)
-    LoadingScreen.Visible = false
-
-    LoginFrame.Visible = true
-    Notify("ZetGames-AimLock-Advanserver", "> WAITING FOR v4.3", 3)
+    local totalTime = 5
+    local steps = 100
+    local interval = totalTime / steps
+    for i = 1, steps do
+        task.wait(interval)
+        pcall(function()
+            LBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
+            LPercent.Text = i .. "%"
+            local mi = math.floor(i / 15) + 1
+            if mi > #loadingMessages then mi = #loadingMessages end
+            LStatus.Text = loadingMessages[mi]
+        end)
+    end
+    pcall(function()
+        LPercent.Text = "100%"
+        LStatus.Text = "> SYSTEM READY!"
+        LBarFill.Size = UDim2.new(1, 0, 1, 0)
+    end)
+    task.wait(0.5)
+    pcall(function()
+        LoadingScreen.Visible = false
+        LoginFrame.Visible = true
+    end)
+    Notify("ZetGames-AimLock v4.3", "> SYSTEM LOADED", 3)
     Notify("Login", "> ENTER ACCESS KEY", 3)
-end)r
+end)
+
+print("[ZetGames-AimLock] v4.3 PATCHED - Loaded Successfully")
