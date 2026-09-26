@@ -1,9 +1,10 @@
 --[[
-    ZetGames-AimLock V4.3 | OFFICIAL RELEASE
+    ZetGames-AimLock V4.3 | OFFICIAL RELEASE (VPN AUTO + LOCKED)
     Theme: Blue & Black Hacker Style
     Login: ✅ WAJIB KEY
-    Night Lock: ✅ ACTIVE (Auto Kick)
-    Features: VPN V2 + Fly Normal + Theme Switcher + Config Save/Load + NPC Detection + Aimbot + ESP + Radar
+    VPN V2: ✅ AUTO ON + LOCKED (Anti-Kick + Anti-Detect + Watchdog + Auto-Reconnect)
+    Night Lock: ✅ AUTO ON + LOCKED
+    All Features: FIXED
 --]]
 
 --==============================================================
@@ -29,7 +30,7 @@ pcall(function()
     SoundService.RespectFilteringEnabled = false
 end)
 
-print("[ZET] Loading V4.3 RESMI...")
+print("[ZET] Loading V4.3 RESMI (VPN AUTO)...")
 
 --==============================================================
 -- THEME (BIRU & HITAM)
@@ -50,7 +51,9 @@ local THEME = {
     YellowDot = Color3.fromRGB(255, 220, 0),
     GreenDot = Color3.fromRGB(0, 255, 100),
     Shield = Color3.fromRGB(0, 255, 200),
-    SuccessColor = Color3.fromRGB(0, 255, 200),
+    Success = Color3.fromRGB(0, 255, 200),
+    Locked = Color3.fromRGB(150, 150, 150),
+    LockedBG = Color3.fromRGB(40, 40, 40),
 }
 
 --==============================================================
@@ -87,8 +90,13 @@ end
 print("[ZET] GUI Parent: " .. tostring(ScreenGui.Parent and ScreenGui.Parent.Name or "NIL"))
 
 --==============================================================
--- VARIABLES
+-- GLOBAL VARIABLES
 --==============================================================
+local IsLoggedIn = false
+local MenuVisible = true
+local MenuKey = Enum.KeyCode.RightControl
+
+-- Aimbot
 local AimbotEnabled = false
 local AimbotTargetPart = "Head"
 local AimbotFOV = 250
@@ -97,7 +105,9 @@ local AimbotStickyType = nil
 local AimbotTeamCheck = false
 local AimbotWallCheck = false
 local FOVCircleEnabled = false
+local AimbotConnection = nil
 
+-- NPC
 local NPCDetectionEnabled = false
 local NPCEspEnabled = false
 local NPCFilterName = ""
@@ -105,7 +115,9 @@ local NPCMaxDistance = 500
 local NPCMaxCount = 50
 local NPCWhitelistKeywords = {"pet", "shop", "vendor", "trainer"}
 local NPCESPObjects = {}
+local NPCEspConnection = nil
 
+-- ESP
 local ESPEnabled = false
 local ESPObjects = {}
 local ChamsObjects = {}
@@ -113,7 +125,9 @@ local TracerColor = Color3.fromRGB(0, 150, 255)
 local RainbowESPEnabled = false
 local RainbowConnection = nil
 local RainbowHue = 0
+local ESPConnection = nil
 
+-- Radar
 local RadarEnabled = false
 local RadarRadius = 300
 local RadarZoom = 1.0
@@ -128,6 +142,7 @@ local RadarDrawingCenterDot = nil
 local RadarDrawingCompass = {}
 local RadarNearestLabel = nil
 
+-- Fly Normal
 local FlyNormalEnabled = false
 local FlyNormalConnection = nil
 local FlyNormalSpeed = 100
@@ -136,6 +151,7 @@ local FlyNormalVelocity = nil
 local FlyNormalGyro = nil
 local FlyKeys = {W=false, A=false, S=false, D=false, Space=false, Ctrl=false}
 
+-- Fly Void
 local FlyVoidEnabled = false
 local FlyVoidConnection = nil
 local FlyVoidHideMode = false
@@ -143,33 +159,43 @@ local FlyVoidOriginalY = nil
 local OriginalTransparency = {}
 local OriginalCanCollide = {}
 
+-- Fullbright
 local FullbrightEnabled = false
 local OriginalLighting = {}
 
+-- FPS
 local FPSBoostEnabled = false
 local OriginalSettings = {}
 
+-- Speed
 local SpeedHackEnabled = false
 local SpeedMultiplier = 100
 local MaxSpeed = 500
 local DefaultWalkSpeed = 16
+local SpeedConnection = nil
 
+-- Noclip
 local NoclipEnabled = false
 local NoclipConnection = nil
 
+-- Infinite Jump
 local InfiniteJumpEnabled = false
 local JumpConnection = nil
 
+-- Chat Spam
 local ChatSpamEnabled = false
 local ChatSpamText = "ZETGAMES-AIMLOCK"
 local ChatSpamDelay = 3
+local ChatSpamConnection = nil
 
+-- Sound ESP
 local SoundESPEnabled = false
 local SoundESPRadius = 100
 local SoundESPConnection = nil
 local SoundESPBeep = nil
 local LastBeepTime = 0
 
+-- Music
 local MusicPlayerEnabled = false
 local MusicSound = nil
 local MusicPlaylist = {
@@ -179,6 +205,7 @@ local MusicPlaylist = {
 local MusicCurrentIndex = 1
 local MusicVolume = 1
 
+-- Survival
 local AutoRespawnEnabled = false
 local AutoRespawnConnection = nil
 local LookAtEnabled = false
@@ -187,15 +214,16 @@ local AntiFlingConnection = nil
 local AntiAFKEnabled = false
 local AntiAFKConnection = nil
 
+-- Hitbox
 local HitboxEnabled = false
 local HitboxSize = 5
 local HitboxConnection = nil
 
--- VPN V2
-local VPNActive = false
-local AntiKickEnabled = false
-local AutoReconnectEnabled = false
-local NetworkWatchdogEnabled = false
+-- VPN V2 (AUTO + LOCKED)
+local VPNActive = true       -- 🔒 AUTO ON
+local AntiKickEnabled = true -- 🔒 AUTO ON
+local AutoReconnectEnabled = true
+local NetworkWatchdogEnabled = true
 local KickLog = {}
 local MaxKickLog = 20
 local ReconnectAttempts = 0
@@ -205,11 +233,13 @@ local WatchdogPingThreshold = 30
 local OriginalKick = nil
 local AutoReconnectConnection = nil
 local WatchdogConnection = nil
+local VPNLocked = true       -- 🔒 LOCKED
 
--- Night Lock
-local NightLockActive = false
+-- Night Lock (AUTO + LOCKED)
+local NightLockActive = true -- 🔒 AUTO ON
 local NightLockConnection = nil
 local NightLockKickLog = {}
+local NightLockLocked = true -- 🔒 LOCKED
 
 -- Teleport
 local TeleportPlayerList = {}
@@ -220,20 +250,7 @@ local SavedLocation = nil
 -- Server Hop
 local ServerHopRunning = false
 
--- Menu
-local IsLoggedIn = false
-local MenuVisible = true
-local MenuKey = Enum.KeyCode.RightControl
-
--- Theme Presets
-local ThemePresets = {
-    Biru = {Main=Color3.fromRGB(8,10,15), Panel=Color3.fromRGB(12,15,22), Section=Color3.fromRGB(0,25,60), Accent=Color3.fromRGB(0,150,255), AccentLight=Color3.fromRGB(80,200,255), AccentDark=Color3.fromRGB(0,80,160), ButtonActive=Color3.fromRGB(0,90,180), Text=Color3.fromRGB(0,180,255), TextLight=Color3.fromRGB(120,210,255)},
-    Merah = {Main=Color3.fromRGB(10,10,10), Panel=Color3.fromRGB(15,15,15), Section=Color3.fromRGB(40,0,0), Accent=Color3.fromRGB(255,0,0), AccentLight=Color3.fromRGB(255,80,80), AccentDark=Color3.fromRGB(150,0,0), ButtonActive=Color3.fromRGB(100,0,0), Text=Color3.fromRGB(255,0,0), TextLight=Color3.fromRGB(255,100,100)},
-    Hijau = {Main=Color3.fromRGB(8,15,8), Panel=Color3.fromRGB(12,22,12), Section=Color3.fromRGB(0,50,0), Accent=Color3.fromRGB(0,255,100), AccentLight=Color3.fromRGB(80,255,150), AccentDark=Color3.fromRGB(0,150,60), ButtonActive=Color3.fromRGB(0,120,50), Text=Color3.fromRGB(0,255,100), TextLight=Color3.fromRGB(120,255,180)},
-    Ungu = {Main=Color3.fromRGB(15,8,20), Panel=Color3.fromRGB(22,12,30), Section=Color3.fromRGB(50,0,70), Accent=Color3.fromRGB(180,0,255), AccentLight=Color3.fromRGB(220,120,255), AccentDark=Color3.fromRGB(100,0,150), ButtonActive=Color3.fromRGB(120,0,180), Text=Color3.fromRGB(200,100,255), TextLight=Color3.fromRGB(230,180,255)},
-}
-local CurrentThemeName = "Biru"
-
+-- FOV Circle
 local FOVCircle
 pcall(function()
     FOVCircle = Drawing.new("Circle")
@@ -302,7 +319,7 @@ local function Notify(title, message, duration)
 end
 
 --==============================================================
--- NIGHT LOCK (AUTO KICK) — OFFICIAL ONLY
+-- 🔒 NIGHT LOCK (AUTO + LOCKED)
 --==============================================================
 local function ActivateNightLock()
     NightLockActive = true
@@ -338,12 +355,16 @@ local function ActivateNightLock()
 end
 
 local function DeactivateNightLock()
+    if NightLockLocked then
+        Notify("🔒 Night Lock", "> LOCKED - tidak bisa dimatiin", 2)
+        return
+    end
     NightLockActive = false
     if NightLockConnection then NightLockConnection:Disconnect(); NightLockConnection = nil end
 end
 
 --==============================================================
--- VPN V2 FUNCTIONS
+-- 🔒 VPN V2 (AUTO + LOCKED)
 --==============================================================
 local function AddKickLog(message, status)
     table.insert(KickLog, 1, {
@@ -395,12 +416,15 @@ local function ActivateAntiKick()
 end
 
 local function DeactivateAntiKick()
+    if VPNLocked then
+        Notify("🔒 VPN V2", "> LOCKED - tidak bisa dimatiin", 2)
+        return
+    end
     if OriginalKick then
         pcall(function()
             LocalPlayer.Kick = OriginalKick
         end)
     end
-    Notify("🛡️ VPN V2", "> Anti-Kick OFF", 2)
 end
 
 local function AttemptReconnect()
@@ -430,8 +454,8 @@ local function ActivateAutoReconnect()
 end
 
 local function DeactivateAutoReconnect()
+    if VPNLocked then return end
     if AutoReconnectConnection then AutoReconnectConnection:Disconnect(); AutoReconnectConnection = nil end
-    Notify("🔄 VPN V2", "> Auto-Reconnect OFF", 2)
 end
 
 local function ActivateWatchdog()
@@ -453,8 +477,8 @@ local function ActivateWatchdog()
 end
 
 local function DeactivateWatchdog()
+    if VPNLocked then return end
     if WatchdogConnection then WatchdogConnection:Disconnect(); WatchdogConnection = nil end
-    Notify("📡 VPN V2", "> Watchdog OFF", 2)
 end
 
 --==============================================================
@@ -498,16 +522,22 @@ local function GetNPCs()
 end
 
 --==============================================================
--- FLY NORMAL
+-- 🛫 FLY NORMAL (FIXED)
 --==============================================================
 local function EnableFlyNormal()
     local char = LocalPlayer.Character
-    if not char then return end
+    if not char then
+        Notify("Fly Normal", "> No character", 2)
+        return
+    end
     local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
+    if not root then
+        Notify("Fly Normal", "> No root", 2)
+        return
+    end
 
-    if FlyNormalVelocity then FlyNormalVelocity:Destroy() end
-    if FlyNormalGyro then FlyNormalGyro:Destroy() end
+    if FlyNormalVelocity then pcall(function() FlyNormalVelocity:Destroy() end) end
+    if FlyNormalGyro then pcall(function() FlyNormalGyro:Destroy() end) end
 
     FlyNormalVelocity = Instance.new("BodyVelocity")
     FlyNormalVelocity.Velocity = Vector3.new(0, 0, 0)
@@ -559,7 +589,7 @@ local function DisableFlyNormal()
 end
 
 --==============================================================
--- FLY VOID
+-- 🕳️ FLY VOID (FIXED)
 --==============================================================
 local function EnableFlyVoid()
     if FlyVoidConnection then FlyVoidConnection:Disconnect() end
@@ -649,7 +679,7 @@ local function DisableFlyVoid()
 end
 
 --==============================================================
--- FULLBRIGHT / FPS / SPEED / NOCLIP / JUMP / SPAM / SOUND / MUSIC
+-- FULLBRIGHT / FPS / SPEED / NOCLIP / JUMP (FIXED)
 --==============================================================
 local function EnableFullbright()
     OriginalLighting.Ambient = Lighting.Ambient
@@ -700,10 +730,18 @@ local function DisableFPSBoost()
     end)
 end
 
-local function ApplySpeedHack()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = SpeedHackEnabled and SpeedMultiplier or DefaultWalkSpeed
-    end
+-- Speed Hack with dedicated loop
+local function StartSpeedLoop()
+    if SpeedConnection then SpeedConnection:Disconnect() end
+    SpeedConnection = RunService.Heartbeat:Connect(function()
+        if not SpeedHackEnabled then return end
+        if LocalPlayer.Character then
+            local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if hum then
+                hum.WalkSpeed = SpeedMultiplier
+            end
+        end
+    end)
 end
 
 local function EnableNoclip()
@@ -734,6 +772,9 @@ local function DisableInfiniteJump()
     if JumpConnection then JumpConnection:Disconnect(); JumpConnection = nil end
 end
 
+--==============================================================
+-- CHAT SPAM / SOUND / MUSIC (FIXED)
+--==============================================================
 local function SendChatMessage(message)
     pcall(function()
         local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
@@ -745,6 +786,10 @@ local function SendChatMessage(message)
 end
 
 local function StartChatSpamLoop()
+    if ChatSpamConnection then ChatSpamConnection:Disconnect() end
+    ChatSpamConnection = RunService.Heartbeat:Connect(function()
+        -- Spam pakai delay terpisah
+    end)
     task.spawn(function()
         while ChatSpamEnabled do
             task.wait(ChatSpamDelay)
@@ -820,6 +865,9 @@ local function PrevMusic()
     if MusicPlayerEnabled then PlayMusic() end
 end
 
+--==============================================================
+-- SURVIVAL (FIXED)
+--==============================================================
 local function StartAutoRespawn()
     if AutoRespawnConnection then AutoRespawnConnection:Disconnect() end
     AutoRespawnConnection = RunService.Heartbeat:Connect(function()
@@ -914,7 +962,7 @@ local function StopHitboxExpander()
 end
 
 --==============================================================
--- ESP
+-- ESP (FIXED)
 --==============================================================
 local function HSVToRGB(h, s, v)
     local r, g, b
@@ -1117,7 +1165,7 @@ local function UpdateNPCEsp()
 end
 
 --==============================================================
--- AIMBOT
+-- AIMBOT (FIXED)
 --==============================================================
 local function IsSameTeam(player)
     if not AimbotTeamCheck then return false end
@@ -1331,7 +1379,7 @@ local function DoJoinByJobId(jobId)
 end
 
 --==============================================================
--- TELEPORT KE ORANG
+-- TELEPORT
 --==============================================================
 local function TeleportToPlayer(targetPlayer)
     if not targetPlayer or not targetPlayer.Character then return end
@@ -1424,7 +1472,7 @@ local function LoadLocation()
 end
 
 --==============================================================
--- MAIN LOOP
+-- MAIN LOOP (FIXED)
 --==============================================================
 RunService.RenderStepped:Connect(function()
     pcall(function()
@@ -1432,7 +1480,12 @@ RunService.RenderStepped:Connect(function()
         UpdateESP()
         UpdateNPCEsp()
         if AimbotEnabled then RunAimbot() end
-        if SpeedHackEnabled then ApplySpeedHack() end
+        if SpeedHackEnabled then
+            if LocalPlayer.Character then
+                local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if hum then hum.WalkSpeed = SpeedMultiplier end
+            end
+        end
         if LookAtEnabled then LookAtPlayer() end
         if FOVCircle and FOVCircleEnabled then
             FOVCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
@@ -1443,6 +1496,9 @@ RunService.RenderStepped:Connect(function()
         end
     end)
 end)
+
+-- Speed loop terpisah biar gak ketiban render step
+StartSpeedLoop()
 
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
@@ -1502,8 +1558,8 @@ local function CreateUI()
     LTag.Size = UDim2.new(1, -20, 0, 18)
     LTag.Position = UDim2.new(0, 10, 0, 45)
     LTag.BackgroundTransparency = 1
-    LTag.Text = "[ OFFICIAL RELEASE - NIGHT LOCK ACTIVE ]"
-    LTag.TextColor3 = THEME.SuccessColor
+    LTag.Text = "[ OFFICIAL - VPN AUTO ON ]"
+    LTag.TextColor3 = THEME.Success
     LTag.Font = Enum.Font.Code
     LTag.TextSize = 9
     LTag.ZIndex = 302
@@ -1554,8 +1610,8 @@ local function CreateUI()
     LFooter.Size = UDim2.new(1, -20, 0, 18)
     LFooter.Position = UDim2.new(0, 10, 0, 148)
     LFooter.BackgroundTransparency = 1
-    LFooter.Text = "> VPN V2 + NPC + FLY + THEME"
-    LFooter.TextColor3 = THEME.SuccessColor
+    LFooter.Text = "> VPN V2 + NIGHT LOCK = AUTO ON"
+    LFooter.TextColor3 = THEME.Success
     LFooter.Font = Enum.Font.Code
     LFooter.TextSize = 8
     LFooter.ZIndex = 302
@@ -1608,8 +1664,8 @@ local function CreateUI()
     LTag2.Size = UDim2.new(1, -30, 0, 20)
     LTag2.Position = UDim2.new(0, 15, 0, 82)
     LTag2.BackgroundTransparency = 1
-    LTag2.Text = "[ RESMI - NIGHT LOCK ACTIVE ]"
-    LTag2.TextColor3 = THEME.SuccessColor
+    LTag2.Text = "[ VPN + NIGHT LOCK AUTO ON ]"
+    LTag2.TextColor3 = THEME.Success
     LTag2.Font = Enum.Font.Code
     LTag2.TextSize = 10
     LTag2.TextXAlignment = Enum.TextXAlignment.Left
@@ -1720,10 +1776,10 @@ local function CreateUI()
     TitleText.Size = UDim2.new(1, -50, 1, 0)
     TitleText.Position = UDim2.new(0, 10, 0, 0)
     TitleText.BackgroundTransparency = 1
-    TitleText.Text = "● ZETGAMES V4.3 [RESMI]"
+    TitleText.Text = "● ZETGAMES V4.3 [RESMI + VPN AUTO]"
     TitleText.TextColor3 = THEME.Text
     TitleText.Font = Enum.Font.Code
-    TitleText.TextSize = 11
+    TitleText.TextSize = 10
     TitleText.TextXAlignment = Enum.TextXAlignment.Left
     TitleText.ZIndex = 12
     TitleText.Parent = TitleBar
@@ -1749,12 +1805,12 @@ local function CreateUI()
     ScrollFrame.BorderSizePixel = 0
     ScrollFrame.ScrollBarThickness = 6
     ScrollFrame.ScrollBarImageColor3 = THEME.Accent
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 4000)
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 3800)
     ScrollFrame.ZIndex = 11
     ScrollFrame.Parent = MainHub
 
     local ScrollContent = Instance.new("Frame")
-    ScrollContent.Size = UDim2.new(1, 0, 0, 4000)
+    ScrollContent.Size = UDim2.new(1, 0, 0, 3800)
     ScrollContent.BackgroundTransparency = 1
     ScrollContent.ZIndex = 11
     ScrollContent.Parent = ScrollFrame
@@ -1800,6 +1856,26 @@ local function CreateUI()
         return btn
     end
 
+    local function LockedToggle(text, y)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -20, 0, 36)
+        btn.Position = UDim2.new(0, 10, 0, y)
+        btn.BackgroundColor3 = THEME.LockedBG
+        btn.BorderColor3 = THEME.Locked
+        btn.BorderSizePixel = 1
+        btn.Text = text
+        btn.TextColor3 = THEME.Locked
+        btn.Font = Enum.Font.Code
+        btn.TextSize = 11
+        btn.ZIndex = 12
+        btn.Parent = ScrollContent
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+        btn.MouseButton1Click:Connect(function()
+            Notify("🔒 Locked", "> Fitur ini tidak bisa dimatiin", 2)
+        end)
+        return btn
+    end
+
     local function Input(placeholder, y, defaultText)
         local tb = Instance.new("TextBox")
         tb.Size = UDim2.new(1, -20, 0, 30)
@@ -1837,48 +1913,16 @@ local function CreateUI()
         return b
     end
 
-    -- ==================== NIGHT LOCK STATUS ====================
-    Section("=== 🔒 NIGHT LOCK (AUTO KICK) ===", 10)
-
-    local NLStatus = Instance.new("TextLabel")
-    NLStatus.Size = UDim2.new(1, -20, 0, 30)
-    NLStatus.Position = UDim2.new(0, 10, 0, 42)
-    NLStatus.BackgroundColor3 = Color3.fromRGB(0, 40, 20)
-    NLStatus.BorderColor3 = THEME.SuccessColor
-    NLStatus.BorderSizePixel = 1
-    NLStatus.Text = "> NIGHT LOCK: ✅ ACTIVE"
-    NLStatus.TextColor3 = THEME.SuccessColor
-    NLStatus.Font = Enum.Font.Code
-    NLStatus.TextSize = 12
-    NLStatus.ZIndex = 12
-    NLStatus.Parent = ScrollContent
-    Instance.new("UICorner", NLStatus).CornerRadius = UDim.new(0, 4)
-
-    local NLInfo = Instance.new("TextLabel")
-    NLInfo.Size = UDim2.new(1, -20, 0, 55)
-    NLInfo.Position = UDim2.new(0, 10, 0, 77)
-    NLInfo.BackgroundColor3 = THEME.PanelBG
-    NLInfo.BorderColor3 = THEME.Accent
-    NLInfo.BorderSizePixel = 1
-    NLInfo.Text = "> Auto Kick: ON\n> Scan: Player + Server\n> Mode: RESMI (OFFICIAL)"
-    NLInfo.TextColor3 = THEME.TextLight
-    NLInfo.Font = Enum.Font.Code
-    NLInfo.TextSize = 10
-    NLInfo.TextXAlignment = Enum.TextXAlignment.Left
-    NLInfo.ZIndex = 12
-    NLInfo.Parent = ScrollContent
-    Instance.new("UICorner", NLInfo).CornerRadius = UDim.new(0, 4)
-
-    -- ==================== VPN V2 ====================
-    Section("=== 🔒 VPN V2 (ANTI-KICK) ===", 145)
+    -- ==================== 🔒 VPN V2 (LOCKED) ====================
+    Section("=== 🔒 VPN V2 (AUTO + LOCKED) ===", 10)
 
     local VPNMasterBtn = Instance.new("TextButton")
     VPNMasterBtn.Size = UDim2.new(1, -20, 0, 42)
-    VPNMasterBtn.Position = UDim2.new(0, 10, 0, 177)
-    VPNMasterBtn.BackgroundColor3 = THEME.ButtonBG
+    VPNMasterBtn.Position = UDim2.new(0, 10, 0, 42)
+    VPNMasterBtn.BackgroundColor3 = THEME.ButtonActive
     VPNMasterBtn.BorderColor3 = THEME.Shield
     VPNMasterBtn.BorderSizePixel = 2
-    VPNMasterBtn.Text = "> 🔒 VPN V2: OFF"
+    VPNMasterBtn.Text = "> 🔒 VPN V2: ON (LOCKED)"
     VPNMasterBtn.TextColor3 = THEME.Shield
     VPNMasterBtn.Font = Enum.Font.Code
     VPNMasterBtn.TextSize = 13
@@ -1886,48 +1930,51 @@ local function CreateUI()
     VPNMasterBtn.Parent = ScrollContent
     Instance.new("UICorner", VPNMasterBtn).CornerRadius = UDim.new(0, 5)
     VPNMasterBtn.MouseButton1Click:Connect(function()
-        if VPNActive then
-            VPNActive = false
-            AntiKickEnabled = false
-            DeactivateAntiKick()
-            VPNMasterBtn.Text = "> 🔒 VPN V2: OFF"
-            VPNMasterBtn.BackgroundColor3 = THEME.ButtonBG
-        else
-            VPNActive = true
-            AntiKickEnabled = true
-            ActivateAntiKick()
-            VPNMasterBtn.Text = "> 🔒 VPN V2: ON"
-            VPNMasterBtn.BackgroundColor3 = THEME.ButtonActive
-        end
+        Notify("🔒 VPN V2", "> LOCKED - tidak bisa dimatiin", 2)
     end)
 
-    Toggle("> 🛡️ ANTI-KICK: OFF", 225, function(btn)
-        AntiKickEnabled = not AntiKickEnabled
-        btn.Text = AntiKickEnabled and "> 🛡️ ANTI-KICK: ON" or "> 🛡️ ANTI-KICK: OFF"
-        btn.BackgroundColor3 = AntiKickEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AntiKickEnabled then ActivateAntiKick() else DeactivateAntiKick() end
-    end)
+    LockedToggle("> 🛡️ ANTI-KICK: ON (LOCKED)", 90)
+    LockedToggle("> 🔄 AUTO-RECONNECT: ON (LOCKED)", 130)
+    LockedToggle("> 📡 WATCHDOG: ON (LOCKED)", 170)
 
-    Toggle("> 🔄 AUTO-RECONNECT: OFF", 265, function(btn)
-        AutoReconnectEnabled = not AutoReconnectEnabled
-        btn.Text = AutoReconnectEnabled and "> 🔄 AUTO-RECONNECT: ON" or "> 🔄 AUTO-RECONNECT: OFF"
-        btn.BackgroundColor3 = AutoReconnectEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AutoReconnectEnabled then ActivateAutoReconnect() else DeactivateAutoReconnect() end
-    end)
+    -- ==================== 🔒 NIGHT LOCK (LOCKED) ====================
+    Section("=== 🔒 NIGHT LOCK (AUTO + LOCKED) ===", 220)
 
-    Toggle("> 📡 NETWORK WATCHDOG: OFF", 305, function(btn)
-        NetworkWatchdogEnabled = not NetworkWatchdogEnabled
-        btn.Text = NetworkWatchdogEnabled and "> 📡 WATCHDOG: ON" or "> 📡 WATCHDOG: OFF"
-        btn.BackgroundColor3 = NetworkWatchdogEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if NetworkWatchdogEnabled then ActivateWatchdog() else DeactivateWatchdog() end
-    end)
+    local NLStatus = Instance.new("TextLabel")
+    NLStatus.Size = UDim2.new(1, -20, 0, 30)
+    NLStatus.Position = UDim2.new(0, 10, 0, 252)
+    NLStatus.BackgroundColor3 = Color3.fromRGB(0, 40, 20)
+    NLStatus.BorderColor3 = THEME.Success
+    NLStatus.BorderSizePixel = 1
+    NLStatus.Text = "> NIGHT LOCK: ✅ ACTIVE (LOCKED)"
+    NLStatus.TextColor3 = THEME.Success
+    NLStatus.Font = Enum.Font.Code
+    NLStatus.TextSize = 11
+    NLStatus.ZIndex = 12
+    NLStatus.Parent = ScrollContent
+    Instance.new("UICorner", NLStatus).CornerRadius = UDim.new(0, 4)
+
+    local NLInfo = Instance.new("TextLabel")
+    NLInfo.Size = UDim2.new(1, -20, 0, 40)
+    NLInfo.Position = UDim2.new(0, 10, 0, 287)
+    NLInfo.BackgroundColor3 = THEME.PanelBG
+    NLInfo.BorderColor3 = THEME.Accent
+    NLInfo.BorderSizePixel = 1
+    NLInfo.Text = "> Auto Kick: ON\n> Tidak bisa dimatiin"
+    NLInfo.TextColor3 = THEME.TextLight
+    NLInfo.Font = Enum.Font.Code
+    NLInfo.TextSize = 9
+    NLInfo.TextXAlignment = Enum.TextXAlignment.Left
+    NLInfo.ZIndex = 12
+    NLInfo.Parent = ScrollContent
+    Instance.new("UICorner", NLInfo).CornerRadius = UDim.new(0, 4)
 
     -- ==================== USER INFO ====================
-    Section("=== USER INFORMATION ===", 355)
+    Section("=== USER INFORMATION ===", 340)
 
     local UIF = Instance.new("Frame")
     UIF.Size = UDim2.new(1, -20, 0, 80)
-    UIF.Position = UDim2.new(0, 10, 0, 387)
+    UIF.Position = UDim2.new(0, 10, 0, 372)
     UIF.BackgroundColor3 = THEME.PanelBG
     UIF.BorderColor3 = THEME.Accent
     UIF.BorderSizePixel = 1
@@ -1963,8 +2010,8 @@ local function CreateUI()
     BuildLbl.Size = UDim2.new(1, -15, 0, 22)
     BuildLbl.Position = UDim2.new(0, 10, 0, 51)
     BuildLbl.BackgroundTransparency = 1
-    BuildLbl.Text = "> BUILD: V4.3 RESMI"
-    BuildLbl.TextColor3 = THEME.SuccessColor
+    BuildLbl.Text = "> BUILD: V4.3 RESMI + VPN AUTO"
+    BuildLbl.TextColor3 = THEME.Success
     BuildLbl.Font = Enum.Font.Code
     BuildLbl.TextSize = 11
     BuildLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -1981,30 +2028,29 @@ local function CreateUI()
     end)
 
     -- ==================== MAIN FEATURES ====================
-    Section("=== MAIN FEATURES ===", 480)
+    Section("=== MAIN FEATURES ===", 465)
 
-    Toggle("> FPS BOOST: OFF", 512, function(btn)
+    Toggle("> FPS BOOST: OFF", 497, function(btn)
         FPSBoostEnabled = not FPSBoostEnabled
         btn.Text = FPSBoostEnabled and "> FPS BOOST: ON" or "> FPS BOOST: OFF"
         btn.BackgroundColor3 = FPSBoostEnabled and THEME.ButtonActive or THEME.ButtonBG
         if FPSBoostEnabled then EnableFPSBoost() else DisableFPSBoost() end
     end)
 
-    Toggle("> FULLBRIGHT: OFF", 552, function(btn)
+    Toggle("> FULLBRIGHT: OFF", 537, function(btn)
         FullbrightEnabled = not FullbrightEnabled
         btn.Text = FullbrightEnabled and "> FULLBRIGHT: ON" or "> FULLBRIGHT: OFF"
         btn.BackgroundColor3 = FullbrightEnabled and THEME.ButtonActive or THEME.ButtonBG
         if FullbrightEnabled then EnableFullbright() else DisableFullbright() end
     end)
 
-    Toggle("> SPEED HACK: OFF", 592, function(btn)
+    Toggle("> SPEED HACK: OFF", 577, function(btn)
         SpeedHackEnabled = not SpeedHackEnabled
         btn.Text = SpeedHackEnabled and "> SPEED HACK: ON" or "> SPEED HACK: OFF"
         btn.BackgroundColor3 = SpeedHackEnabled and THEME.ButtonActive or THEME.ButtonBG
-        ApplySpeedHack()
     end)
 
-    local SpeedInput = Input("> Speed (16-500)", 632, tostring(SpeedMultiplier))
+    local SpeedInput = Input("> Speed (16-500)", 617, tostring(SpeedMultiplier))
     SpeedInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local ns = tonumber(SpeedInput.Text)
@@ -2013,14 +2059,14 @@ local function CreateUI()
         end
     end)
 
-    Toggle("> INFINITE JUMP: OFF", 668, function(btn)
+    Toggle("> INFINITE JUMP: OFF", 653, function(btn)
         InfiniteJumpEnabled = not InfiniteJumpEnabled
         btn.Text = InfiniteJumpEnabled and "> INFINITE JUMP: ON" or "> INFINITE JUMP: OFF"
         btn.BackgroundColor3 = InfiniteJumpEnabled and THEME.ButtonActive or THEME.ButtonBG
         if InfiniteJumpEnabled then EnableInfiniteJump() else DisableInfiniteJump() end
     end)
 
-    Toggle("> NOCLIP: OFF", 708, function(btn)
+    Toggle("> NOCLIP: OFF", 693, function(btn)
         NoclipEnabled = not NoclipEnabled
         btn.Text = NoclipEnabled and "> NOCLIP: ON" or "> NOCLIP: OFF"
         btn.BackgroundColor3 = NoclipEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2028,9 +2074,9 @@ local function CreateUI()
     end)
 
     -- ==================== FLY NORMAL ====================
-    Section("=== 🛫 FLY NORMAL (SKY) ===", 756)
+    Section("=== 🛫 FLY NORMAL ===", 741)
 
-    Toggle("> FLY NORMAL: OFF", 788, function(btn)
+    Toggle("> FLY NORMAL: OFF", 773, function(btn)
         FlyNormalEnabled = not FlyNormalEnabled
         if FlyNormalEnabled then
             btn.Text = "> FLY NORMAL: ON"
@@ -2043,16 +2089,16 @@ local function CreateUI()
         end
     end)
 
-    Half("> MODE: FREE", 828, 0, function(btn)
+    Half("> MODE: FREE", 813, 0, function(btn)
         FlyNormalMode = FlyNormalMode == "Free" and "Hover" or "Free"
         btn.Text = "> MODE: " .. string.upper(FlyNormalMode)
     end)
 
-    Half("> KEY: F/WASD", 828, 0.5, function(btn)
+    Half("> KEY: F/WASD", 813, 0.5, function(btn)
         Notify("Fly", "> WASD + Space = Gerak", 2)
     end)
 
-    local FlySpeedInput = Input("> Fly Speed (10-500)", 864, tostring(FlyNormalSpeed))
+    local FlySpeedInput = Input("> Fly Speed (10-500)", 849, tostring(FlyNormalSpeed))
     FlySpeedInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local ns = tonumber(FlySpeedInput.Text)
@@ -2062,15 +2108,15 @@ local function CreateUI()
     end)
 
     -- ==================== NPC ====================
-    Section("=== 🎯 NPC DETECTION ===", 908)
+    Section("=== 🎯 NPC DETECTION ===", 893)
 
-    Toggle("> NPC DETECTION: OFF", 940, function(btn)
+    Toggle("> NPC DETECTION: OFF", 925, function(btn)
         NPCDetectionEnabled = not NPCDetectionEnabled
         btn.Text = NPCDetectionEnabled and "> NPC DETECTION: ON" or "> NPC DETECTION: OFF"
         btn.BackgroundColor3 = NPCDetectionEnabled and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    Toggle("> NPC ESP: OFF", 980, function(btn)
+    Toggle("> NPC ESP: OFF", 965, function(btn)
         NPCEspEnabled = not NPCEspEnabled
         btn.Text = NPCEspEnabled and "> NPC ESP: ON" or "> NPC ESP: OFF"
         btn.BackgroundColor3 = NPCEspEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2079,17 +2125,17 @@ local function CreateUI()
         end
     end)
 
-    local NPCFilterInput = Input("> Filter nama NPC", 1020, NPCFilterName)
+    local NPCFilterInput = Input("> Filter nama NPC", 1005, NPCFilterName)
     NPCFilterInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then NPCFilterName = NPCFilterInput.Text end
     end)
 
     -- ==================== AIMBOT ====================
-    Section("=== 🎯 AIMBOT ===", 1064)
+    Section("=== 🎯 AIMBOT ===", 1049)
 
     local AimbotBtn = Instance.new("TextButton")
     AimbotBtn.Size = UDim2.new(1, -20, 0, 42)
-    AimbotBtn.Position = UDim2.new(0, 10, 0, 1096)
+    AimbotBtn.Position = UDim2.new(0, 10, 0, 1081)
     AimbotBtn.BackgroundColor3 = THEME.ButtonBG
     AimbotBtn.BorderColor3 = THEME.Accent
     AimbotBtn.BorderSizePixel = 2
@@ -2113,19 +2159,19 @@ local function CreateUI()
         end
     end)
 
-    Half("> FOV CIRCLE: OFF", 1148, 0, function(btn)
+    Half("> FOV CIRCLE: OFF", 1133, 0, function(btn)
         FOVCircleEnabled = not FOVCircleEnabled
         btn.Text = FOVCircleEnabled and "> FOV: ON" or "> FOV: OFF"
         btn.BackgroundColor3 = FOVCircleEnabled and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    Half("> TEAM CHECK: OFF", 1148, 0.5, function(btn)
+    Half("> TEAM CHECK: OFF", 1133, 0.5, function(btn)
         AimbotTeamCheck = not AimbotTeamCheck
         btn.Text = AimbotTeamCheck and "> TEAM: ON" or "> TEAM: OFF"
         btn.BackgroundColor3 = AimbotTeamCheck and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    local FOVInput = Input("> FOV (50-2000)", 1186, tostring(AimbotFOV))
+    local FOVInput = Input("> FOV (50-2000)", 1171, tostring(AimbotFOV))
     FOVInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local nf = tonumber(FOVInput.Text)
@@ -2134,7 +2180,7 @@ local function CreateUI()
         end
     end)
 
-    Toggle("> WALL CHECK: OFF", 1222, function(btn)
+    Toggle("> WALL CHECK: OFF", 1207, function(btn)
         AimbotWallCheck = not AimbotWallCheck
         btn.Text = AimbotWallCheck and "> WALL CHECK: ON" or "> WALL CHECK: OFF"
         btn.BackgroundColor3 = AimbotWallCheck and THEME.ButtonActive or THEME.ButtonBG
@@ -2142,9 +2188,9 @@ local function CreateUI()
     end)
 
     -- ==================== ESP ====================
-    Section("=== 👁️ FULL ESP ===", 1270)
+    Section("=== 👁️ FULL ESP ===", 1255)
 
-    Toggle("> ESP MASTER: OFF", 1302, function(btn)
+    Toggle("> ESP MASTER: OFF", 1287, function(btn)
         ESPEnabled = not ESPEnabled
         btn.Text = ESPEnabled and "> ESP MASTER: ON" or "> ESP MASTER: OFF"
         btn.BackgroundColor3 = ESPEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2153,7 +2199,7 @@ local function CreateUI()
         end
     end)
 
-    Toggle("> 🌈 RAINBOW ESP: OFF", 1342, function(btn)
+    Toggle("> 🌈 RAINBOW ESP: OFF", 1327, function(btn)
         RainbowESPEnabled = not RainbowESPEnabled
         btn.Text = RainbowESPEnabled and "> 🌈 RAINBOW: ON" or "> 🌈 RAINBOW: OFF"
         btn.BackgroundColor3 = RainbowESPEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2161,9 +2207,9 @@ local function CreateUI()
     end)
 
     -- ==================== RADAR ====================
-    Section("=== 📡 RADAR BULAT ===", 1390)
+    Section("=== 📡 RADAR BULAT ===", 1375)
 
-    Toggle("> RADAR: OFF", 1422, function(btn)
+    Toggle("> RADAR: OFF", 1407, function(btn)
         RadarEnabled = not RadarEnabled
         if RadarEnabled then
             btn.Text = "> RADAR: ON"
@@ -2177,18 +2223,18 @@ local function CreateUI()
     end)
 
     -- ==================== SERVER HOP ====================
-    Section("=== 🌐 SERVER HOP ===", 1470)
+    Section("=== 🌐 SERVER HOP ===", 1455)
 
-    Toggle("> 🌐 SERVER HOP (RANDOM)", 1502, function(btn) DoServerHop() end)
-    Half("> 🎯 BEST SERVER", 1542, 0, function(btn) DoBestServerHop() end)
-    Half("> 🔄 REJOIN", 1542, 0.5, function(btn) DoRejoin() end)
+    Toggle("> 🌐 SERVER HOP (RANDOM)", 1487, function(btn) DoServerHop() end)
+    Half("> 🎯 BEST SERVER", 1527, 0, function(btn) DoBestServerHop() end)
+    Half("> 🔄 REJOIN", 1527, 0.5, function(btn) DoRejoin() end)
 
     -- ==================== TELEPORT KE ORANG ====================
-    Section("=== 🆕 TELEPORT KE ORANG ===", 1590)
+    Section("=== 🆕 TELEPORT KE ORANG ===", 1575)
 
     TeleportListFrame = Instance.new("ScrollingFrame")
     TeleportListFrame.Size = UDim2.new(1, -20, 0, 150)
-    TeleportListFrame.Position = UDim2.new(0, 10, 0, 1622)
+    TeleportListFrame.Position = UDim2.new(0, 10, 0, 1607)
     TeleportListFrame.BackgroundColor3 = THEME.PanelBG
     TeleportListFrame.BorderColor3 = THEME.Accent
     TeleportListFrame.BorderSizePixel = 1
@@ -2213,9 +2259,9 @@ local function CreateUI()
     end)
 
     -- ==================== HITBOX ====================
-    Section("=== 🎯 HITBOX EXPANDER ===", 1791)
+    Section("=== 🎯 HITBOX EXPANDER ===", 1776)
 
-    Toggle("> HITBOX: OFF", 1823, function(btn)
+    Toggle("> HITBOX: OFF", 1808, function(btn)
         HitboxEnabled = not HitboxEnabled
         if HitboxEnabled then
             btn.Text = "> HITBOX: ON"
@@ -2228,7 +2274,7 @@ local function CreateUI()
         end
     end)
 
-    local HitboxInput = Input("> Size (1-1000)", 1863, tostring(HitboxSize))
+    local HitboxInput = Input("> Size (1-1000)", 1848, tostring(HitboxSize))
     HitboxInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local nh = tonumber(HitboxInput.Text)
@@ -2238,9 +2284,9 @@ local function CreateUI()
     end)
 
     -- ==================== ANTI-AFK ====================
-    Section("=== 😴 ANTI-AFK ===", 1909)
+    Section("=== 😴 ANTI-AFK ===", 1894)
 
-    Toggle("> ANTI-AFK: OFF", 1941, function(btn)
+    Toggle("> ANTI-AFK: OFF", 1926, function(btn)
         AntiAFKEnabled = not AntiAFKEnabled
         btn.Text = AntiAFKEnabled and "> ANTI-AFK: ON" or "> ANTI-AFK: OFF"
         btn.BackgroundColor3 = AntiAFKEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2248,32 +2294,32 @@ local function CreateUI()
     end)
 
     -- ==================== SURVIVAL ====================
-    Section("=== SURVIVAL ===", 1989)
+    Section("=== SURVIVAL ===", 1974)
 
-    Toggle("> AUTO RESPAWN: OFF", 2021, function(btn)
+    Toggle("> AUTO RESPAWN: OFF", 2006, function(btn)
         AutoRespawnEnabled = not AutoRespawnEnabled
         btn.Text = AutoRespawnEnabled and "> AUTO RESPAWN: ON" or "> AUTO RESPAWN: OFF"
         btn.BackgroundColor3 = AutoRespawnEnabled and THEME.ButtonActive or THEME.ButtonBG
         if AutoRespawnEnabled then StartAutoRespawn() else StopAutoRespawn() end
     end)
 
-    Toggle("> ANTI-FLING: OFF", 2061, function(btn)
+    Toggle("> ANTI-FLING: OFF", 2046, function(btn)
         AntiFlingEnabled = not AntiFlingEnabled
         btn.Text = AntiFlingEnabled and "> ANTI-FLING: ON" or "> ANTI-FLING: OFF"
         btn.BackgroundColor3 = AntiFlingEnabled and THEME.ButtonActive or THEME.ButtonBG
         if AntiFlingEnabled then StartAntiFling() else StopAntiFling() end
     end)
 
-    Toggle("> LOOK AT PLAYER: OFF", 2101, function(btn)
+    Toggle("> LOOK AT PLAYER: OFF", 2086, function(btn)
         LookAtEnabled = not LookAtEnabled
         btn.Text = LookAtEnabled and "> LOOK AT PLAYER: ON" or "> LOOK AT PLAYER: OFF"
         btn.BackgroundColor3 = LookAtEnabled and THEME.ButtonActive or THEME.ButtonBG
     end)
 
     -- ==================== FLY-VOID ====================
-    Section("=== 🕳️ FLY-VOID V2 ===", 2149)
+    Section("=== 🕳️ FLY-VOID V2 ===", 2134)
 
-    Toggle("> FLY-VOID: OFF", 2181, function(btn)
+    Toggle("> FLY-VOID: OFF", 2166, function(btn)
         FlyVoidEnabled = not FlyVoidEnabled
         if FlyVoidEnabled then
             btn.Text = "> FLY-VOID: ON"
@@ -2286,20 +2332,20 @@ local function CreateUI()
         end
     end)
 
-    Half("> HIDE: OFF", 2221, 0, function(btn)
+    Half("> HIDE: OFF", 2206, 0, function(btn)
         FlyVoidHideMode = not FlyVoidHideMode
         btn.Text = FlyVoidHideMode and "> HIDE: ON" or "> HIDE: OFF"
         btn.BackgroundColor3 = FlyVoidHideMode and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    Half("> KEY: V", 2221, 0.5, function(btn)
+    Half("> KEY: V", 2206, 0.5, function(btn)
         Notify("Fly-Void", "> Tekan V", 2)
     end)
 
     -- ==================== SOUND ESP ====================
-    Section("=== SOUND ESP ===", 2269)
+    Section("=== SOUND ESP ===", 2254)
 
-    Toggle("> SOUND ESP: OFF", 2301, function(btn)
+    Toggle("> SOUND ESP: OFF", 2286, function(btn)
         SoundESPEnabled = not SoundESPEnabled
         btn.Text = SoundESPEnabled and "> SOUND ESP: ON" or "> SOUND ESP: OFF"
         btn.BackgroundColor3 = SoundESPEnabled and THEME.ButtonActive or THEME.ButtonBG
@@ -2307,11 +2353,11 @@ local function CreateUI()
     end)
 
     -- ==================== MUSIC ====================
-    Section("=== 🎵 MUSIC PLAYLIST ===", 2349)
+    Section("=== 🎵 MUSIC PLAYLIST ===", 2334)
 
     local MusicNowLbl = Instance.new("TextLabel")
     MusicNowLbl.Size = UDim2.new(1, -20, 0, 22)
-    MusicNowLbl.Position = UDim2.new(0, 10, 0, 2381)
+    MusicNowLbl.Position = UDim2.new(0, 10, 0, 2366)
     MusicNowLbl.BackgroundTransparency = 1
     MusicNowLbl.Text = "> NOW: " .. MusicPlaylist[MusicCurrentIndex].Name
     MusicNowLbl.TextColor3 = THEME.Text
@@ -2321,37 +2367,37 @@ local function CreateUI()
     MusicNowLbl.ZIndex = 12
     MusicNowLbl.Parent = ScrollContent
 
-    Toggle("> MUSIC PLAYER: OFF", 2408, function(btn)
+    Toggle("> MUSIC PLAYER: OFF", 2393, function(btn)
         MusicPlayerEnabled = not MusicPlayerEnabled
         btn.Text = MusicPlayerEnabled and "> MUSIC PLAYER: ON" or "> MUSIC PLAYER: OFF"
         btn.BackgroundColor3 = MusicPlayerEnabled and THEME.ButtonActive or THEME.ButtonBG
         if MusicPlayerEnabled then PlayMusic() else StopMusic() end
     end)
 
-    Half("> ⏮ PREV", 2448, 0, function(btn) PrevMusic() end)
-    Half("> ⏭ NEXT", 2448, 0.5, function(btn) NextMusic() end)
+    Half("> ⏮ PREV", 2433, 0, function(btn) PrevMusic() end)
+    Half("> ⏭ NEXT", 2433, 0.5, function(btn) NextMusic() end)
 
     -- ==================== CHAT SPAM ====================
-    Section("=== CHAT SPAM ===", 2496)
+    Section("=== CHAT SPAM ===", 2481)
 
-    Toggle("> CHAT SPAM: OFF", 2528, function(btn)
+    Toggle("> CHAT SPAM: OFF", 2513, function(btn)
         ChatSpamEnabled = not ChatSpamEnabled
         btn.Text = ChatSpamEnabled and "> CHAT SPAM: ON" or "> CHAT SPAM: OFF"
         btn.BackgroundColor3 = ChatSpamEnabled and THEME.ButtonActive or THEME.ButtonBG
         if ChatSpamEnabled then StartChatSpamLoop() end
     end)
 
-    local ChatInput = Input("> Message", 2568, ChatSpamText)
+    local ChatInput = Input("> Message", 2553, ChatSpamText)
     ChatInput.FocusLost:Connect(function(enterPressed)
         if enterPressed and ChatInput.Text ~= "" then ChatSpamText = ChatInput.Text end
     end)
 
     -- ==================== TELEPORT ====================
-    Section("=== TELEPORT ===", 2614)
+    Section("=== TELEPORT ===", 2599)
 
-    Toggle("> TELEPORT TO MOUSE", 2646, function(btn) TeleportToMouse() end)
-    Half("> SAVE LOC", 2686, 0, function(btn) SaveLocation() end)
-    Half("> LOAD LOC", 2686, 0.5, function(btn) LoadLocation() end)
+    Toggle("> TELEPORT TO MOUSE", 2631, function(btn) TeleportToMouse() end)
+    Half("> SAVE LOC", 2671, 0, function(btn) SaveLocation() end)
+    Half("> LOAD LOC", 2671, 0.5, function(btn) LoadLocation() end)
 
     -- TOGGLE MENU BUTTON
     local ToggleMenuButton = Instance.new("TextButton")
@@ -2465,8 +2511,12 @@ local function CreateUI()
                 MenuVisible = true
                 StatusTxt.Text = "> ACCESS GRANTED..."
                 Notify("Success", "> WELCOME | " .. keyData.Level, 3)
-                Notify("NightLock", "> AUTO KICK ACTIVE", 3)
+                -- 🔒 AUTO ACTIVATE VPN + NIGHT LOCK
+                ActivateAntiKick()
+                ActivateAutoReconnect()
+                ActivateWatchdog()
                 ActivateNightLock()
+                Notify("🔒 AUTO ON", "> VPN + Night Lock ACTIVE", 3)
                 task.wait(0.3)
                 RefreshTeleportList()
             elseif os.time() < keyData.Expiry then
@@ -2479,8 +2529,12 @@ local function CreateUI()
                 local tl = keyData.Expiry - os.time()
                 local days = math.floor(tl / 86400)
                 Notify("Success", "> WELCOME | " .. days .. "d left", 3)
-                Notify("NightLock", "> AUTO KICK ACTIVE", 3)
+                -- 🔒 AUTO ACTIVATE VPN + NIGHT LOCK
+                ActivateAntiKick()
+                ActivateAutoReconnect()
+                ActivateWatchdog()
                 ActivateNightLock()
+                Notify("🔒 AUTO ON", "> VPN + Night Lock ACTIVE", 3)
                 task.wait(0.3)
                 RefreshTeleportList()
             else
@@ -2505,8 +2559,8 @@ local function CreateUI()
     -- ==================== LOADING ANIMATION ====================
     local loadingMessages = {
         "> LOADING V4.3 RESMI...",
-        "> INIT NIGHT LOCK...",
-        "> INIT VPN V2...",
+        "> LOCK VPN V2...",
+        "> LOCK NIGHT LOCK...",
         "> INIT NPC...",
         "> INIT FLY...",
         "> INIT AIMBOT...",
@@ -2530,7 +2584,7 @@ local function CreateUI()
         LoadingScreen.Visible = false
         LoginFrame.Visible = true
         Notify("V4.3 RESMI", "> ENTER ACCESS KEY", 3)
-        Notify("NightLock", "> ACTIVE setelah login", 3)
+        Notify("🔒 AUTO", "> VPN + Night Lock siap aktif", 3)
         print("[ZET] Login screen shown")
     end)
 end
