@@ -1,7 +1,8 @@
 --[[
-    ZetGames-AimLock-Advanserver | TIMER BUILD v4.4 (FIX v2)
+    ZetGames-AimLock-Advanserver | INFO BUILD v4.4
     Theme: Red & Black (TESTING)
-    Target Release: 30 September 2025 | 19:30 WIB | Rabu
+    Info: Update selesai 30 September 2025 | 19:30 WIB | Rabu
+    No Timer - No Auto Execute - Just Info Display
 --]]
 
 --==============================================================
@@ -23,8 +24,6 @@ local THEME = {
     AccentColor = Color3.fromRGB(255, 0, 0),
     AccentLight = Color3.fromRGB(255, 80, 80),
     AccentDark = Color3.fromRGB(150, 0, 0),
-    ButtonBG = Color3.fromRGB(25, 25, 25),
-    ButtonActive = Color3.fromRGB(100, 0, 0),
     TextColor = Color3.fromRGB(255, 0, 0),
     TextLight = Color3.fromRGB(255, 100, 100),
     WarningColor = Color3.fromRGB(255, 200, 0),
@@ -32,18 +31,7 @@ local THEME = {
 }
 
 --==============================================================
--- CONFIG — TARGET RELEASE
---==============================================================
-local TARGET_YEAR = 2025
-local TARGET_MONTH = 9   -- 9 = September
-local TARGET_DAY = 30
-local TARGET_HOUR = 19   -- 19:30
-local TARGET_MIN = 30
-
-local EXECUTE_URL = "https://raw.githubusercontent.com/arkaraffaza387-dotcom/Testing-Update/refs/heads/main/README.md"
-
---==============================================================
--- SCREEN GUI
+-- SCREEN GUI (FIXED - MULTIPLE FALLBACK)
 --==============================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZetGamesAimLockAdvanserver"
@@ -123,147 +111,33 @@ local function Notify(title, message, duration)
 end
 
 --==============================================================
--- FIX TOTAL: BANDINGKAN LANGSUNG PAKAI ANGKA
+-- INFO FRAME (MAIN UI)
 --==============================================================
--- Kita bandingkan angka tahun/bulan/tanggal/jam/menit
--- dari os.date("*t") yang mengembalikan waktu LOKAL DEVICE.
+local InfoFrame = Instance.new("Frame")
+InfoFrame.Size = UDim2.new(0, 400, 0, 420)
+InfoFrame.Position = UDim2.new(0.5, -200, 0.5, -210)
+InfoFrame.BackgroundColor3 = THEME.MainBG
+InfoFrame.BorderColor3 = THEME.AccentColor
+InfoFrame.BorderSizePixel = 3
+InfoFrame.ZIndex = 10
+InfoFrame.Visible = false
+InfoFrame.Parent = ScreenGui
+Instance.new("UICorner", InfoFrame).CornerRadius = UDim.new(0, 12)
 
-local function GetNowTable()
-    return os.date("*t")
-end
-
--- Konversi target ke "nomor urut" (format YYYYMMDDHHMM)
--- Contoh: 2025-09-30 19:30 → 202509301930
-local function ToNumber(tbl)
-    return tbl.year * 100000000
-         + tbl.month * 1000000
-         + tbl.day * 10000
-         + tbl.hour * 100
-         + tbl.min
-end
-
-local TARGET_NUM = TARGET_YEAR * 100000000
-                 + TARGET_MONTH * 1000000
-                 + TARGET_DAY * 10000
-                 + TARGET_HOUR * 100
-                 + TARGET_MIN
-
---==============================================================
--- HITUNG SISA WAKTU (PAKAI DETIK)
---==============================================================
-local function GetNowNum()
-    return ToNumber(GetNowTable())
-end
-
--- Hitung selisih dalam detik dengan cara akurat:
--- Kita ubah target ke epoch time lokal
-local function GetTargetEpoch()
-    -- os.time() menerima table dengan format lokal
-    -- jadi langsung aja, tidak perlu konversi WIB/UTC
-    return os.time({
-        year = TARGET_YEAR,
-        month = TARGET_MONTH,
-        day = TARGET_DAY,
-        hour = TARGET_HOUR,
-        min = TARGET_MIN,
-        sec = 0
-    })
-end
-
-local function GetNowEpoch()
-    return os.time()
-end
-
-local function FormatCountdown(seconds)
-    if seconds < 0 then seconds = 0 end
-    local days = math.floor(seconds / 86400)
-    local hours = math.floor((seconds % 86400) / 3600)
-    local mins = math.floor((seconds % 3600) / 60)
-    local secs = math.floor(seconds % 60)
-    return days, hours, mins, secs
-end
-
-local function IsTimeReached()
-    -- Bandingkan langsung pakai angka YYYYMMDDHHMM
-    local nowNum = GetNowNum()
-    return nowNum >= TARGET_NUM
-end
-
---==============================================================
--- DEBUG INFO
---==============================================================
-local function PrintDebug()
-    local nowTbl = GetNowTable()
-    local nowNum = GetNowNum()
-    local target = GetTargetEpoch()
-    local now = GetNowEpoch()
-    local remaining = target - now
-    
-    print("╔══════════════════════════════════════════╗")
-    print("║      ZETGAMES TIMER - DEBUG INFO v2      ║")
-    print("╠══════════════════════════════════════════╣")
-    print(string.format("║ Now (local):  %04d-%02d-%02d %02d:%02d:%02d",
-        nowTbl.year, nowTbl.month, nowTbl.day, nowTbl.hour, nowTbl.min, nowTbl.sec))
-    print(string.format("║ Target:       %04d-%02d-%02d %02d:%02d:00",
-        TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN))
-    print(string.format("║ Now (number): %d", nowNum))
-    print(string.format("║ Target (num): %d", TARGET_NUM))
-    print(string.format("║ Remaining:    %d seconds", remaining))
-    print(string.format("║ Status:       %s", IsTimeReached() and "REACHED!" or "WAITING"))
-    print("╚══════════════════════════════════════════╝")
-end
-
---==============================================================
--- EXECUTE
---==============================================================
-local hasExecuted = false
-
-local function ExecuteNewScript()
-    if hasExecuted then return end
-    hasExecuted = true
-    
-    Notify("System", "> TIME REACHED! LOADING v4.4...", 3)
-    task.wait(1)
-    
-    local success, err = pcall(function()
-        loadstring(game:HttpGet(EXECUTE_URL))()
-    end)
-    
-    if success then
-        Notify("Success", "> v4.4 LOADED", 3)
-    else
-        Notify("Error", "> FAILED TO LOAD", 3)
-        warn("[ZetGames] Execute Error: " .. tostring(err))
-    end
-end
-
---==============================================================
--- TIMER FRAME UI
---==============================================================
-local TimerFrame = Instance.new("Frame")
-TimerFrame.Size = UDim2.new(0, 400, 0, 480)
-TimerFrame.Position = UDim2.new(0.5, -200, 0.5, -240)
-TimerFrame.BackgroundColor3 = THEME.MainBG
-TimerFrame.BorderColor3 = THEME.AccentColor
-TimerFrame.BorderSizePixel = 3
-TimerFrame.ZIndex = 10
-TimerFrame.Visible = false
-TimerFrame.Parent = ScreenGui
-Instance.new("UICorner", TimerFrame).CornerRadius = UDim.new(0, 12)
-
+-- TOP BAR
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = THEME.SectionBG
 TopBar.BorderSizePixel = 0
 TopBar.ZIndex = 11
-TopBar.Parent = TimerFrame
+TopBar.Parent = InfoFrame
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local TopTxt = Instance.new("TextLabel")
 TopTxt.Size = UDim2.new(1, -16, 1, 0)
 TopTxt.Position = UDim2.new(0, 8, 0, 0)
 TopTxt.BackgroundTransparency = 1
-TopTxt.Text = "● ZETGAMES-AIMLOCK v4.4 TIMER"
+TopTxt.Text = "● ZETGAMES-AIMLOCK v4.4 INFO"
 TopTxt.TextColor3 = THEME.TextColor
 TopTxt.Font = Enum.Font.Code
 TopTxt.TextSize = 13
@@ -271,17 +145,19 @@ TopTxt.TextXAlignment = Enum.TextXAlignment.Left
 TopTxt.ZIndex = 12
 TopTxt.Parent = TopBar
 
+-- TITLE
 local MTitle = Instance.new("TextLabel")
 MTitle.Size = UDim2.new(1, -30, 0, 35)
 MTitle.Position = UDim2.new(0, 15, 0, 55)
 MTitle.BackgroundTransparency = 1
-MTitle.Text = "⏳ WAITING FOR RELEASE ⏳"
+MTitle.Text = "📢 UPDATE INFORMATION 📢"
 MTitle.TextColor3 = THEME.WarningColor
 MTitle.Font = Enum.Font.Code
 MTitle.TextSize = 18
 MTitle.ZIndex = 12
-MTitle.Parent = TimerFrame
+MTitle.Parent = InfoFrame
 
+-- TAG
 local MTag = Instance.new("TextLabel")
 MTag.Size = UDim2.new(1, -30, 0, 20)
 MTag.Position = UDim2.new(0, 15, 0, 90)
@@ -291,147 +167,114 @@ MTag.TextColor3 = THEME.WarningColor
 MTag.Font = Enum.Font.Code
 MTag.TextSize = 11
 MTag.ZIndex = 12
-MTag.Parent = TimerFrame
+MTag.Parent = InfoFrame
 
-local ReleaseInfo = Instance.new("TextLabel")
-ReleaseInfo.Size = UDim2.new(1, -30, 0, 25)
-ReleaseInfo.Position = UDim2.new(0, 15, 0, 120)
-ReleaseInfo.BackgroundTransparency = 1
-ReleaseInfo.Text = "> RELEASE: 30 SEPTEMBER 2025 | 19:30 WIB"
-ReleaseInfo.TextColor3 = THEME.TextLight
-ReleaseInfo.Font = Enum.Font.Code
-ReleaseInfo.TextSize = 11
-ReleaseInfo.TextXAlignment = Enum.TextXAlignment.Center
-ReleaseInfo.ZIndex = 12
-ReleaseInfo.Parent = TimerFrame
+-- MAIN INFO BOX
+local InfoBox = Instance.new("Frame")
+InfoBox.Size = UDim2.new(1, -30, 0, 200)
+InfoBox.Position = UDim2.new(0, 15, 0, 125)
+InfoBox.BackgroundColor3 = THEME.PanelBG
+InfoBox.BorderColor3 = THEME.AccentColor
+InfoBox.BorderSizePixel = 2
+InfoBox.ZIndex = 12
+InfoBox.Parent = InfoFrame
+Instance.new("UICorner", InfoBox).CornerRadius = UDim.new(0, 8)
 
-local DayInfo = Instance.new("TextLabel")
-DayInfo.Size = UDim2.new(1, -30, 0, 20)
-DayInfo.Position = UDim2.new(0, 15, 0, 145)
-DayInfo.BackgroundTransparency = 1
-DayInfo.Text = "> HARI: RABU"
-DayInfo.TextColor3 = THEME.AccentLight
-DayInfo.Font = Enum.Font.Code
-DayInfo.TextSize = 11
-DayInfo.TextXAlignment = Enum.TextXAlignment.Center
-DayInfo.ZIndex = 12
-DayInfo.Parent = TimerFrame
+-- LABEL "UPDATE SELESAI PADA:"
+local InfoTitle = Instance.new("TextLabel")
+InfoTitle.Size = UDim2.new(1, -20, 0, 25)
+InfoTitle.Position = UDim2.new(0, 10, 0, 15)
+InfoTitle.BackgroundTransparency = 1
+InfoTitle.Text = "> UPDATE SELESAI PADA:"
+InfoTitle.TextColor3 = THEME.TextColor
+InfoTitle.Font = Enum.Font.Code
+InfoTitle.TextSize = 12
+InfoTitle.TextXAlignment = Enum.TextXAlignment.Left
+InfoTitle.ZIndex = 13
+InfoTitle.Parent = InfoBox
 
-local TimerBox = Instance.new("Frame")
-TimerBox.Size = UDim2.new(1, -30, 0, 130)
-TimerBox.Position = UDim2.new(0, 15, 0, 175)
-TimerBox.BackgroundColor3 = THEME.PanelBG
-TimerBox.BorderColor3 = THEME.AccentColor
-TimerBox.BorderSizePixel = 2
-TimerBox.ZIndex = 12
-TimerBox.Parent = TimerFrame
-Instance.new("UICorner", TimerBox).CornerRadius = UDim.new(0, 8)
+-- TANGGAL
+local DateLbl = Instance.new("TextLabel")
+DateLbl.Size = UDim2.new(1, -20, 0, 35)
+DateLbl.Position = UDim2.new(0, 10, 0, 45)
+DateLbl.BackgroundTransparency = 1
+DateLbl.Text = "30 SEPTEMBER 2025"
+DateLbl.TextColor3 = THEME.WarningColor
+DateLbl.Font = Enum.Font.Code
+DateLbl.TextSize = 20
+DateLbl.TextXAlignment = Enum.TextXAlignment.Left
+DateLbl.ZIndex = 13
+DateLbl.Parent = InfoBox
 
-local CountdownLbl = Instance.new("TextLabel")
-CountdownLbl.Size = UDim2.new(1, -10, 0, 20)
-CountdownLbl.Position = UDim2.new(0, 5, 0, 5)
-CountdownLbl.BackgroundTransparency = 1
-CountdownLbl.Text = "> COUNTDOWN:"
-CountdownLbl.TextColor3 = THEME.TextColor
-CountdownLbl.Font = Enum.Font.Code
-CountdownLbl.TextSize = 11
-CountdownLbl.TextXAlignment = Enum.TextXAlignment.Left
-CountdownLbl.ZIndex = 13
-CountdownLbl.Parent = TimerBox
+-- JAM
+local TimeLbl = Instance.new("TextLabel")
+TimeLbl.Size = UDim2.new(1, -20, 0, 30)
+TimeLbl.Position = UDim2.new(0, 10, 0, 85)
+TimeLbl.BackgroundTransparency = 1
+TimeLbl.Text = "⏰ JAM: 19:30 WIB"
+TimeLbl.TextColor3 = THEME.AccentLight
+TimeLbl.Font = Enum.Font.Code
+TimeLbl.TextSize = 16
+TimeLbl.TextXAlignment = Enum.TextXAlignment.Left
+TimeLbl.ZIndex = 13
+TimeLbl.Parent = InfoBox
 
-local TimerDisplay = Instance.new("TextLabel")
-TimerDisplay.Size = UDim2.new(1, -20, 0, 50)
-TimerDisplay.Position = UDim2.new(0, 10, 0, 30)
-TimerDisplay.BackgroundTransparency = 1
-TimerDisplay.Text = "00 : 00 : 00 : 00"
-TimerDisplay.TextColor3 = THEME.AccentColor
-TimerDisplay.Font = Enum.Font.Code
-TimerDisplay.TextSize = 28
-TimerDisplay.TextXAlignment = Enum.TextXAlignment.Center
-TimerDisplay.ZIndex = 13
-TimerDisplay.Parent = TimerBox
+-- HARI
+local DayLbl = Instance.new("TextLabel")
+DayLbl.Size = UDim2.new(1, -20, 0, 25)
+DayLbl.Position = UDim2.new(0, 10, 0, 120)
+DayLbl.BackgroundTransparency = 1
+DayLbl.Text = "📅 HARI: RABU"
+DayLbl.TextColor3 = THEME.AccentLight
+DayLbl.Font = Enum.Font.Code
+DayLbl.TextSize = 14
+DayLbl.TextXAlignment = Enum.TextXAlignment.Left
+DayLbl.ZIndex = 13
+DayLbl.Parent = InfoBox
 
-local LabelsFrame = Instance.new("Frame")
-LabelsFrame.Size = UDim2.new(1, -20, 0, 20)
-LabelsFrame.Position = UDim2.new(0, 10, 0, 85)
-LabelsFrame.BackgroundTransparency = 1
-LabelsFrame.ZIndex = 13
-LabelsFrame.Parent = TimerBox
+-- SEPARATOR
+local Sep2 = Instance.new("Frame")
+Sep2.Size = UDim2.new(1, -20, 0, 2)
+Sep2.Position = UDim2.new(0, 10, 0, 155)
+Sep2.BackgroundColor3 = THEME.AccentColor
+Sep2.BorderSizePixel = 0
+Sep2.ZIndex = 13
+Sep2.Parent = InfoBox
 
-local function CreateTimerLabel(text, xPos)
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0.25, 0, 1, 0)
-    lbl.Position = UDim2.new(xPos, 0, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = text
-    lbl.TextColor3 = THEME.TextLight
-    lbl.Font = Enum.Font.Code
-    lbl.TextSize = 10
-    lbl.TextXAlignment = Enum.TextXAlignment.Center
-    lbl.ZIndex = 14
-    lbl.Parent = LabelsFrame
-end
-
-CreateTimerLabel("DAYS", 0)
-CreateTimerLabel("HOURS", 0.25)
-CreateTimerLabel("MINS", 0.5)
-CreateTimerLabel("SECS", 0.75)
-
-local Sep = Instance.new("Frame")
-Sep.Size = UDim2.new(1, -30, 0, 2)
-Sep.Position = UDim2.new(0, 15, 0, 320)
-Sep.BackgroundColor3 = THEME.AccentColor
-Sep.BorderSizePixel = 0
-Sep.ZIndex = 12
-Sep.Parent = TimerFrame
-
+-- STATUS
 local StatusLbl = Instance.new("TextLabel")
-StatusLbl.Size = UDim2.new(1, -30, 0, 25)
-StatusLbl.Position = UDim2.new(0, 15, 0, 330)
+StatusLbl.Size = UDim2.new(1, -20, 0, 25)
+StatusLbl.Position = UDim2.new(0, 10, 0, 165)
 StatusLbl.BackgroundTransparency = 1
-StatusLbl.Text = "> STATUS: WAITING FOR RELEASE..."
-StatusLbl.TextColor3 = THEME.TextColor
+StatusLbl.Text = "> STATUS: DALAM PROSES PATCH..."
+StatusLbl.TextColor3 = THEME.TextLight
 StatusLbl.Font = Enum.Font.Code
 StatusLbl.TextSize = 11
 StatusLbl.TextXAlignment = Enum.TextXAlignment.Left
-StatusLbl.ZIndex = 12
-StatusLbl.Parent = TimerFrame
+StatusLbl.ZIndex = 13
+StatusLbl.Parent = InfoBox
 
-local TimeInfoLbl = Instance.new("TextLabel")
-TimeInfoLbl.Size = UDim2.new(1, -30, 0, 20)
-TimeInfoLbl.Position = UDim2.new(0, 15, 0, 360)
-TimeInfoLbl.BackgroundTransparency = 1
-TimeInfoLbl.Text = "> DEVICE TIME: --"
-TimeInfoLbl.TextColor3 = THEME.TextLight
-TimeInfoLbl.Font = Enum.Font.Code
-TimeInfoLbl.TextSize = 10
-TimeInfoLbl.TextXAlignment = Enum.TextXAlignment.Left
-TimeInfoLbl.ZIndex = 12
-TimeInfoLbl.Parent = TimerFrame
+-- SEPARATOR
+local Sep = Instance.new("Frame")
+Sep.Size = UDim2.new(1, -30, 0, 2)
+Sep.Position = UDim2.new(0, 15, 0, 340)
+Sep.BackgroundColor3 = THEME.AccentColor
+Sep.BorderSizePixel = 0
+Sep.ZIndex = 12
+Sep.Parent = InfoFrame
 
-local TargetInfoLbl = Instance.new("TextLabel")
-TargetInfoLbl.Size = UDim2.new(1, -30, 0, 20)
-TargetInfoLbl.Position = UDim2.new(0, 15, 0, 380)
-TargetInfoLbl.BackgroundTransparency = 1
-TargetInfoLbl.Text = "> TARGET TIME: --"
-TargetInfoLbl.TextColor3 = THEME.TextLight
-TargetInfoLbl.Font = Enum.Font.Code
-TargetInfoLbl.TextSize = 10
-TargetInfoLbl.TextXAlignment = Enum.TextXAlignment.Left
-TargetInfoLbl.ZIndex = 12
-TargetInfoLbl.Parent = TimerFrame
-
-local InfoLbl = Instance.new("TextLabel")
-InfoLbl.Size = UDim2.new(1, -30, 0, 50)
-InfoLbl.Position = UDim2.new(0, 15, 0, 405)
-InfoLbl.BackgroundTransparency = 1
-InfoLbl.Text = "> Script akan otomatis dijalankan\n> saat waktu release tercapai"
-InfoLbl.TextColor3 = THEME.TextLight
-InfoLbl.Font = Enum.Font.Code
-InfoLbl.TextSize = 10
-InfoLbl.TextXAlignment = Enum.TextXAlignment.Left
-InfoLbl.ZIndex = 12
-InfoLbl.Parent = TimerFrame
+-- INFO TAMBAHAN
+local InfoMsg = Instance.new("TextLabel")
+InfoMsg.Size = UDim2.new(1, -30, 0, 60)
+InfoMsg.Position = UDim2.new(0, 15, 0, 350)
+InfoMsg.BackgroundTransparency = 1
+InfoMsg.Text = "> Script akan otomatis tersedia\n> setelah waktu update selesai\n> Mohon tunggu dengan sabar"
+InfoMsg.TextColor3 = THEME.TextLight
+InfoMsg.Font = Enum.Font.Code
+InfoMsg.TextSize = 10
+InfoMsg.TextXAlignment = Enum.TextXAlignment.Left
+InfoMsg.ZIndex = 12
+InfoMsg.Parent = InfoFrame
 
 --==============================================================
 -- DRAGGABLE
@@ -468,10 +311,10 @@ local function MakeDraggable(frame)
     end)
 end
 
-MakeDraggable(TimerFrame)
+MakeDraggable(InfoFrame)
 
 --==============================================================
--- LOADING SCREEN
+-- LOADING SCREEN (MINI)
 --==============================================================
 local LoadingScreen = Instance.new("Frame")
 LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
@@ -506,7 +349,7 @@ local LTag = Instance.new("TextLabel")
 LTag.Size = UDim2.new(1, -30, 0, 20)
 LTag.Position = UDim2.new(0, 15, 0, 50)
 LTag.BackgroundTransparency = 1
-LTag.Text = "[ TIMER BUILD - v4.4 ]"
+LTag.Text = "[ INFO BUILD - v4.4 ]"
 LTag.TextColor3 = THEME.WarningColor
 LTag.Font = Enum.Font.Code
 LTag.TextSize = 11
@@ -546,7 +389,7 @@ local LStatus = Instance.new("TextLabel")
 LStatus.Size = UDim2.new(1, -30, 0, 20)
 LStatus.Position = UDim2.new(0, 15, 0, 145)
 LStatus.BackgroundTransparency = 1
-LStatus.Text = "> LOADING TIMER..."
+LStatus.Text = "> LOADING INFO..."
 LStatus.TextColor3 = THEME.TextLight
 LStatus.Font = Enum.Font.Code
 LStatus.TextSize = 10
@@ -555,48 +398,17 @@ LStatus.ZIndex = 302
 LStatus.Parent = LoadingBg
 
 --==============================================================
--- UPDATE TIMER DISPLAY
---==============================================================
-local function UpdateTimerDisplay()
-    local nowTbl = GetNowTable()
-    local targetEpoch = GetTargetEpoch()
-    local nowEpoch = GetNowEpoch()
-    local remaining = targetEpoch - nowEpoch
-    
-    TimeInfoLbl.Text = string.format("> DEVICE TIME: %04d-%02d-%02d %02d:%02d:%02d",
-        nowTbl.year, nowTbl.month, nowTbl.day, nowTbl.hour, nowTbl.min, nowTbl.sec)
-    
-    TargetInfoLbl.Text = string.format("> TARGET TIME: %04d-%02d-%02d %02d:%02d:00",
-        TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN)
-    
-    if IsTimeReached() then
-        TimerDisplay.Text = "00 : 00 : 00 : 00"
-        TimerDisplay.TextColor3 = THEME.SuccessColor
-        StatusLbl.Text = "> STATUS: RELEASE TIME REACHED!"
-        StatusLbl.TextColor3 = THEME.SuccessColor
-        return false
-    end
-    
-    local days, hours, mins, secs = FormatCountdown(remaining)
-    TimerDisplay.Text = string.format("%02d : %02d : %02d : %02d", days, hours, mins, secs)
-    StatusLbl.Text = string.format("> STATUS: WAITING... (%dd %dh %dm %ds)", days, hours, mins, secs)
-    return true
-end
-
---==============================================================
--- MAIN LOOP
+-- LOADING ANIMATION
 --==============================================================
 task.spawn(function()
-    PrintDebug()
-    
     task.wait(0.3)
     local totalTime = 3
     local steps = 100
     local interval = totalTime / steps
     local loadingMsgs = {
-        "> LOADING TIMER SYSTEM...",
-        "> CHECKING RELEASE DATE...",
-        "> INITIALIZING COUNTDOWN...",
+        "> LOADING INFO SYSTEM...",
+        "> FETCHING UPDATE DATA...",
+        "> PREPARING DISPLAY...",
         "> SYSTEM READY!"
     }
     
@@ -620,31 +432,12 @@ task.spawn(function()
     task.wait(0.5)
     pcall(function()
         LoadingScreen.Visible = false
-        TimerFrame.Visible = true
+        InfoFrame.Visible = true
     end)
     
-    if IsTimeReached() then
-        Notify("System", "> RELEASE TIME REACHED!", 3)
-        Notify("Info", "> Auto-loading v4.4...", 3)
-        task.wait(2)
-        ExecuteNewScript()
-        return
-    end
-    
-    Notify("Timer v4.4", "> COUNTDOWN STARTED", 3)
-    Notify("Release", "> 30 SEPT 2025 | 19:30 WIB", 3)
-    
-    while true do
-        task.wait(1)
-        local shouldContinue = UpdateTimerDisplay()
-        if not shouldContinue then
-            Notify("System", "> RELEASE TIME REACHED!", 3)
-            task.wait(2)
-            ExecuteNewScript()
-            break
-        end
-    end
+    Notify("ZetGames v4.4", "> INFO BUILD LOADED", 3)
+    Notify("Update Info", "> SELESAI 30 SEPT 2025", 3)
 end)
 
-print("[ZetGames-AimLock] TIMER BUILD v4.4 (FIX v2) - Loaded")
-print(string.format("[ZetGames] Target: %04d-%02d-%02d %02d:%02d", TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN))
+print("[ZetGames-AimLock] INFO BUILD v4.4 - Loaded Successfully")
+print("[ZetGames] Update Release: 30 September 2025 | 19:30 WIB | Rabu")
