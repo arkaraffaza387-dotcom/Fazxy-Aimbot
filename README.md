@@ -1,5 +1,5 @@
 --[[
-    ZetGames-AimLock-Advanserver | TIMER BUILD v4.4
+    ZetGames-AimLock-Advanserver | TIMER BUILD v4.4 (FIXED)
     Theme: Red & Black (TESTING)
     Target Release: 30 September 2025 | 19:30 WIB | Rabu
     Auto Execute: https://raw.githubusercontent.com/arkaraffaza387-dotcom/Testing-Update/refs/heads/main/README.md
@@ -38,7 +38,6 @@ local THEME = {
 -- CONFIG
 --==============================================================
 -- Target Release: 30 September 2025, 19:30 WIB (UTC+7)
--- Kalau tahun sekarang adalah 2026, ganti ke 2026
 local TARGET_YEAR = 2025
 local TARGET_MONTH = 9   -- September
 local TARGET_DAY = 30
@@ -128,23 +127,33 @@ local function Notify(title, message, duration)
 end
 
 --==============================================================
--- HELPER FUNCTIONS
+-- HELPER: TIME CALCULATION (FIXED!)
 --==============================================================
--- Hitung waktu target (30 September 19:30 WIB = UTC+7)
--- os.time() pakai UTC, jadi kita konversi
-local function GetTargetTime()
-    -- Buat target time dalam UTC (WIB = UTC+7, jadi 19:30 WIB = 12:30 UTC)
-    return os.time({
+-- CARA KERJA:
+-- os.time() mengembalikan waktu Unix dalam UTC (bukan lokal)
+-- WIB = UTC+7
+-- Untuk hitung target dalam WIB, kita HARUS kurangi 7 jam dari jam WIB
+-- Contoh: Target 30 Sept 2025 jam 19:30 WIB = 30 Sept 2025 jam 12:30 UTC
+
+local function GetTargetTimeUTC()
+    -- os.time() dengan table jam 12:30 akan dianggap UTC 12:30
+    -- UTC 12:30 = WIB 19:30 ✓
+    local target = os.time({
         year = TARGET_YEAR,
         month = TARGET_MONTH,
         day = TARGET_DAY,
-        hour = TARGET_HOUR - 7,  -- Konversi WIB ke UTC
+        hour = TARGET_HOUR - 7,  -- 19:30 WIB → 12:30 UTC
         min = TARGET_MIN,
         sec = 0
     })
+    return target
 end
 
-local function FormatTime(seconds)
+local function GetCurrentTimeUTC()
+    return os.time()
+end
+
+local function FormatCountdown(seconds)
     if seconds < 0 then seconds = 0 end
     local days = math.floor(seconds / 86400)
     local hours = math.floor((seconds % 86400) / 3600)
@@ -154,13 +163,39 @@ local function FormatTime(seconds)
 end
 
 local function IsTimeReached()
-    return os.time() >= GetTargetTime()
+    local target = GetTargetTimeUTC()
+    local now = GetCurrentTimeUTC()
+    return now >= target
+end
+
+--==============================================================
+-- DEBUG: TAMPILKAN INFO WAKTU
+--==============================================================
+local function PrintTimeDebug()
+    local target = GetTargetTimeUTC()
+    local now = GetCurrentTimeUTC()
+    local remaining = target - now
+    
+    print("╔══════════════════════════════════════════╗")
+    print("║       ZETGAMES TIMER - DEBUG INFO        ║")
+    print("╠══════════════════════════════════════════╣")
+    print("║ Current UTC : " .. os.date("%Y-%m-%d %H:%M:%S", now))
+    print("║ Target UTC  : " .. os.date("%Y-%m-%d %H:%M:%S", target))
+    print("║ Remaining   : " .. remaining .. " seconds")
+    print("║ Days Left   : " .. math.floor(remaining / 86400))
+    print("║ Status      : " .. (remaining > 0 and "WAITING" or "REACHED"))
+    print("╚══════════════════════════════════════════╝")
 end
 
 --==============================================================
 -- EXECUTE NEW SCRIPT
 --==============================================================
+local hasExecuted = false  -- Prevent double execution
+
 local function ExecuteNewScript()
+    if hasExecuted then return end
+    hasExecuted = true
+    
     Notify("System", "> TIME REACHED! LOADING v4.4...", 3)
     task.wait(1)
     
@@ -180,8 +215,8 @@ end
 -- MAIN TIMER FRAME (RED THEME)
 --==============================================================
 local TimerFrame = Instance.new("Frame")
-TimerFrame.Size = UDim2.new(0, 400, 0, 420)
-TimerFrame.Position = UDim2.new(0.5, -200, 0.5, -210)
+TimerFrame.Size = UDim2.new(0, 400, 0, 480)
+TimerFrame.Position = UDim2.new(0.5, -200, 0.5, -240)
 TimerFrame.BackgroundColor3 = THEME.MainBG
 TimerFrame.BorderColor3 = THEME.AccentColor
 TimerFrame.BorderSizePixel = 3
@@ -263,7 +298,7 @@ DayInfo.Parent = TimerFrame
 
 -- TIMER BOX (BIG)
 local TimerBox = Instance.new("Frame")
-TimerBox.Size = UDim2.new(1, -30, 0, 120)
+TimerBox.Size = UDim2.new(1, -30, 0, 130)
 TimerBox.Position = UDim2.new(0, 15, 0, 175)
 TimerBox.BackgroundColor3 = THEME.PanelBG
 TimerBox.BorderColor3 = THEME.AccentColor
@@ -287,8 +322,8 @@ CountdownLbl.Parent = TimerBox
 
 -- TIMER DISPLAY (Main)
 local TimerDisplay = Instance.new("TextLabel")
-TimerDisplay.Size = UDim2.new(1, -20, 0, 45)
-TimerDisplay.Position = UDim2.new(0, 10, 0, 25)
+TimerDisplay.Size = UDim2.new(1, -20, 0, 50)
+TimerDisplay.Position = UDim2.new(0, 10, 0, 30)
 TimerDisplay.BackgroundTransparency = 1
 TimerDisplay.Text = "00 : 00 : 00 : 00"
 TimerDisplay.TextColor3 = THEME.AccentColor
@@ -298,10 +333,10 @@ TimerDisplay.TextXAlignment = Enum.TextXAlignment.Center
 TimerDisplay.ZIndex = 13
 TimerDisplay.Parent = TimerBox
 
--- TIMER LABELS (Days, Hours, Mins, Secs)
+-- TIMER LABELS
 local LabelsFrame = Instance.new("Frame")
 LabelsFrame.Size = UDim2.new(1, -20, 0, 20)
-LabelsFrame.Position = UDim2.new(0, 10, 0, 75)
+LabelsFrame.Position = UDim2.new(0, 10, 0, 85)
 LabelsFrame.BackgroundTransparency = 1
 LabelsFrame.ZIndex = 13
 LabelsFrame.Parent = TimerBox
@@ -328,7 +363,7 @@ CreateTimerLabel("SECS", 0.75)
 -- SEPARATOR
 local Sep = Instance.new("Frame")
 Sep.Size = UDim2.new(1, -30, 0, 2)
-Sep.Position = UDim2.new(0, 15, 0, 310)
+Sep.Position = UDim2.new(0, 15, 0, 320)
 Sep.BackgroundColor3 = THEME.AccentColor
 Sep.BorderSizePixel = 0
 Sep.ZIndex = 12
@@ -337,7 +372,7 @@ Sep.Parent = TimerFrame
 -- STATUS
 local StatusLbl = Instance.new("TextLabel")
 StatusLbl.Size = UDim2.new(1, -30, 0, 25)
-StatusLbl.Position = UDim2.new(0, 15, 0, 320)
+StatusLbl.Position = UDim2.new(0, 15, 0, 330)
 StatusLbl.BackgroundTransparency = 1
 StatusLbl.Text = "> STATUS: WAITING FOR RELEASE..."
 StatusLbl.TextColor3 = THEME.TextColor
@@ -347,10 +382,36 @@ StatusLbl.TextXAlignment = Enum.TextXAlignment.Left
 StatusLbl.ZIndex = 12
 StatusLbl.Parent = TimerFrame
 
+-- TIME INFO (Server Time)
+local TimeInfoLbl = Instance.new("TextLabel")
+TimeInfoLbl.Size = UDim2.new(1, -30, 0, 20)
+TimeInfoLbl.Position = UDim2.new(0, 15, 0, 360)
+TimeInfoLbl.BackgroundTransparency = 1
+TimeInfoLbl.Text = "> SERVER TIME (UTC): --"
+TimeInfoLbl.TextColor3 = THEME.TextLight
+TimeInfoLbl.Font = Enum.Font.Code
+TimeInfoLbl.TextSize = 10
+TimeInfoLbl.TextXAlignment = Enum.TextXAlignment.Left
+TimeInfoLbl.ZIndex = 12
+TimeInfoLbl.Parent = TimerFrame
+
+-- TARGET INFO
+local TargetInfoLbl = Instance.new("TextLabel")
+TargetInfoLbl.Size = UDim2.new(1, -30, 0, 20)
+TargetInfoLbl.Position = UDim2.new(0, 15, 0, 380)
+TargetInfoLbl.BackgroundTransparency = 1
+TargetInfoLbl.Text = "> TARGET (UTC): --"
+TargetInfoLbl.TextColor3 = THEME.TextLight
+TargetInfoLbl.Font = Enum.Font.Code
+TargetInfoLbl.TextSize = 10
+TargetInfoLbl.TextXAlignment = Enum.TextXAlignment.Left
+TargetInfoLbl.ZIndex = 12
+TargetInfoLbl.Parent = TimerFrame
+
 -- INFO
 local InfoLbl = Instance.new("TextLabel")
-InfoLbl.Size = UDim2.new(1, -30, 0, 45)
-InfoLbl.Position = UDim2.new(0, 15, 0, 350)
+InfoLbl.Size = UDim2.new(1, -30, 0, 50)
+InfoLbl.Position = UDim2.new(0, 15, 0, 405)
 InfoLbl.BackgroundTransparency = 1
 InfoLbl.Text = "> Script akan otomatis dijalankan\n> saat waktu release tercapai"
 InfoLbl.TextColor3 = THEME.TextLight
@@ -482,34 +543,40 @@ LStatus.ZIndex = 302
 LStatus.Parent = LoadingBg
 
 --==============================================================
--- LOADING ANIMATION + TIMER LOOP
+-- TIMER UPDATE FUNCTION (FIXED!)
 --==============================================================
-local function UpdateTimer()
-    local now = os.time()
-    local target = GetTargetTime()
+local function UpdateTimerDisplay()
+    local target = GetTargetTimeUTC()
+    local now = GetCurrentTimeUTC()
     local remaining = target - now
     
+    -- Update SERVER TIME info
+    TimeInfoLbl.Text = "> SERVER TIME (UTC): " .. os.date("%Y-%m-%d %H:%M:%S", now)
+    TargetInfoLbl.Text = "> TARGET (UTC): " .. os.date("%Y-%m-%d %H:%M:%S", target)
+    
+    -- Kalau waktu HABIS (now >= target) ATAU remaining <= 0
     if remaining <= 0 then
-        -- Waktu habis!
         TimerDisplay.Text = "00 : 00 : 00 : 00"
         TimerDisplay.TextColor3 = THEME.SuccessColor
         StatusLbl.Text = "> STATUS: RELEASE TIME REACHED!"
         StatusLbl.TextColor3 = THEME.SuccessColor
-        
-        task.wait(1)
-        ExecuteNewScript()
         return false  -- Stop loop
-    else
-        local days, hours, mins, secs = FormatTime(remaining)
-        TimerDisplay.Text = string.format("%02d : %02d : %02d : %02d", days, hours, mins, secs)
-        
-        -- Update status
-        StatusLbl.Text = string.format("> STATUS: WAITING... (%dd %dh %dm %ds left)", days, hours, mins, secs)
-        return true  -- Continue loop
     end
+    
+    -- Update countdown
+    local days, hours, mins, secs = FormatCountdown(remaining)
+    TimerDisplay.Text = string.format("%02d : %02d : %02d : %02d", days, hours, mins, secs)
+    StatusLbl.Text = string.format("> STATUS: WAITING... (%dd %dh %dm %ds)", days, hours, mins, secs)
+    return true  -- Continue
 end
 
+--==============================================================
+-- LOADING ANIMATION + TIMER LOOP
+--==============================================================
 task.spawn(function()
+    -- Print debug info
+    PrintTimeDebug()
+    
     -- Loading animation (3 detik)
     task.wait(0.3)
     local totalTime = 3
@@ -545,10 +612,11 @@ task.spawn(function()
         TimerFrame.Visible = true
     end)
     
-    -- Cek apakah waktu sudah tercapai
+    -- Cek apakah waktu sudah tercapai saat script dimulai
     if IsTimeReached() then
         Notify("System", "> RELEASE TIME REACHED!", 3)
-        task.wait(1)
+        Notify("Info", "> Auto-loading v4.4...", 3)
+        task.wait(2)
         ExecuteNewScript()
         return
     end
@@ -559,8 +627,14 @@ task.spawn(function()
     -- Timer loop (update setiap 1 detik)
     while true do
         task.wait(1)
-        local continue = UpdateTimer()
-        if not continue then break end
+        local shouldContinue = UpdateTimerDisplay()
+        if not shouldContinue then
+            -- Waktu tercapai!
+            Notify("System", "> RELEASE TIME REACHED!", 3)
+            task.wait(2)
+            ExecuteNewScript()
+            break
+        end
     end
 end)
 
