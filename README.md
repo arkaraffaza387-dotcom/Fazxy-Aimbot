@@ -1,9 +1,10 @@
 --[[
-    ZetGames-AimLock V4.4 | OFFICIAL RESMI
+    ZetGames-AimLock V4.4 | OFFICIAL RESMI (FIXED)
     Theme: Blue & Black
-    Login: ✅ WAJIB KEY
-    Night Lock: ✅ ACTIVE (Auto Kick)
-    Anti-Kick: ✅ SAFE MODE
+    Login: WAJIB KEY
+    Night Lock: ACTIVE (Auto Kick)
+    Anti-Kick: SAFE MODE
+    FIXED: Noclip reset, Info Panel default OFF, Loading 10s fullscreen
 --]]
 
 --==============================================================
@@ -27,7 +28,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 pcall(function() SoundService.RespectFilteringEnabled = false end)
 
-print("[ZET] Loading V4.4 RESMI...")
+print("[ZET] Loading V4.4 RESMI (FIXED)...")
 
 --==============================================================
 -- THEME SYSTEM (BIRU & HITAM DEFAULT)
@@ -78,6 +79,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZetGamesV44Resmi"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.IgnoreGuiInset = true
 local coreOk = pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
 if not coreOk or not ScreenGui.Parent then
     pcall(function() ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end)
@@ -86,7 +88,7 @@ end
 print("[ZET] GUI Parent: " .. tostring(ScreenGui.Parent and ScreenGui.Parent.Name or "NIL"))
 
 --==============================================================
--- STATE
+-- STATE (SEMUA DEFAULT OFF ✅ FIX BUG)
 --==============================================================
 local IsLoggedIn = false
 local MenuVisible = true
@@ -100,7 +102,7 @@ local function DisconnectKey(key)
     end
 end
 
--- Feature Flags
+-- Feature Flags (SEMUA DEFAULT OFF)
 local AimbotEnabled = false
 local AimbotTargetPart = "Head"
 local AimbotFOV = 250
@@ -202,14 +204,13 @@ local AutoShootEnabled = false
 local AutoShootDelay = 100
 local DroneModeEnabled = false
 
-local KillNotifEnabled = true
+local KillNotifEnabled = false  -- ✅ FIX: default OFF
 local LastPlayerHealth = {}
-local InfoPanelEnabled = true
+local InfoPanelEnabled = false   -- ✅ FIX: default OFF (dulu true)
 local InfoPanelFrame = nil
 
 local Waypoints = {}
 
--- Anti-Kick + Night Lock (RESMI)
 local AntiKickEnabled = true
 local AutoReconnectEnabled = true
 local ReconnectAttempts = 0
@@ -217,7 +218,6 @@ local MaxReconnectAttempts = 5
 local WatchdogLastPing = tick()
 local WatchdogPingThreshold = 60
 
--- 🔵 NIGHT LOCK (KHUSUS RESMI)
 local NightLockActive = true
 local NightLockKickLog = {}
 local NightLockScanInterval = 1
@@ -334,7 +334,7 @@ local function DisableFOVLoop()
 end
 
 --==============================================================
--- OFF-SCREEN ARROW LOOP
+-- OFF-SCREEN ARROW
 --==============================================================
 local function EnableOffScreenArrow()
     DisconnectKey("OffScreenArrow")
@@ -445,7 +445,7 @@ local function ActivateAutoReconnect()
 end
 
 --==============================================================
--- 🔵 NIGHT LOCK (RESMI)
+-- NIGHT LOCK
 --==============================================================
 local function ActivateNightLock()
     DisconnectKey("NightLock")
@@ -710,7 +710,7 @@ local function DisableFPSBoost()
 end
 
 --==============================================================
--- NOCLIP / SPEED / JUMP / DASH
+-- ✅ NOCLIP (FIXED — reset semua saat OFF)
 --==============================================================
 local function EnableNoclip()
     DisconnectKey("Noclip")
@@ -727,15 +727,28 @@ end
 
 local function DisableNoclip()
     DisconnectKey("Noclip")
-    task.wait(0.05)
+    NoclipEnabled = false -- ✅ FIX: pastikan state OFF
+    task.wait(0.1)
     local char = LocalPlayer.Character
     if char then
         for _, p in pairs(char:GetDescendants()) do
-            if p:IsA("BasePart") then pcall(function() p.CanCollide = true end) end
+            if p:IsA("BasePart") then
+                pcall(function()
+                    -- ✅ FIX: HRP tetap false, bagian lain true
+                    if p.Name == "HumanoidRootPart" then
+                        p.CanCollide = false
+                    else
+                        p.CanCollide = true
+                    end
+                end)
+            end
         end
     end
 end
 
+--==============================================================
+-- SPEED / JUMP / DASH / INVISIBLE
+--==============================================================
 local function EnableSpeedHack()
     DisconnectKey("Speed")
     local conn = RunService.Heartbeat:Connect(function()
@@ -750,6 +763,7 @@ end
 
 local function DisableSpeedHack()
     DisconnectKey("Speed")
+    SpeedHackEnabled = false
     task.wait(0.05)
     local char = LocalPlayer.Character
     if char then
@@ -770,7 +784,10 @@ local function EnableInfiniteJump()
     ActiveConnections["Jump"] = conn
 end
 
-local function DisableInfiniteJump() DisconnectKey("Jump") end
+local function DisableInfiniteJump()
+    DisconnectKey("Jump")
+    InfiniteJumpEnabled = false
+end
 
 local function PerformDash()
     if not DashEnabled then return end
@@ -807,6 +824,7 @@ end
 
 local function DisableInvisible()
     DisconnectKey("Invisible")
+    InvisibleEnabled = false
     local char = LocalPlayer.Character
     if char then
         for _, part in pairs(char:GetDescendants()) do
@@ -859,6 +877,7 @@ end
 
 local function DisableHitboxExpander()
     DisconnectKey("Hitbox")
+    HitboxEnabled = false
     task.wait(0.05)
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
@@ -900,7 +919,10 @@ local function EnableChatSpam()
     end)
 end
 
-local function DisableChatSpam() DisconnectKey("ChatSpam") end
+local function DisableChatSpam()
+    DisconnectKey("ChatSpam")
+    ChatSpamEnabled = false
+end
 
 local function EnableSoundESP()
     DisconnectKey("SoundESP")
@@ -938,6 +960,7 @@ end
 
 local function DisableSoundESP()
     DisconnectKey("SoundESP")
+    SoundESPEnabled = false
     if SoundESPBeep then pcall(function() SoundESPBeep:Destroy() end); SoundESPBeep = nil end
 end
 
@@ -1007,7 +1030,7 @@ local function EnableAutoRespawn()
     end)
     ActiveConnections["AutoRespawn"] = conn
 end
-local function DisableAutoRespawn() DisconnectKey("AutoRespawn") end
+local function DisableAutoRespawn() DisconnectKey("AutoRespawn"); AutoRespawnEnabled = false end
 
 local function EnableAntiFling()
     DisconnectKey("AntiFling")
@@ -1022,7 +1045,7 @@ local function EnableAntiFling()
     end)
     ActiveConnections["AntiFling"] = conn
 end
-local function DisableAntiFling() DisconnectKey("AntiFling") end
+local function DisableAntiFling() DisconnectKey("AntiFling"); AntiFlingEnabled = false end
 
 local function EnableAntiAFK()
     DisconnectKey("AntiAFK")
@@ -1035,7 +1058,7 @@ local function EnableAntiAFK()
     end)
     ActiveConnections["AntiAFK"] = conn
 end
-local function DisableAntiAFK() DisconnectKey("AntiAFK") end
+local function DisableAntiAFK() DisconnectKey("AntiAFK"); AntiAFKEnabled = false end
 
 --==============================================================
 -- ESP
@@ -1075,7 +1098,7 @@ local function EnableRainbowESP()
     ActiveConnections["Rainbow"] = conn
 end
 
-local function DisableRainbowESP() DisconnectKey("Rainbow") end
+local function DisableRainbowESP() DisconnectKey("Rainbow"); RainbowESPEnabled = false end
 
 local function CreateESP(player)
     if ESPObjects[player] then return end
@@ -1244,6 +1267,7 @@ end
 
 local function DisableESPLoop()
     DisconnectKey("ESPLoop")
+    ESPEnabled = false
     for _, d in pairs(ESPObjects) do
         for _, v in pairs(d) do pcall(function() v.Visible = false end) end
     end
@@ -1252,7 +1276,7 @@ local function DisableESPLoop()
 end
 
 --==============================================================
--- AIMBOT + SILENT + TARGET PRIORITY
+-- AIMBOT
 --==============================================================
 local function IsSameTeam(player)
     if not AimbotTeamCheck then return false end
@@ -1387,18 +1411,6 @@ local function RunAimbot()
     end
 end
 
-local function LookAtPlayer()
-    if not LookAtEnabled then return end
-    local target, tType = FindTarget()
-    if target then
-        local tPart = GetTargetPart(target, tType)
-        if tPart then
-            local camPos = Camera.CFrame.Position
-            pcall(function() Camera.CFrame = CFrame.new(camPos, camPos + (tPart.Position - camPos).Unit) end)
-        end
-    end
-end
-
 local function TryAutoShoot()
     if not AutoShootEnabled then return end
     local char = LocalPlayer.Character
@@ -1429,7 +1441,6 @@ local function EnableAimbotLoop()
     DisconnectKey("Aimbot")
     local conn = RunService.RenderStepped:Connect(function()
         if AimbotEnabled then RunAimbot() end
-        if LookAtEnabled then LookAtPlayer() end
         if AutoShootEnabled then
             local now = tick()
             if now - AutoShootLast >= AutoShootDelay/1000 then
@@ -1462,6 +1473,7 @@ end
 
 local function DisableDroneMode()
     DisconnectKey("DroneMode")
+    DroneModeEnabled = false
     pcall(function()
         Camera.CameraSubject = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
         Camera.CameraType = Enum.CameraType.Custom
@@ -1493,26 +1505,18 @@ local function EnableKillNotif()
                 end
             end
         end
-        if LocalPlayer.Character then
-            local myHum = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if myHum and myHum.Health > 0 and myHum.Health <= myHum.MaxHealth * 0.3 then
-                if not _G._ZET_LowHPWarned or tick() - _G._ZET_LowHPWarned > 10 then
-                    _G._ZET_LowHPWarned = tick()
-                    Notify("⚠️ LOW HP", "> HP: " .. math.floor(myHum.Health) .. "/" .. myHum.MaxHealth, 3)
-                end
-            end
-        end
     end)
     ActiveConnections["KillNotif"] = conn
 end
-local function DisableKillNotif() DisconnectKey("KillNotif") end
+local function DisableKillNotif() DisconnectKey("KillNotif"); KillNotifEnabled = false end
 
 --==============================================================
--- INFO PANEL
+-- INFO PANEL ✅ FIX: Destroy saat OFF
 --==============================================================
-local InfoPanelLabel = nil
 local function CreateInfoPanel()
+    if InfoPanelFrame then pcall(function() InfoPanelFrame:Destroy() end) end
     InfoPanelFrame = Instance.new("Frame")
+    InfoPanelFrame.Name = "ZetInfoPanel"
     InfoPanelFrame.Size = UDim2.new(0, 180, 0, 70)
     InfoPanelFrame.Position = UDim2.new(1, -190, 1, -80)
     InfoPanelFrame.BackgroundColor3 = THEME.PanelBG
@@ -1523,7 +1527,7 @@ local function CreateInfoPanel()
     InfoPanelFrame.Parent = ScreenGui
     Instance.new("UICorner", InfoPanelFrame).CornerRadius = UDim.new(0, 8)
 
-    InfoPanelLabel = Instance.new("TextLabel")
+    local InfoPanelLabel = Instance.new("TextLabel")
     InfoPanelLabel.Size = UDim2.new(1, -10, 1, -10)
     InfoPanelLabel.Position = UDim2.new(0, 5, 0, 5)
     InfoPanelLabel.BackgroundTransparency = 1
@@ -1538,6 +1542,7 @@ local function CreateInfoPanel()
 
     task.spawn(function()
         while task.wait(1) do
+            if not InfoPanelFrame or not InfoPanelFrame.Parent then break end
             pcall(function()
                 local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
                 local pc = #Players:GetPlayers()
@@ -1546,6 +1551,13 @@ local function CreateInfoPanel()
             end)
         end
     end)
+end
+
+local function DestroyInfoPanel()
+    if InfoPanelFrame then
+        pcall(function() InfoPanelFrame:Destroy() end)
+        InfoPanelFrame = nil
+    end
 end
 
 --==============================================================
@@ -1680,111 +1692,133 @@ local function LoadLocation()
     else Notify("Save", "> NO SAVED", 2) end
 end
 
---==============================================================
--- WAYPOINT
---==============================================================
 local function AddWaypoint(name)
     if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
     table.insert(Waypoints, {Name = name, CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame})
     Notify("Waypoint", "> Added: " .. name, 2)
 end
 
-local function GotoWaypoint(wp)
-    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
-    pcall(function()
-        LocalPlayer.Character.HumanoidRootPart.CFrame = wp.CFrame + Vector3.new(0, 3, 0)
-        Notify("Waypoint", "> TP to: " .. wp.Name, 2)
-    end)
-end
-
 --==============================================================
--- UI BUILDER
+-- ✅ UI BUILDER (FIXED)
 --==============================================================
 local function CreateUI()
     print("[ZET] Creating UI...")
 
-    -- LOADING
+    -- ================= LOADING SCREEN (10s + FULLSCREEN) =================
     local LoadingScreen = Instance.new("Frame")
+    LoadingScreen.Name = "LoadingScreen"
     LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
-    LoadingScreen.BackgroundColor3 = Color3.fromRGB(0, 5, 15)
+    LoadingScreen.Position = UDim2.new(0, 0, 0, 0)
+    LoadingScreen.BackgroundColor3 = Color3.fromRGB(0, 3, 10)
     LoadingScreen.BorderSizePixel = 0
-    LoadingScreen.ZIndex = 300
+    LoadingScreen.ZIndex = 500
     LoadingScreen.Parent = ScreenGui
 
+    -- Background pattern
+    local BgPattern = Instance.new("Frame")
+    BgPattern.Size = UDim2.new(1, 0, 1, 0)
+    BgPattern.BackgroundColor3 = Color3.fromRGB(0, 5, 15)
+    BgPattern.BackgroundTransparency = 0.3
+    BgPattern.BorderSizePixel = 0
+    BgPattern.ZIndex = 501
+    BgPattern.Parent = LoadingScreen
+
     local LoadingBg = Instance.new("Frame")
-    LoadingBg.Size = UDim2.new(0, 360, 0, 200)
-    LoadingBg.Position = UDim2.new(0.5, -180, 0.5, -100)
+    LoadingBg.Size = UDim2.new(0, 400, 0, 240)
+    LoadingBg.Position = UDim2.new(0.5, -200, 0.5, -120)
     LoadingBg.BackgroundColor3 = THEME.MainBG
     LoadingBg.BorderColor3 = THEME.Accent
     LoadingBg.BorderSizePixel = 2
-    LoadingBg.ZIndex = 301
+    LoadingBg.ZIndex = 502
     LoadingBg.Parent = LoadingScreen
     Instance.new("UICorner", LoadingBg).CornerRadius = UDim.new(0, 12)
 
     local LTitle = Instance.new("TextLabel")
-    LTitle.Size = UDim2.new(1, -20, 0, 30)
-    LTitle.Position = UDim2.new(0, 10, 0, 15)
+    LTitle.Size = UDim2.new(1, -20, 0, 36)
+    LTitle.Position = UDim2.new(0, 10, 0, 20)
     LTitle.BackgroundTransparency = 1
     LTitle.Text = "ZETGAMES V4.4 RESMI"
     LTitle.TextColor3 = THEME.Text
     LTitle.Font = Enum.Font.Code
-    LTitle.TextSize = 16
-    LTitle.ZIndex = 302
+    LTitle.TextSize = 20
+    LTitle.ZIndex = 503
     LTitle.Parent = LoadingBg
 
     local LTag = Instance.new("TextLabel")
-    LTag.Size = UDim2.new(1, -20, 0, 18)
-    LTag.Position = UDim2.new(0, 10, 0, 45)
+    LTag.Size = UDim2.new(1, -20, 0, 20)
+    LTag.Position = UDim2.new(0, 10, 0, 58)
     LTag.BackgroundTransparency = 1
     LTag.Text = "[ OFFICIAL RELEASE ]"
     LTag.TextColor3 = Color3.fromRGB(0, 255, 200)
     LTag.Font = Enum.Font.Code
-    LTag.TextSize = 9
-    LTag.ZIndex = 302
+    LTag.TextSize = 10
+    LTag.ZIndex = 503
     LTag.Parent = LoadingBg
 
     local LStatus = Instance.new("TextLabel")
-    LStatus.Size = UDim2.new(1, -20, 0, 18)
-    LStatus.Position = UDim2.new(0, 10, 0, 70)
+    LStatus.Size = UDim2.new(1, -20, 0, 20)
+    LStatus.Position = UDim2.new(0, 10, 0, 88)
     LStatus.BackgroundTransparency = 1
-    LStatus.Text = "> Loading..."
+    LStatus.Text = "> Menginisialisasi sistem..."
     LStatus.TextColor3 = THEME.TextLight
     LStatus.Font = Enum.Font.Code
-    LStatus.TextSize = 10
+    LStatus.TextSize = 11
     LStatus.TextXAlignment = Enum.TextXAlignment.Left
-    LStatus.ZIndex = 302
+    LStatus.ZIndex = 503
     LStatus.Parent = LoadingBg
 
     local LBarBg = Instance.new("Frame")
-    LBarBg.Size = UDim2.new(1, -20, 0, 15)
-    LBarBg.Position = UDim2.new(0, 10, 0, 100)
+    LBarBg.Size = UDim2.new(1, -20, 0, 18)
+    LBarBg.Position = UDim2.new(0, 10, 0, 120)
     LBarBg.BackgroundColor3 = Color3.fromRGB(10, 25, 40)
     LBarBg.BorderColor3 = THEME.Accent
     LBarBg.BorderSizePixel = 1
-    LBarBg.ZIndex = 302
+    LBarBg.ZIndex = 503
     LBarBg.Parent = LoadingBg
-    Instance.new("UICorner", LBarBg).CornerRadius = UDim.new(0, 7)
+    Instance.new("UICorner", LBarBg).CornerRadius = UDim.new(0, 9)
 
     local LBarFill = Instance.new("Frame")
     LBarFill.Size = UDim2.new(0, 0, 1, 0)
     LBarFill.BackgroundColor3 = THEME.Accent
     LBarFill.BorderSizePixel = 0
-    LBarFill.ZIndex = 303
+    LBarFill.ZIndex = 504
     LBarFill.Parent = LBarBg
-    Instance.new("UICorner", LBarFill).CornerRadius = UDim.new(0, 7)
+    Instance.new("UICorner", LBarFill).CornerRadius = UDim.new(0, 9)
 
     local LPercent = Instance.new("TextLabel")
-    LPercent.Size = UDim2.new(1, -20, 0, 20)
-    LPercent.Position = UDim2.new(0, 10, 0, 125)
+    LPercent.Size = UDim2.new(1, -20, 0, 22)
+    LPercent.Position = UDim2.new(0, 10, 0, 148)
     LPercent.BackgroundTransparency = 1
     LPercent.Text = "0%"
     LPercent.TextColor3 = THEME.Text
     LPercent.Font = Enum.Font.Code
-    LPercent.TextSize = 12
-    LPercent.ZIndex = 302
+    LPercent.TextSize = 13
+    LPercent.ZIndex = 503
     LPercent.Parent = LoadingBg
 
-    -- LOGIN FRAME
+    local LTimeLeft = Instance.new("TextLabel")
+    LTimeLeft.Size = UDim2.new(1, -20, 0, 20)
+    LTimeLeft.Position = UDim2.new(0, 10, 0, 178)
+    LTimeLeft.BackgroundTransparency = 1
+    LTimeLeft.Text = "Waktu tersisa: 10 detik"
+    LTimeLeft.TextColor3 = THEME.TextLight
+    LTimeLeft.Font = Enum.Font.Code
+    LTimeLeft.TextSize = 10
+    LTimeLeft.ZIndex = 503
+    LTimeLeft.Parent = LoadingBg
+
+    local LVersion = Instance.new("TextLabel")
+    LVersion.Size = UDim2.new(1, -20, 0, 18)
+    LVersion.Position = UDim2.new(0, 10, 0, 205)
+    LVersion.BackgroundTransparency = 1
+    LVersion.Text = "V4.4 | Build Official"
+    LVersion.TextColor3 = Color3.fromRGB(60, 100, 140)
+    LVersion.Font = Enum.Font.Code
+    LVersion.TextSize = 9
+    LVersion.ZIndex = 503
+    LVersion.Parent = LoadingBg
+
+    -- ================= LOGIN FRAME =================
     local LoginFrame = Instance.new("Frame")
     LoginFrame.Size = UDim2.new(0, 320, 0, 400)
     LoginFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
@@ -1882,7 +1916,6 @@ local function CreateUI()
     LoginBtn.Parent = LoginFrame
     Instance.new("UICorner", LoginBtn).CornerRadius = UDim.new(0, 5)
 
-    -- GET KEY (TANPA setclipboard biar gak kena ban)
     local GetKeyBtn = Instance.new("TextButton")
     GetKeyBtn.Size = UDim2.new(1, -30, 0, 45)
     GetKeyBtn.Position = UDim2.new(0, 15, 0, 240)
@@ -1922,7 +1955,7 @@ local function CreateUI()
     Instr.ZIndex = 102
     Instr.Parent = LoginFrame
 
-    -- MAIN HUB
+    -- ================= MAIN HUB =================
     local MainHub = Instance.new("Frame")
     MainHub.Size = UDim2.new(0, 360, 0, 500)
     MainHub.Position = UDim2.new(0.5, -180, 0.5, -250)
@@ -2083,13 +2116,13 @@ local function CreateUI()
         return b
     end
 
-    -- SAFE MODE + NIGHT LOCK (RESMI)
+    -- SAFE MODE
     Section("=== 🛡️ SAFE MODE (LOCKED) ===", 10)
     LockedToggle("> 🛡️ ANTI-KICK: ON (SAFE)", 42)
     LockedToggle("> 🔄 AUTO-RECONNECT: ON", 82)
     LockedToggle("> 🔒 NIGHT LOCK: ON (AUTO KICK)", 122)
 
-    -- THEME SWITCHER
+    -- THEME
     Section("=== 🎨 THEME SWITCHER ===", 170)
     local ThemeLbl = Instance.new("TextLabel")
     ThemeLbl.Size = UDim2.new(1, -20, 0, 18)
@@ -2462,20 +2495,24 @@ local function CreateUI()
 
     -- KILL NOTIF
     Section("=== 🔔 KILL/DEATH NOTIF ===", 2182)
-    Toggle("> KILL NOTIF: ON", 2214, function(btn)
+    Toggle("> KILL NOTIF: OFF", 2214, function(btn)
         KillNotifEnabled = not KillNotifEnabled
         btn.Text = KillNotifEnabled and "> KILL NOTIF: ON" or "> KILL NOTIF: OFF"
         btn.BackgroundColor3 = KillNotifEnabled and THEME.ButtonActive or THEME.ButtonBG
         if KillNotifEnabled then EnableKillNotif() else DisableKillNotif() end
     end)
 
-    -- INFO PANEL
+    -- INFO PANEL ✅ FIX
     Section("=== 📊 INFO PANEL ===", 2262)
-    Toggle("> INFO PANEL: ON", 2294, function(btn)
+    Toggle("> INFO PANEL: OFF", 2294, function(btn)
         InfoPanelEnabled = not InfoPanelEnabled
         btn.Text = InfoPanelEnabled and "> INFO PANEL: ON" or "> INFO PANEL: OFF"
         btn.BackgroundColor3 = InfoPanelEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if InfoPanelFrame then InfoPanelFrame.Visible = InfoPanelEnabled end
+        if InfoPanelEnabled then
+            CreateInfoPanel()
+        else
+            DestroyInfoPanel()
+        end
     end)
 
     -- WAYPOINT
@@ -2589,23 +2626,40 @@ local function CreateUI()
     MakeDraggable(LoginFrame)
     MakeDraggable(MainHub)
 
-    if InfoPanelEnabled then CreateInfoPanel() end
-
-    -- LOADING → LOGIN
+    -- ================= LOADING 10 DETIK =================
     task.spawn(function()
+        local totalTime = 10
+        local startTime = tick()
+        local messages = {
+            "> Menginisialisasi sistem...",
+            "> Memuat resource...",
+            "> Menghubungkan ke server...",
+            "> Memuat konfigurasi...",
+            "> Memverifikasi build...",
+            "> Menyiapkan UI...",
+            "> Memuat fitur...",
+            "> Sinkronisasi data...",
+            "> Finalisasi...",
+            "> Selesai!",
+        }
         for i = 1, 100 do
-            task.wait(0.03)
+            local elapsed = tick() - startTime
+            local remaining = math.max(0, totalTime - elapsed)
             LBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
             LPercent.Text = i .. "%"
+            LTimeLeft.Text = "Waktu tersisa: " .. math.ceil(remaining) .. " detik"
+            local msgIdx = math.min(10, math.ceil(i / 10))
+            LStatus.Text = messages[msgIdx]
+            task.wait(totalTime / 100)
         end
         task.wait(0.3)
         LoadingScreen.Visible = false
         LoadingScreen:Destroy()
         LoginFrame.Visible = true
-        Notify("V4.4 RESMI", "> NIGHT LOCK ACTIVE", 3)
+        Notify("V4.4 RESMI", "> Silakan login dengan key", 3)
     end)
 
-    -- LOGIN LOGIC
+    -- ================= LOGIN LOGIC =================
     LoginBtn.MouseButton1Click:Connect(function()
         local key = KeyInput.Text
         local kd = ValidKeys[key]
@@ -2629,7 +2683,6 @@ local function CreateUI()
         end
     end)
 
-    -- GET KEY (TANPA setclipboard)
     GetKeyBtn.MouseButton1Click:Connect(function()
         StatusTxt.Text = "> Key site: " .. KeyWebsite
         Notify("🔑 Key Site", KeyWebsite, 5)
