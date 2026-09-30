@@ -76,7 +76,7 @@ local ValidKeys = {
     ["FazxyFree"] = {Expiry = os.time({year=2027, month=9, day=10}), Level = "Code"},
     ["FreePrem-By-Fazxy"] = {Expiry = 0, Level = "Free"},
 }
-local KeyWebsite = "rscripts.net/@ZetGames"
+local KeyWebsite = "https://arkaraffaza387-dotcom.github.io/Key-Zero/"
 
 --==============================================================
 -- SCREEN GUI
@@ -1942,7 +1942,7 @@ local function CreateUI()
     Instr.Size = UDim2.new(1, -30, 0, 60)
     Instr.Position = UDim2.new(0, 15, 0, 325)
     Instr.BackgroundTransparency = 1
-    Instr.Text = "> Keys: AzferModz, AzferFree,\n> AzferCode, AzferHc,\n> FazxyFree, FreePrem-By-Fazxy"
+    Instr.Text = "> STEPS:\n> 1. Klik GET KEY\n> 2. Ambil key di website\n> 3. Masukkan key\n> 4. AUTHENTICATE"
     Instr.TextColor3 = THEME.TextLight
     Instr.Font = Enum.Font.Code
     Instr.TextSize = 9
@@ -2811,7 +2811,7 @@ local function CreateUI()
         Notify("V4.4 RESMI", "> Silakan login dengan key", 3)
     end)
 
-    -- LOGIN LOGIC + CTA
+    -- LOGIN LOGIC
     LoginBtn.MouseButton1Click:Connect(function()
         local key = KeyInput.Text
         local kd = ValidKeys[key]
@@ -2839,9 +2839,11 @@ local function CreateUI()
         end
     end)
 
+    -- GET KEY → WEBSITE KEY ASLI
     GetKeyBtn.MouseButton1Click:Connect(function()
-        StatusTxt.Text = "> Key site: " .. KeyWebsite
-        Notify("🔑 Key Site", KeyWebsite, 5)
+        StatusTxt.Text = "> Buka website key di browser..."
+        Notify("🔑 Get Key", "Buka: " .. KeyWebsite, 8)
+        Notify("📋 Steps", "1. Copy link di atas\n2. Buka di browser\n3. Ambil key", 6)
     end)
 end
 
