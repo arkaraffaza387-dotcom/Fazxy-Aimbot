@@ -1,10 +1,11 @@
 --[[
-    ZetGames-AimLock V4.4 | OFFICIAL RESMI
+    ZetGames-AimLock V4.4 | OFFICIAL RESMI (FIXED)
     Theme: Blue & Black
     Login: ✅ WAJIB KEY
     Anti-Kick: ✅ SAFE MODE
     Night Lock: ✅ ACTIVE (Auto Kick)
     All Features: 100% WORK
+    FIXED: Menu muncul, ScrollFrame, Z-Index, Loading Screen
 --]]
 
 --==============================================================
@@ -28,7 +29,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 pcall(function() SoundService.RespectFilteringEnabled = false end)
 
-print("[ZET] Loading V4.4 RESMI...")
+print("[ZET] Loading V4.4 RESMI (FIXED)...")
 
 --==============================================================
 -- THEME
@@ -73,15 +74,20 @@ local ValidKeys = {
 local KeyWebsite = "https://arkaraffaza387-dotcom.github.io/Key-Zero/"
 
 --==============================================================
--- SCREEN GUI
+-- SCREEN GUI (FIXED)
 --==============================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZetGamesV44Resmi"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-local coreOk = pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
-if not coreOk or not ScreenGui.Parent then
-    pcall(function() ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end)
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.DisplayOrder = 9999
+
+local parentOk = pcall(function()
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui", 5)
+end)
+if not parentOk or not ScreenGui.Parent then
+    pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
 end
 
 print("[ZET] GUI Parent: " .. tostring(ScreenGui.Parent and ScreenGui.Parent.Name or "NIL"))
@@ -101,7 +107,7 @@ local function DisconnectKey(key)
     end
 end
 
--- Feature Flags (DEFAULT OFF)
+-- Feature Flags
 local AimbotEnabled = false
 local AimbotTargetPart = "Head"
 local AimbotFOV = 250
@@ -218,7 +224,7 @@ local MaxReconnectAttempts = 5
 local WatchdogLastPing = tick()
 local WatchdogPingThreshold = 60
 
--- 🔒 NIGHT LOCK (RESMI)
+-- NIGHT LOCK
 local NightLockActive = true
 local NightLockKickLog = {}
 local NightLockScanInterval = 1
@@ -260,7 +266,7 @@ local Notifications = Instance.new("Frame")
 Notifications.Size = UDim2.new(0, 250, 1, 0)
 Notifications.Position = UDim2.new(1, -260, 0, 10)
 Notifications.BackgroundTransparency = 1
-Notifications.ZIndex = 500
+Notifications.ZIndex = 4000
 Notifications.Parent = ScreenGui
 
 local function Notify(title, message, duration)
@@ -271,7 +277,7 @@ local function Notify(title, message, duration)
     Notif.BackgroundColor3 = THEME.PanelBG
     Notif.BorderColor3 = THEME.Accent
     Notif.BorderSizePixel = 2
-    Notif.ZIndex = 501
+    Notif.ZIndex = 4001
     Notif.Parent = Notifications
     Instance.new("UICorner", Notif).CornerRadius = UDim.new(0, 8)
     local T = Instance.new("TextLabel")
@@ -283,7 +289,7 @@ local function Notify(title, message, duration)
     T.Font = Enum.Font.Code
     T.TextSize = 12
     T.TextXAlignment = Enum.TextXAlignment.Left
-    T.ZIndex = 502
+    T.ZIndex = 4002
     T.Parent = Notif
     local M = Instance.new("TextLabel")
     M.Size = UDim2.new(1, -16, 0, 22)
@@ -294,7 +300,7 @@ local function Notify(title, message, duration)
     M.Font = Enum.Font.Code
     M.TextSize = 10
     M.TextXAlignment = Enum.TextXAlignment.Left
-    M.ZIndex = 502
+    M.ZIndex = 4002
     M.Parent = Notif
     TweenService:Create(Notif, TweenInfo.new(0.3), {Position = UDim2.new(0, 0, 0, 0)}):Play()
     task.delay(duration, function()
@@ -449,7 +455,7 @@ local function ActivateAutoReconnect()
 end
 
 --==============================================================
--- 🔒 NIGHT LOCK (RESMI - AUTO KICK)
+-- NIGHT LOCK
 --==============================================================
 local function ActivateNightLock()
     DisconnectKey("NightLock")
@@ -466,14 +472,12 @@ local function ActivateNightLock()
                 local suspicious = false
                 local reason = ""
 
-                -- Deteksi nama suspicious
                 if string.find(name, "bot", 1, true) then suspicious = true; reason = "Name: bot" end
                 if string.find(name, "exploit", 1, true) then suspicious = true; reason = "Name: exploit" end
                 if string.find(name, "hack", 1, true) then suspicious = true; reason = "Name: hack" end
                 if string.find(name, "cheat", 1, true) then suspicious = true; reason = "Name: cheat" end
                 if string.find(name, "aimbot", 1, true) then suspicious = true; reason = "Name: aimbot" end
 
-                -- Deteksi karakter abnormal
                 if plr.Character then
                     local root = plr.Character:FindFirstChild("HumanoidRootPart")
                     local hum = plr.Character:FindFirstChild("Humanoid")
@@ -489,7 +493,6 @@ local function ActivateNightLock()
                     end
                 end
 
-                -- AUTO KICK
                 if suspicious and not NightLockKickLog[plr.UserId] then
                     NightLockKickLog[plr.UserId] = true
                     Notify("🔒 NIGHT LOCK", "> " .. plr.Name .. " | " .. reason, 5)
@@ -728,7 +731,7 @@ local function DisableFPSBoost()
 end
 
 --==============================================================
--- 🔧 NOCLIP (FIXED - GAK RESET)
+-- NOCLIP
 --==============================================================
 local function EnableNoclip()
     DisconnectKey("Noclip")
@@ -738,14 +741,10 @@ local function EnableNoclip()
         if not char then return end
         local hum = char:FindFirstChildOfClass("Humanoid")
         if hum then
-            pcall(function()
-                hum:ChangeState(Enum.HumanoidStateType.Physics)
-            end)
+            pcall(function() hum:ChangeState(Enum.HumanoidStateType.Physics) end)
         end
         for _, p in pairs(char:GetDescendants()) do
-            if p:IsA("BasePart") then
-                p.CanCollide = false
-            end
+            if p:IsA("BasePart") then p.CanCollide = false end
         end
     end)
     ActiveConnections["Noclip"] = conn
@@ -757,17 +756,12 @@ local function DisableNoclip()
     local char = LocalPlayer.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            pcall(function() hum:ChangeState(Enum.HumanoidStateType.GettingUp) end)
-        end
+        if hum then pcall(function() hum:ChangeState(Enum.HumanoidStateType.GettingUp) end) end
         for _, p in pairs(char:GetDescendants()) do
             if p:IsA("BasePart") then
                 pcall(function()
-                    if p.Name == "HumanoidRootPart" then
-                        p.CanCollide = false
-                    else
-                        p.CanCollide = true
-                    end
+                    if p.Name == "HumanoidRootPart" then p.CanCollide = false
+                    else p.CanCollide = true end
                 end)
             end
         end
@@ -1561,7 +1555,7 @@ local function CreateInfoPanel()
     InfoPanelFrame.BackgroundTransparency = 0.2
     InfoPanelFrame.BorderColor3 = THEME.Accent
     InfoPanelFrame.BorderSizePixel = 2
-    InfoPanelFrame.ZIndex = 100
+    InfoPanelFrame.ZIndex = 200
     InfoPanelFrame.Parent = ScreenGui
     Instance.new("UICorner", InfoPanelFrame).CornerRadius = UDim.new(0, 8)
 
@@ -1575,7 +1569,7 @@ local function CreateInfoPanel()
     InfoPanelLabel.TextSize = 10
     InfoPanelLabel.TextXAlignment = Enum.TextXAlignment.Left
     InfoPanelLabel.TextYAlignment = Enum.TextYAlignment.Top
-    InfoPanelLabel.ZIndex = 101
+    InfoPanelLabel.ZIndex = 201
     InfoPanelLabel.Parent = InfoPanelFrame
 
     task.spawn(function()
@@ -1741,13 +1735,14 @@ local function GotoWaypoint(wp)
 end
 
 --==============================================================
--- CREATE UI
+-- CREATE UI (FULLY FIXED)
 --==============================================================
 local function CreateUI()
     print("[ZET] Creating UI...")
 
-    -- LOADING SCREEN
+    -- ===== LOADING SCREEN =====
     local LoadingScreen = Instance.new("Frame")
+    LoadingScreen.Name = "LoadingScreen"
     LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
     LoadingScreen.BackgroundColor3 = Color3.fromRGB(0, 5, 15)
     LoadingScreen.BorderSizePixel = 0
@@ -1827,15 +1822,16 @@ local function CreateUI()
     LPercent.ZIndex = 302
     LPercent.Parent = LoadingBg
 
-    -- LOGIN FRAME
+    -- ===== LOGIN FRAME =====
     local LoginFrame = Instance.new("Frame")
+    LoginFrame.Name = "LoginFrame"
     LoginFrame.Size = UDim2.new(0, 320, 0, 400)
     LoginFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
     LoginFrame.BackgroundColor3 = THEME.MainBG
     LoginFrame.BorderColor3 = THEME.Accent
     LoginFrame.BorderSizePixel = 2
     LoginFrame.Visible = false
-    LoginFrame.ZIndex = 10
+    LoginFrame.ZIndex = 100
     LoginFrame.Parent = ScreenGui
     Instance.new("UICorner", LoginFrame).CornerRadius = UDim.new(0, 10)
 
@@ -1843,7 +1839,7 @@ local function CreateUI()
     LTopBar.Size = UDim2.new(1, 0, 0, 35)
     LTopBar.BackgroundColor3 = THEME.SectionBG
     LTopBar.BorderSizePixel = 0
-    LTopBar.ZIndex = 11
+    LTopBar.ZIndex = 101
     LTopBar.Parent = LoginFrame
     Instance.new("UICorner", LTopBar).CornerRadius = UDim.new(0, 10)
 
@@ -1856,7 +1852,7 @@ local function CreateUI()
     LTopTxt.Font = Enum.Font.Code
     LTopTxt.TextSize = 11
     LTopTxt.TextXAlignment = Enum.TextXAlignment.Left
-    LTopTxt.ZIndex = 12
+    LTopTxt.ZIndex = 102
     LTopTxt.Parent = LTopBar
 
     local LTitle2 = Instance.new("TextLabel")
@@ -1867,7 +1863,7 @@ local function CreateUI()
     LTitle2.TextColor3 = THEME.Text
     LTitle2.Font = Enum.Font.Code
     LTitle2.TextSize = 16
-    LTitle2.ZIndex = 12
+    LTitle2.ZIndex = 102
     LTitle2.Parent = LoginFrame
 
     local LTag2 = Instance.new("TextLabel")
@@ -1879,7 +1875,7 @@ local function CreateUI()
     LTag2.Font = Enum.Font.Code
     LTag2.TextSize = 9
     LTag2.TextXAlignment = Enum.TextXAlignment.Left
-    LTag2.ZIndex = 12
+    LTag2.ZIndex = 102
     LTag2.Parent = LoginFrame
 
     local KeyLbl = Instance.new("TextLabel")
@@ -1891,7 +1887,7 @@ local function CreateUI()
     KeyLbl.Font = Enum.Font.Code
     KeyLbl.TextSize = 12
     KeyLbl.TextXAlignment = Enum.TextXAlignment.Left
-    KeyLbl.ZIndex = 12
+    KeyLbl.ZIndex = 102
     KeyLbl.Parent = LoginFrame
 
     local KeyInput = Instance.new("TextBox")
@@ -1906,7 +1902,7 @@ local function CreateUI()
     KeyInput.TextColor3 = THEME.Text
     KeyInput.Font = Enum.Font.Code
     KeyInput.TextSize = 13
-    KeyInput.ZIndex = 12
+    KeyInput.ZIndex = 102
     KeyInput.Parent = LoginFrame
     Instance.new("UICorner", KeyInput).CornerRadius = UDim.new(0, 5)
 
@@ -1920,7 +1916,7 @@ local function CreateUI()
     LoginBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     LoginBtn.Font = Enum.Font.Code
     LoginBtn.TextSize = 14
-    LoginBtn.ZIndex = 12
+    LoginBtn.ZIndex = 102
     LoginBtn.Parent = LoginFrame
     Instance.new("UICorner", LoginBtn).CornerRadius = UDim.new(0, 5)
 
@@ -1934,7 +1930,7 @@ local function CreateUI()
     GetKeyBtn.TextColor3 = THEME.TextLight
     GetKeyBtn.Font = Enum.Font.Code
     GetKeyBtn.TextSize = 14
-    GetKeyBtn.ZIndex = 12
+    GetKeyBtn.ZIndex = 102
     GetKeyBtn.Parent = LoginFrame
     Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 5)
 
@@ -1947,7 +1943,7 @@ local function CreateUI()
     StatusTxt.Font = Enum.Font.Code
     StatusTxt.TextSize = 10
     StatusTxt.TextXAlignment = Enum.TextXAlignment.Left
-    StatusTxt.ZIndex = 12
+    StatusTxt.ZIndex = 102
     StatusTxt.Parent = LoginFrame
 
     local Instr = Instance.new("TextLabel")
@@ -1959,18 +1955,19 @@ local function CreateUI()
     Instr.Font = Enum.Font.Code
     Instr.TextSize = 9
     Instr.TextXAlignment = Enum.TextXAlignment.Left
-    Instr.ZIndex = 12
+    Instr.ZIndex = 102
     Instr.Parent = LoginFrame
 
-    -- MAIN HUB
+    -- ===== MAIN HUB =====
     local MainHub = Instance.new("Frame")
+    MainHub.Name = "MainHub"
     MainHub.Size = UDim2.new(0, 360, 0, 500)
     MainHub.Position = UDim2.new(0.5, -180, 0.5, -250)
     MainHub.BackgroundColor3 = THEME.MainBG
     MainHub.BorderColor3 = THEME.Accent
     MainHub.BorderSizePixel = 2
     MainHub.Visible = false
-    MainHub.ZIndex = 10
+    MainHub.ZIndex = 100
     MainHub.Parent = ScreenGui
     Instance.new("UICorner", MainHub).CornerRadius = UDim.new(0, 10)
 
@@ -1978,7 +1975,7 @@ local function CreateUI()
     TitleBar.Size = UDim2.new(1, 0, 0, 38)
     TitleBar.BackgroundColor3 = THEME.SectionBG
     TitleBar.BorderSizePixel = 0
-    TitleBar.ZIndex = 11
+    TitleBar.ZIndex = 101
     TitleBar.Parent = MainHub
     Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)
 
@@ -1991,7 +1988,7 @@ local function CreateUI()
     TitleText.Font = Enum.Font.Code
     TitleText.TextSize = 10
     TitleText.TextXAlignment = Enum.TextXAlignment.Left
-    TitleText.ZIndex = 12
+    TitleText.ZIndex = 102
     TitleText.Parent = TitleBar
 
     local CloseBtn = Instance.new("TextButton")
@@ -2004,10 +2001,11 @@ local function CreateUI()
     CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseBtn.Font = Enum.Font.Code
     CloseBtn.TextSize = 14
-    CloseBtn.ZIndex = 13
+    CloseBtn.ZIndex = 103
     CloseBtn.Parent = TitleBar
     Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 14)
 
+    -- ✅ FIXED: ScrollFrame dengan CanvasSize manual
     local ScrollFrame = Instance.new("ScrollingFrame")
     ScrollFrame.Size = UDim2.new(1, 0, 1, -38)
     ScrollFrame.Position = UDim2.new(0, 0, 0, 38)
@@ -2015,17 +2013,19 @@ local function CreateUI()
     ScrollFrame.BorderSizePixel = 0
     ScrollFrame.ScrollBarThickness = 6
     ScrollFrame.ScrollBarImageColor3 = THEME.Accent
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 3200)
     ScrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-    ScrollFrame.ZIndex = 11
+    ScrollFrame.ScrollingEnabled = true
+    ScrollFrame.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
+    ScrollFrame.ZIndex = 101
     ScrollFrame.Parent = MainHub
 
+    -- ✅ FIXED: ScrollContent dengan ukuran valid
     local ScrollContent = Instance.new("Frame")
-    ScrollContent.Size = UDim2.new(1, 0, 0, 0)
+    ScrollContent.Name = "ScrollContent"
+    ScrollContent.Size = UDim2.new(1, 0, 0, 3200)
     ScrollContent.BackgroundTransparency = 1
-    ScrollContent.AutomaticSize = Enum.AutomaticSize.Y
-    ScrollContent.ZIndex = 11
+    ScrollContent.ZIndex = 101
     ScrollContent.Parent = ScrollFrame
 
     local function Section(title, y)
@@ -2035,7 +2035,7 @@ local function CreateUI()
         f.BackgroundColor3 = THEME.SectionBG
         f.BorderColor3 = THEME.Accent
         f.BorderSizePixel = 1
-        f.ZIndex = 12
+        f.ZIndex = 102
         f.Parent = ScrollContent
         Instance.new("UICorner", f).CornerRadius = UDim.new(0, 4)
         local t = Instance.new("TextLabel")
@@ -2047,7 +2047,7 @@ local function CreateUI()
         t.Font = Enum.Font.Code
         t.TextSize = 11
         t.TextXAlignment = Enum.TextXAlignment.Left
-        t.ZIndex = 13
+        t.ZIndex = 103
         t.Parent = f
     end
 
@@ -2062,7 +2062,7 @@ local function CreateUI()
         btn.TextColor3 = THEME.Text
         btn.Font = Enum.Font.Code
         btn.TextSize = 11
-        btn.ZIndex = 12
+        btn.ZIndex = 102
         btn.Parent = ScrollContent
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
         btn.MouseButton1Click:Connect(function() callback(btn) end)
@@ -2080,7 +2080,7 @@ local function CreateUI()
         btn.TextColor3 = THEME.Locked
         btn.Font = Enum.Font.Code
         btn.TextSize = 11
-        btn.ZIndex = 12
+        btn.ZIndex = 102
         btn.Parent = ScrollContent
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
         btn.MouseButton1Click:Connect(function() Notify("🔒 Locked", "> Tidak bisa dimatiin", 2) end)
@@ -2100,7 +2100,7 @@ local function CreateUI()
         tb.TextColor3 = THEME.Text
         tb.Font = Enum.Font.Code
         tb.TextSize = 11
-        tb.ZIndex = 12
+        tb.ZIndex = 102
         tb.Parent = ScrollContent
         Instance.new("UICorner", tb).CornerRadius = UDim.new(0, 4)
         return tb
@@ -2117,7 +2117,7 @@ local function CreateUI()
         b.TextColor3 = THEME.Text
         b.Font = Enum.Font.Code
         b.TextSize = 10
-        b.ZIndex = 12
+        b.ZIndex = 102
         b.Parent = ScrollContent
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
         b.MouseButton1Click:Connect(function() callback(b) end)
@@ -2141,14 +2141,14 @@ local function CreateUI()
     ThemeLbl.Font = Enum.Font.Code
     ThemeLbl.TextSize = 10
     ThemeLbl.TextXAlignment = Enum.TextXAlignment.Left
-    ThemeLbl.ZIndex = 12
+    ThemeLbl.ZIndex = 102
     ThemeLbl.Parent = ScrollContent
 
     local ThemeBtnFrame = Instance.new("Frame")
     ThemeBtnFrame.Size = UDim2.new(1, -20, 0, 30)
     ThemeBtnFrame.Position = UDim2.new(0, 10, 0, 224)
     ThemeBtnFrame.BackgroundTransparency = 1
-    ThemeBtnFrame.ZIndex = 12
+    ThemeBtnFrame.ZIndex = 102
     ThemeBtnFrame.Parent = ScrollContent
 
     local function ThemeBtn(text, themeName, xPos)
@@ -2162,7 +2162,7 @@ local function CreateUI()
         b.TextColor3 = THEME.Text
         b.Font = Enum.Font.Code
         b.TextSize = 9
-        b.ZIndex = 13
+        b.ZIndex = 103
         b.Parent = ThemeBtnFrame
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 3)
         b.MouseButton1Click:Connect(function()
@@ -2189,7 +2189,7 @@ local function CreateUI()
     UIF.BackgroundColor3 = THEME.PanelBG
     UIF.BorderColor3 = THEME.Accent
     UIF.BorderSizePixel = 1
-    UIF.ZIndex = 12
+    UIF.ZIndex = 102
     UIF.Parent = ScrollContent
     Instance.new("UICorner", UIF).CornerRadius = UDim.new(0, 4)
 
@@ -2202,7 +2202,7 @@ local function CreateUI()
     NameLbl.Font = Enum.Font.Code
     NameLbl.TextSize = 11
     NameLbl.TextXAlignment = Enum.TextXAlignment.Left
-    NameLbl.ZIndex = 13
+    NameLbl.ZIndex = 103
     NameLbl.Parent = UIF
 
     local UserLbl = Instance.new("TextLabel")
@@ -2214,7 +2214,7 @@ local function CreateUI()
     UserLbl.Font = Enum.Font.Code
     UserLbl.TextSize = 11
     UserLbl.TextXAlignment = Enum.TextXAlignment.Left
-    UserLbl.ZIndex = 13
+    UserLbl.ZIndex = 103
     UserLbl.Parent = UIF
 
     local BuildLbl = Instance.new("TextLabel")
@@ -2226,7 +2226,7 @@ local function CreateUI()
     BuildLbl.Font = Enum.Font.Code
     BuildLbl.TextSize = 10
     BuildLbl.TextXAlignment = Enum.TextXAlignment.Left
-    BuildLbl.ZIndex = 13
+    BuildLbl.ZIndex = 103
     BuildLbl.Parent = UIF
 
     -- ===== MAIN FEATURES =====
@@ -2323,7 +2323,7 @@ local function CreateUI()
     AimbotBtn.TextColor3 = THEME.Text
     AimbotBtn.Font = Enum.Font.Code
     AimbotBtn.TextSize = 13
-    AimbotBtn.ZIndex = 12
+    AimbotBtn.ZIndex = 102
     AimbotBtn.Parent = ScrollContent
     Instance.new("UICorner", AimbotBtn).CornerRadius = UDim.new(0, 5)
     AimbotBtn.MouseButton1Click:Connect(function()
@@ -2332,7 +2332,6 @@ local function CreateUI()
         else AimbotBtn.Text = "> AIMBOT: OFF"; AimbotBtn.BackgroundColor3 = THEME.ButtonBG; AimbotStickyTarget = nil; AimbotStickyType = nil; DisconnectKey("Aimbot") end
     end)
 
-    -- 🎯 TARGET PART SELECTOR
     local TargetPartLbl = Instance.new("TextLabel")
     TargetPartLbl.Size = UDim2.new(1, -20, 0, 18)
     TargetPartLbl.Position = UDim2.new(0, 10, 0, 980)
@@ -2342,14 +2341,14 @@ local function CreateUI()
     TargetPartLbl.Font = Enum.Font.Code
     TargetPartLbl.TextSize = 10
     TargetPartLbl.TextXAlignment = Enum.TextXAlignment.Left
-    TargetPartLbl.ZIndex = 12
+    TargetPartLbl.ZIndex = 102
     TargetPartLbl.Parent = ScrollContent
 
     local TargetPartFrame = Instance.new("Frame")
     TargetPartFrame.Size = UDim2.new(1, -20, 0, 30)
     TargetPartFrame.Position = UDim2.new(0, 10, 0, 1002)
     TargetPartFrame.BackgroundTransparency = 1
-    TargetPartFrame.ZIndex = 12
+    TargetPartFrame.ZIndex = 102
     TargetPartFrame.Parent = ScrollContent
 
     local function TargetPartBtn(text, part, xPos)
@@ -2363,7 +2362,7 @@ local function CreateUI()
         b.TextColor3 = THEME.Text
         b.Font = Enum.Font.Code
         b.TextSize = 10
-        b.ZIndex = 13
+        b.ZIndex = 103
         b.Parent = TargetPartFrame
         Instance.new("UICorner", b).CornerRadius = UDim.new(0, 3)
         b.MouseButton1Click:Connect(function()
@@ -2611,14 +2610,14 @@ local function CreateUI()
     TeleportListFrame.ScrollBarThickness = 5
     TeleportListFrame.ScrollBarImageColor3 = THEME.Accent
     TeleportListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    TeleportListFrame.ZIndex = 12
+    TeleportListFrame.ZIndex = 102
     TeleportListFrame.Parent = ScrollContent
     Instance.new("UICorner", TeleportListFrame).CornerRadius = UDim.new(0, 4)
     TeleportListContainer = Instance.new("Frame")
     TeleportListContainer.Size = UDim2.new(1, -10, 1, -10)
     TeleportListContainer.Position = UDim2.new(0, 5, 0, 5)
     TeleportListContainer.BackgroundTransparency = 1
-    TeleportListContainer.ZIndex = 13
+    TeleportListContainer.ZIndex = 103
     TeleportListContainer.Parent = TeleportListFrame
     task.spawn(function()
         while task.wait(2) do
@@ -2632,7 +2631,7 @@ local function CreateUI()
     Half("> SAVE LOC", 3042, 0, function(btn) SaveLocation() end)
     Half("> LOAD LOC", 3042, 0.5, function(btn) LoadLocation() end)
 
-    -- ===== MENU BUTTON (DRAGGABLE) =====
+    -- ===== MENU BUTTON =====
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuBtn"
     ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
@@ -2644,7 +2643,7 @@ local function CreateUI()
     ToggleMenuButton.TextColor3 = THEME.Text
     ToggleMenuButton.Font = Enum.Font.Code
     ToggleMenuButton.TextSize = 24
-    ToggleMenuButton.ZIndex = 15
+    ToggleMenuButton.ZIndex = 200
     ToggleMenuButton.Visible = false
     ToggleMenuButton.Parent = ScreenGui
     Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
@@ -2724,17 +2723,6 @@ local function CreateUI()
     MakeDraggable(LoginFrame)
     MakeDraggable(MainHub)
 
-    MainHub:GetPropertyChangedSignal("Position"):Connect(function()
-        local vpSize = Camera.ViewportSize
-        local pos = MainHub.AbsolutePosition
-        local size = MainHub.AbsoluteSize
-        local newX = math.clamp(pos.X, 0, math.max(0, vpSize.X - size.X))
-        local newY = math.clamp(pos.Y, 0, math.max(0, vpSize.Y - size.Y))
-        if pos.X ~= newX or pos.Y ~= newY then
-            MainHub.Position = UDim2.new(0, newX, 0, newY)
-        end
-    end)
-
     -- ===== LOGIN LOGIC =====
     LoginBtn.MouseButton1Click:Connect(function()
         local key = KeyInput.Text
@@ -2771,14 +2759,28 @@ local function CreateUI()
     -- ===== LOADING =====
     task.spawn(function()
         for i = 1, 100 do
-            task.wait(0.04)
-            LBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
-            LPercent.Text = i .. "%"
+            task.wait(0.03)
+            pcall(function()
+                LBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
+                LPercent.Text = i .. "%"
+            end)
         end
         task.wait(0.3)
-        LoadingScreen.Visible = false
+        pcall(function()
+            LoadingScreen.Visible = false
+            LoadingScreen:Destroy()
+        end)
         LoginFrame.Visible = true
         Notify("V4.4 RESMI", "> NIGHT LOCK ACTIVE", 3)
+    end)
+
+    -- ===== DEBUG =====
+    task.delay(1, function()
+        print("[ZET][DEBUG] ScreenGui.Parent =", ScreenGui.Parent and ScreenGui.Parent.Name or "NIL")
+        print("[ZET][DEBUG] LoginFrame.Visible =", LoginFrame.Visible)
+        print("[ZET][DEBUG] LoginFrame.AbsoluteSize =", LoginFrame.AbsoluteSize)
+        print("[ZET][DEBUG] MainHub.AbsoluteSize =", MainHub.AbsoluteSize)
+        print("[ZET][DEBUG] ScrollContent.AbsoluteSize =", ScrollContent.AbsoluteSize)
     end)
 end
 
@@ -2788,6 +2790,6 @@ end
 print("[ZET] Starting UI...")
 local uiOk, uiErr = pcall(CreateUI)
 if not uiOk then
-    print("[ZET] ERROR di CreateUI: " .. tostring(uiErr))
+    warn("[ZET] ERROR di CreateUI: " .. tostring(uiErr))
 end
 print("[ZET] Script loaded successfully!")
