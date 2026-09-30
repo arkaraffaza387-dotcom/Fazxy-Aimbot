@@ -1,10 +1,16 @@
 --[[
-    ZetGames-AimLock V4.4 | OFFICIAL RESMI (FIXED)
-    Theme: Blue & Black
-    Login: WAJIB KEY
-    Night Lock: ACTIVE (Auto Kick)
-    Anti-Kick: SAFE MODE
-    FIXED: Noclip reset, Info Panel default OFF, Loading 10s fullscreen
+    ══════════════════════════════════════════════════
+      ZetGames-AimLock V4.4 | OFFICIAL RESMI
+    ══════════════════════════════════════════════════
+      Theme    : 🔵 Blue & Black
+      Login    : ✅ WAJIB KEY
+      Night Lock: ✅ ACTIVE (Auto Kick)
+      Anti-Kick: ✅ SAFE MODE
+      
+      ⭐ FOLLOW @ZetGames di rscripts.net
+      ⭐ Link: rscripts.net/@ZetGames
+      ⭐ Update V4.5, V4.6, dst coming soon!
+    ══════════════════════════════════════════════════
 --]]
 
 --==============================================================
@@ -28,10 +34,10 @@ local Mouse = LocalPlayer:GetMouse()
 
 pcall(function() SoundService.RespectFilteringEnabled = false end)
 
-print("[ZET] Loading V4.4 RESMI (FIXED)...")
+print("[ZET] Loading V4.4 RESMI...")
 
 --==============================================================
--- THEME SYSTEM (BIRU & HITAM DEFAULT)
+-- THEME
 --==============================================================
 local ThemePresets = {
     Biru = {MainBG=Color3.fromRGB(8,10,15), PanelBG=Color3.fromRGB(12,15,22), SectionBG=Color3.fromRGB(0,25,60), Accent=Color3.fromRGB(0,150,255), AccentLight=Color3.fromRGB(80,200,255), AccentDark=Color3.fromRGB(0,80,160), ButtonBG=Color3.fromRGB(20,25,35), ButtonActive=Color3.fromRGB(0,90,180), Text=Color3.fromRGB(0,180,255), TextLight=Color3.fromRGB(120,210,255)},
@@ -70,7 +76,7 @@ local ValidKeys = {
     ["FazxyFree"] = {Expiry = os.time({year=2027, month=9, day=10}), Level = "Code"},
     ["FreePrem-By-Fazxy"] = {Expiry = 0, Level = "Free"},
 }
-local KeyWebsite = "arkaraffaza387-dotcom.github.io/Key-Zero"
+local KeyWebsite = "rscripts.net/@ZetGames"
 
 --==============================================================
 -- SCREEN GUI
@@ -88,7 +94,7 @@ end
 print("[ZET] GUI Parent: " .. tostring(ScreenGui.Parent and ScreenGui.Parent.Name or "NIL"))
 
 --==============================================================
--- STATE (SEMUA DEFAULT OFF ✅ FIX BUG)
+-- STATE
 --==============================================================
 local IsLoggedIn = false
 local MenuVisible = true
@@ -102,7 +108,6 @@ local function DisconnectKey(key)
     end
 end
 
--- Feature Flags (SEMUA DEFAULT OFF)
 local AimbotEnabled = false
 local AimbotTargetPart = "Head"
 local AimbotFOV = 250
@@ -157,15 +162,12 @@ local OriginalCanCollide = {}
 
 local FullbrightEnabled = false
 local OriginalLighting = {}
-
 local FPSBoostEnabled = false
 local OriginalSettings = {}
-
 local SpeedHackEnabled = false
 local SpeedMultiplier = 100
 local MaxSpeed = 500
 local DefaultWalkSpeed = 16
-
 local NoclipEnabled = false
 local InfiniteJumpEnabled = false
 
@@ -190,12 +192,10 @@ local MusicShuffle = false
 local MusicRepeatAll = true
 
 local AutoRespawnEnabled = false
-local LookAtEnabled = false
 local AntiFlingEnabled = false
 local AntiAFKEnabled = false
 local HitboxEnabled = false
 local HitboxSize = 5
-
 local DashEnabled = false
 local DashCooldown = 0
 local InvisibleEnabled = false
@@ -203,12 +203,10 @@ local InvisibleOriginalTransparency = {}
 local AutoShootEnabled = false
 local AutoShootDelay = 100
 local DroneModeEnabled = false
-
-local KillNotifEnabled = false  -- ✅ FIX: default OFF
+local KillNotifEnabled = false
 local LastPlayerHealth = {}
-local InfoPanelEnabled = false   -- ✅ FIX: default OFF (dulu true)
+local InfoPanelEnabled = false
 local InfoPanelFrame = nil
-
 local Waypoints = {}
 
 local AntiKickEnabled = true
@@ -710,7 +708,7 @@ local function DisableFPSBoost()
 end
 
 --==============================================================
--- ✅ NOCLIP (FIXED — reset semua saat OFF)
+-- NOCLIP
 --==============================================================
 local function EnableNoclip()
     DisconnectKey("Noclip")
@@ -727,14 +725,13 @@ end
 
 local function DisableNoclip()
     DisconnectKey("Noclip")
-    NoclipEnabled = false -- ✅ FIX: pastikan state OFF
+    NoclipEnabled = false
     task.wait(0.1)
     local char = LocalPlayer.Character
     if char then
         for _, p in pairs(char:GetDescendants()) do
             if p:IsA("BasePart") then
                 pcall(function()
-                    -- ✅ FIX: HRP tetap false, bagian lain true
                     if p.Name == "HumanoidRootPart" then
                         p.CanCollide = false
                     else
@@ -1511,7 +1508,7 @@ end
 local function DisableKillNotif() DisconnectKey("KillNotif"); KillNotifEnabled = false end
 
 --==============================================================
--- INFO PANEL ✅ FIX: Destroy saat OFF
+-- INFO PANEL
 --==============================================================
 local function CreateInfoPanel()
     if InfoPanelFrame then pcall(function() InfoPanelFrame:Destroy() end) end
@@ -1699,12 +1696,12 @@ local function AddWaypoint(name)
 end
 
 --==============================================================
--- ✅ UI BUILDER (FIXED)
+-- UI BUILDER
 --==============================================================
 local function CreateUI()
     print("[ZET] Creating UI...")
 
-    -- ================= LOADING SCREEN (10s + FULLSCREEN) =================
+    -- LOADING
     local LoadingScreen = Instance.new("Frame")
     LoadingScreen.Name = "LoadingScreen"
     LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
@@ -1714,7 +1711,6 @@ local function CreateUI()
     LoadingScreen.ZIndex = 500
     LoadingScreen.Parent = ScreenGui
 
-    -- Background pattern
     local BgPattern = Instance.new("Frame")
     BgPattern.Size = UDim2.new(1, 0, 1, 0)
     BgPattern.BackgroundColor3 = Color3.fromRGB(0, 5, 15)
@@ -1811,14 +1807,14 @@ local function CreateUI()
     LVersion.Size = UDim2.new(1, -20, 0, 18)
     LVersion.Position = UDim2.new(0, 10, 0, 205)
     LVersion.BackgroundTransparency = 1
-    LVersion.Text = "V4.4 | Build Official"
+    LVersion.Text = "V4.4 | rscripts.net/@ZetGames"
     LVersion.TextColor3 = Color3.fromRGB(60, 100, 140)
     LVersion.Font = Enum.Font.Code
     LVersion.TextSize = 9
     LVersion.ZIndex = 503
     LVersion.Parent = LoadingBg
 
-    -- ================= LOGIN FRAME =================
+    -- LOGIN FRAME
     local LoginFrame = Instance.new("Frame")
     LoginFrame.Size = UDim2.new(0, 320, 0, 400)
     LoginFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
@@ -1955,7 +1951,7 @@ local function CreateUI()
     Instr.ZIndex = 102
     Instr.Parent = LoginFrame
 
-    -- ================= MAIN HUB =================
+    -- MAIN HUB
     local MainHub = Instance.new("Frame")
     MainHub.Size = UDim2.new(0, 360, 0, 500)
     MainHub.Position = UDim2.new(0.5, -180, 0.5, -250)
@@ -2008,14 +2004,14 @@ local function CreateUI()
     ScrollFrame.BorderSizePixel = 0
     ScrollFrame.ScrollBarThickness = 6
     ScrollFrame.ScrollBarImageColor3 = THEME.Accent
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 5200)
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 5600)
     ScrollFrame.ScrollingEnabled = true
     ScrollFrame.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
     ScrollFrame.ZIndex = 101
     ScrollFrame.Parent = MainHub
 
     local ScrollContent = Instance.new("Frame")
-    ScrollContent.Size = UDim2.new(1, 0, 0, 5200)
+    ScrollContent.Size = UDim2.new(1, 0, 0, 5600)
     ScrollContent.BackgroundTransparency = 1
     ScrollContent.ZIndex = 101
     ScrollContent.Parent = ScrollFrame
@@ -2502,17 +2498,13 @@ local function CreateUI()
         if KillNotifEnabled then EnableKillNotif() else DisableKillNotif() end
     end)
 
-    -- INFO PANEL ✅ FIX
+    -- INFO PANEL
     Section("=== 📊 INFO PANEL ===", 2262)
     Toggle("> INFO PANEL: OFF", 2294, function(btn)
         InfoPanelEnabled = not InfoPanelEnabled
         btn.Text = InfoPanelEnabled and "> INFO PANEL: ON" or "> INFO PANEL: OFF"
         btn.BackgroundColor3 = InfoPanelEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if InfoPanelEnabled then
-            CreateInfoPanel()
-        else
-            DestroyInfoPanel()
-        end
+        if InfoPanelEnabled then CreateInfoPanel() else DestroyInfoPanel() end
     end)
 
     -- WAYPOINT
@@ -2571,8 +2563,80 @@ local function CreateUI()
     Half("> SAVE LOC", 2951, 0, function(btn) SaveLocation() end)
     Half("> LOAD LOC", 2951, 0.5, function(btn) LoadLocation() end)
 
+    -- ⭐ SOCIAL SECTION
+    Section("=== ⭐ ZETGAMES OFFICIAL ===", 2999)
+
+    local SocialInfo = Instance.new("TextLabel")
+    SocialInfo.Size = UDim2.new(1, -20, 0, 60)
+    SocialInfo.Position = UDim2.new(0, 10, 0, 3031)
+    SocialInfo.BackgroundColor3 = THEME.PanelBG
+    SocialInfo.BorderColor3 = THEME.Accent
+    SocialInfo.BorderSizePixel = 1
+    SocialInfo.Text = "> Follow: rscripts.net/@ZetGames\n> Update tiap 2 minggu\n> V4.5 coming soon!"
+    SocialInfo.TextColor3 = THEME.TextLight
+    SocialInfo.Font = Enum.Font.Code
+    SocialInfo.TextSize = 10
+    SocialInfo.TextXAlignment = Enum.TextXAlignment.Left
+    SocialInfo.TextYAlignment = Enum.TextYAlignment.Top
+    SocialInfo.ZIndex = 102
+    SocialInfo.Parent = ScrollContent
+    Instance.new("UICorner", SocialInfo).CornerRadius = UDim.new(0, 4)
+
+    local PromoteBtn = Instance.new("TextButton")
+    PromoteBtn.Size = UDim2.new(1, -20, 0, 42)
+    PromoteBtn.Position = UDim2.new(0, 10, 0, 3097)
+    PromoteBtn.BackgroundColor3 = Color3.fromRGB(30, 100, 200)
+    PromoteBtn.BorderColor3 = Color3.fromRGB(100, 200, 255)
+    PromoteBtn.BorderSizePixel = 2
+    PromoteBtn.Text = "⭐ FOLLOW @ZetGames NOW"
+    PromoteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    PromoteBtn.Font = Enum.Font.Code
+    PromoteBtn.TextSize = 13
+    PromoteBtn.ZIndex = 102
+    PromoteBtn.Parent = ScrollContent
+    Instance.new("UICorner", PromoteBtn).CornerRadius = UDim.new(0, 5)
+    PromoteBtn.MouseButton1Click:Connect(function()
+        Notify("⭐ ZetGames", "rscripts.net/@ZetGames", 8)
+        Notify("💙 Thanks!", "Dukung creator biar update terus", 6)
+    end)
+
+    local PromoteBtn2 = Instance.new("TextButton")
+    PromoteBtn2.Size = UDim2.new(0.5, -15, 0, 34)
+    PromoteBtn2.Position = UDim2.new(0, 10, 0, 3147)
+    PromoteBtn2.BackgroundColor3 = Color3.fromRGB(100, 30, 150)
+    PromoteBtn2.BorderColor3 = Color3.fromRGB(180, 100, 255)
+    PromoteBtn2.BorderSizePixel = 1
+    PromoteBtn2.Text = "🎁 BONUS"
+    PromoteBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    PromoteBtn2.Font = Enum.Font.Code
+    PromoteBtn2.TextSize = 11
+    PromoteBtn2.ZIndex = 102
+    PromoteBtn2.Parent = ScrollContent
+    Instance.new("UICorner", PromoteBtn2).CornerRadius = UDim.new(0, 4)
+    PromoteBtn2.MouseButton1Click:Connect(function()
+        Notify("🎁 Bonus Follower", "Follower dapet preview V4.5!", 5)
+    end)
+
+    local PromoteBtn3 = Instance.new("TextButton")
+    PromoteBtn3.Size = UDim2.new(0.5, -15, 0, 34)
+    PromoteBtn3.Position = UDim2.new(0.5, 5, 0, 3147)
+    PromoteBtn3.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
+    PromoteBtn3.BorderColor3 = Color3.fromRGB(255, 100, 100)
+    PromoteBtn3.BorderSizePixel = 1
+    PromoteBtn3.Text = "📢 SHARE"
+    PromoteBtn3.TextColor3 = Color3.fromRGB(255, 255, 255)
+    PromoteBtn3.Font = Enum.Font.Code
+    PromoteBtn3.TextSize = 11
+    PromoteBtn3.ZIndex = 102
+    PromoteBtn3.Parent = ScrollContent
+    Instance.new("UICorner", PromoteBtn3).CornerRadius = UDim.new(0, 4)
+    PromoteBtn3.MouseButton1Click:Connect(function()
+        Notify("📢 Share ke Teman", "rscripts.net/@ZetGames", 6)
+    end)
+
     -- MENU BUTTON
     local ToggleMenuButton = Instance.new("TextButton")
+    ToggleMenuButton.Name = "ZetMenuButton"
     ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
     ToggleMenuButton.Position = UDim2.new(0, 10, 0.5, -25)
     ToggleMenuButton.BackgroundColor3 = THEME.ButtonActive
@@ -2587,14 +2651,92 @@ local function CreateUI()
     ToggleMenuButton.Parent = ScreenGui
     Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
 
+    local menuBtnDragging = false
+    local menuBtnDragStart = nil
+    local menuBtnStartPos = nil
+    local menuBtnMoved = false
+    local menuBtnLastTap = 0
+    local DEFAULT_MENU_POS = UDim2.new(0, 10, 0.5, -25)
+
+    local function clampMenuButtonPos(pos)
+        local vp = Camera.ViewportSize
+        local btnSize = 50
+        local margin = 5
+        local x = math.clamp(pos.X.Offset, margin, vp.X - btnSize - margin)
+        local y = math.clamp(pos.Y.Offset, margin, vp.Y - btnSize - margin)
+        return UDim2.new(0, x, 0, y)
+    end
+
+    local function resetMenuButtonPos(silent)
+        local newPos = clampMenuButtonPos(DEFAULT_MENU_POS)
+        TweenService:Create(ToggleMenuButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Position = newPos}):Play()
+        if not silent then Notify("📍 Menu Button", "> Posisi di-reset", 2) end
+    end
+
+    local lastViewportSize = Camera.ViewportSize
+    RunService.Heartbeat:Connect(function()
+        local vp = Camera.ViewportSize
+        if vp ~= lastViewportSize then
+            lastViewportSize = vp
+            task.wait(0.1)
+            resetMenuButtonPos(true)
+        end
+        local pos = ToggleMenuButton.AbsolutePosition
+        local size = ToggleMenuButton.AbsoluteSize
+        if pos.X < -size.X or pos.Y < -size.Y or pos.X > vp.X + size.X or pos.Y > vp.Y + size.Y then
+            resetMenuButtonPos(true)
+        end
+    end)
+
+    ToggleMenuButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            menuBtnDragging = true
+            menuBtnMoved = false
+            menuBtnDragStart = input.Position
+            menuBtnStartPos = ToggleMenuButton.Position
+            local now = tick()
+            if now - menuBtnLastTap < 0.4 then
+                resetMenuButtonPos(false)
+                menuBtnDragging = false
+                menuBtnLastTap = 0
+                return
+            end
+            menuBtnLastTap = now
+        end
+    end)
+
+    ToggleMenuButton.InputChanged:Connect(function(input)
+        if not menuBtnDragging then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - menuBtnDragStart
+            if math.abs(delta.X) > 10 or math.abs(delta.Y) > 10 then menuBtnMoved = true end
+            if menuBtnMoved then
+                local newPos = UDim2.new(
+                    menuBtnStartPos.X.Scale, menuBtnStartPos.X.Offset + delta.X,
+                    menuBtnStartPos.Y.Scale, menuBtnStartPos.Y.Offset + delta.Y
+                )
+                ToggleMenuButton.Position = clampMenuButtonPos(newPos)
+            end
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            menuBtnDragging = false
+        end
+    end)
+
     ToggleMenuButton.MouseButton1Click:Connect(function()
+        if menuBtnMoved then return end
         MenuVisible = not MenuVisible
         MainHub.Visible = MenuVisible
     end)
+
     CloseBtn.MouseButton1Click:Connect(function()
         MenuVisible = false
         MainHub.Visible = false
     end)
+
     UserInputService.InputBegan:Connect(function(input, gp)
         if gp then return end
         if input.KeyCode == MenuKey and IsLoggedIn then
@@ -2626,7 +2768,17 @@ local function CreateUI()
     MakeDraggable(LoginFrame)
     MakeDraggable(MainHub)
 
-    -- ================= LOADING 10 DETIK =================
+    -- ⭐ AUTO PROMOTE NOTIF (tiap 5 menit)
+    task.spawn(function()
+        task.wait(30)
+        while task.wait(300) do
+            pcall(function()
+                Notify("⭐ ZetGames", "Follow rscripts.net/@ZetGames", 4)
+            end)
+        end
+    end)
+
+    -- LOADING 10 DETIK
     task.spawn(function()
         local totalTime = 10
         local startTime = tick()
@@ -2659,7 +2811,7 @@ local function CreateUI()
         Notify("V4.4 RESMI", "> Silakan login dengan key", 3)
     end)
 
-    -- ================= LOGIN LOGIC =================
+    -- LOGIN LOGIC + CTA
     LoginBtn.MouseButton1Click:Connect(function()
         local key = KeyInput.Text
         local kd = ValidKeys[key]
@@ -2675,6 +2827,10 @@ local function CreateUI()
             pcall(ActivateAutoReconnect)
             pcall(ActivateNightLock)
             Notify("🔒 NIGHT LOCK", "> AUTO KICK ACTIVE", 3)
+            task.wait(0.5)
+            Notify("⭐ ZetGames", "Follow rscripts.net/@ZetGames", 6)
+            task.wait(1)
+            Notify("🎁 Bonus", "Update V4.5 coming soon!", 5)
             task.wait(0.3)
             RefreshTeleportList()
         else
