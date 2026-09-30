@@ -2634,19 +2634,18 @@ local function CreateUI()
         Notify("📢 Share ke Teman", "rscripts.net/@ZetGames", 6)
     end)
 
-    -- ⭐ MENU BUTTON (EMOJI 🟢/🔴)
+    -- ⭐ MENU BUTTON (SIMPLE ≡ + SAFE ZONE)
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuButton"
     ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
-    ToggleMenuButton.Position = UDim2.new(0, 120, 0.4, 0)
+    ToggleMenuButton.Position = UDim2.new(0, 120, 0.5, -25)
     ToggleMenuButton.BackgroundColor3 = THEME.ButtonActive
-    ToggleMenuButton.BorderColor3 = Color3.fromRGB(255, 50, 50)
+    ToggleMenuButton.BorderColor3 = THEME.Accent
     ToggleMenuButton.BorderSizePixel = 2
-    ToggleMenuButton.Text = "🔴"
-    ToggleMenuButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleMenuButton.Text = "≡"
+    ToggleMenuButton.TextColor3 = Color3.fromRGB(0, 180, 255)
     ToggleMenuButton.Font = Enum.Font.GothamBold
     ToggleMenuButton.TextSize = 26
-    ToggleMenuButton.TextTransparency = 0
     ToggleMenuButton.AutoButtonColor = true
     ToggleMenuButton.Active = true
     ToggleMenuButton.ZIndex = 200
@@ -2654,23 +2653,12 @@ local function CreateUI()
     ToggleMenuButton.Parent = ScreenGui
     Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
 
-    -- ✅ Update emoji berdasarkan state menu
-    local function updateMenuButtonEmoji()
-        if MenuVisible then
-            ToggleMenuButton.Text = "🟢"
-            ToggleMenuButton.BorderColor3 = Color3.fromRGB(0, 255, 100)
-        else
-            ToggleMenuButton.Text = "🔴"
-            ToggleMenuButton.BorderColor3 = Color3.fromRGB(255, 50, 50)
-        end
-    end
-
-    -- SAFE ZONE CONFIG
+    -- ✅ SAFE ZONE
     local BTN_SIZE = 50
     local SAFE_TOP = 90
     local SAFE_LEFT = 100
     local SAFE_MARGIN = 5
-    local DEFAULT_POS = UDim2.new(0, 120, 0.4, 0)
+    local DEFAULT_POS = UDim2.new(0, 120, 0.5, -25)
 
     local menuBtnDragging = false
     local menuBtnDragStart = nil
@@ -2737,7 +2725,7 @@ local function CreateUI()
         if not menuBtnDragging then return end
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             local delta = input.Position - menuBtnDragStart
-            if math.abs(delta.X) > 10 or math.abs(delta.Y) > 10 then
+            if math.abs(delta.X) > 8 or math.abs(delta.Y) > 8 then
                 menuBtnMoved = true
                 if menuBtnHoldTimer then pcall(function() menuBtnHoldTimer:Cancel() end); menuBtnHoldTimer = nil end
             end
@@ -2762,13 +2750,11 @@ local function CreateUI()
         if menuBtnMoved then return end
         MenuVisible = not MenuVisible
         MainHub.Visible = MenuVisible
-        updateMenuButtonEmoji()
     end)
 
     CloseBtn.MouseButton1Click:Connect(function()
         MenuVisible = false
         MainHub.Visible = false
-        updateMenuButtonEmoji()
     end)
 
     UserInputService.InputBegan:Connect(function(input, gp)
@@ -2776,12 +2762,12 @@ local function CreateUI()
         if input.KeyCode == MenuKey and IsLoggedIn then
             MenuVisible = not MenuVisible
             MainHub.Visible = MenuVisible
-            updateMenuButtonEmoji()
         end
     end)
 
     local function MakeDraggable(frame)
-        local dragging, dragInput, dragStart, startPos = false, nil, nil, nil        frame.InputBegan:Connect(function(input)
+        local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+        frame.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true; dragStart = input.Position; startPos = frame.Position
             end
@@ -2855,7 +2841,6 @@ local function CreateUI()
             MainHub.Visible = true
             ToggleMenuButton.Visible = true
             MenuVisible = true
-            updateMenuButtonEmoji()
             StatusTxt.Text = "> ACCESS GRANTED..."
             Notify("✅ Success", "WELCOME V4.4 RESMI", 3)
             pcall(ActivateAntiKick)
