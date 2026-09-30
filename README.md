@@ -37,6 +37,16 @@ pcall(function() SoundService.RespectFilteringEnabled = false end)
 print("[ZET] Loading V4.4 RESMI...")
 
 --==============================================================
+-- MENU ICON CONFIG
+--==============================================================
+-- Opsi A: Pakai Cloudinary (coba dulu, kalau gak muncul pakai Opsi B/C)
+local MENU_ICON_ID = "rbxassetid://0"  -- KOSONG dulu biar aman
+-- Kalau mau pakai gambar: isi dengan link di bawah ini
+-- local MENU_ICON_ID = "https://res.cloudinary.com/opyeeh5w/image/upload/f_auto,q_auto/1000236060"
+-- Atau pakai Roblox asset ID (upload dulu di roblox.com/create → Decals):
+-- local MENU_ICON_ID = "rbxassetid://1234567890"  -- Ganti dengan ID asli lu
+
+--==============================================================
 -- THEME
 --==============================================================
 local ThemePresets = {
@@ -2634,36 +2644,73 @@ local function CreateUI()
         Notify("📢 Share ke Teman", "rscripts.net/@ZetGames", 6)
     end)
 
-    -- MENU BUTTON
+    -- ⭐ MENU BUTTON (PAKAI GAMBAR + SAFE ZONE)
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuButton"
-    ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
-    ToggleMenuButton.Position = UDim2.new(0, 10, 0.5, -25)
-    ToggleMenuButton.BackgroundColor3 = THEME.ButtonActive
+    ToggleMenuButton.Size = UDim2.new(0, 55, 0, 55)
+    ToggleMenuButton.Position = UDim2.new(0, 120, 0.5, -27)
+    ToggleMenuButton.BackgroundColor3 = Color3.fromRGB(15, 25, 45)
     ToggleMenuButton.BorderColor3 = THEME.Accent
     ToggleMenuButton.BorderSizePixel = 2
-    ToggleMenuButton.Text = "≡"
+    ToggleMenuButton.Text = "≡"  -- Fallback kalau gambar gak load
     ToggleMenuButton.TextColor3 = THEME.Text
     ToggleMenuButton.Font = Enum.Font.Code
-    ToggleMenuButton.TextSize = 24
+    ToggleMenuButton.TextSize = 28
+    ToggleMenuButton.TextTransparency = 0  -- Akan di-transparent-kan kalau gambar berhasil
     ToggleMenuButton.ZIndex = 200
     ToggleMenuButton.Visible = false
     ToggleMenuButton.Parent = ScreenGui
-    Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
+    Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 27)
 
+    -- ⭐ IMAGE LABEL UNTUK LOGO
+    if MENU_ICON_ID ~= "" and MENU_ICON_ID ~= "rbxassetid://0" then
+        local MenuIcon = Instance.new("ImageLabel")
+        MenuIcon.Name = "MenuIcon"
+        MenuIcon.Size = UDim2.new(1, -8, 1, -8)
+        MenuIcon.Position = UDim2.new(0, 4, 0, 4)
+        MenuIcon.BackgroundTransparency = 1
+        MenuIcon.Image = MENU_ICON_ID
+        MenuIcon.ScaleType = Enum.ScaleType.Fit
+        MenuIcon.ZIndex = 201
+        MenuIcon.Parent = ToggleMenuButton
+        Instance.new("UICorner", MenuIcon).CornerRadius = UDim.new(0, 23)
+        
+        -- Sembunyikan text kalau gambar berhasil load
+        MenuIcon.Visible = true
+        ToggleMenuButton.TextTransparency = 1
+        
+        -- Kalau gambar gagal load, tetap tampilkan simbol ≡
+        MenuIcon:GetPropertyChangedSignal("IsLoaded"):Connect(function()
+            if not MenuIcon.IsLoaded then
+                ToggleMenuButton.TextTransparency = 0
+            end
+        end)
+    end
+
+    -- ✅ SAFE ZONE: hindari area Leave button
     local menuBtnDragging = false
     local menuBtnDragStart = nil
     local menuBtnStartPos = nil
     local menuBtnMoved = false
     local menuBtnLastTap = 0
-    local DEFAULT_MENU_POS = UDim2.new(0, 10, 0.5, -25)
+    local DEFAULT_MENU_POS = UDim2.new(0, 120, 0.5, -27)
+
+    -- ✅ ZONA AMAN (hindari Leave button + chat)
+    local SAFE_TOP = 90       -- minimal 90px dari atas
+    local SAFE_LEFT = 100     -- minimal 100px dari kiri
 
     local function clampMenuButtonPos(pos)
         local vp = Camera.ViewportSize
-        local btnSize = 50
+        local btnSize = 55
         local margin = 5
-        local x = math.clamp(pos.X.Offset, margin, vp.X - btnSize - margin)
-        local y = math.clamp(pos.Y.Offset, margin, vp.Y - btnSize - margin)
+        
+        local x = pos.X.Offset
+        local y = pos.Y.Offset
+        
+        -- Clamp dengan safe zone
+        x = math.clamp(x, SAFE_LEFT, vp.X - btnSize - margin)
+        y = math.clamp(y, SAFE_TOP, vp.Y - btnSize - margin)
+        
         return UDim2.new(0, x, 0, y)
     end
 
@@ -2673,6 +2720,7 @@ local function CreateUI()
         if not silent then Notify("📍 Menu Button", "> Posisi di-reset", 2) end
     end
 
+    -- Auto-check: kalau keluar layar → reset
     local lastViewportSize = Camera.ViewportSize
     RunService.Heartbeat:Connect(function()
         local vp = Camera.ViewportSize
@@ -2839,7 +2887,7 @@ local function CreateUI()
         end
     end)
 
-    -- GET KEY → WEBSITE KEY ASLI
+    -- GET KEY
     GetKeyBtn.MouseButton1Click:Connect(function()
         StatusTxt.Text = "> Buka website key di browser..."
         Notify("🔑 Get Key", "Buka: " .. KeyWebsite, 8)
