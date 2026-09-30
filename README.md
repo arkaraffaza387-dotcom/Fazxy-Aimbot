@@ -37,16 +37,6 @@ pcall(function() SoundService.RespectFilteringEnabled = false end)
 print("[ZET] Loading V4.4 RESMI...")
 
 --==============================================================
--- MENU ICON CONFIG
---==============================================================
--- Opsi A: Pakai Cloudinary (coba dulu, kalau gak muncul pakai Opsi B/C)
-local MENU_ICON_ID = "rbxassetid://0"  -- KOSONG dulu biar aman
--- Kalau mau pakai gambar: isi dengan link di bawah ini
--- local MENU_ICON_ID = "https://res.cloudinary.com/opyeeh5w/image/upload/f_auto,q_auto/1000236060"
--- Atau pakai Roblox asset ID (upload dulu di roblox.com/create → Decals):
--- local MENU_ICON_ID = "rbxassetid://1234567890"  -- Ganti dengan ID asli lu
-
---==============================================================
 -- THEME
 --==============================================================
 local ThemePresets = {
@@ -2644,94 +2634,75 @@ local function CreateUI()
         Notify("📢 Share ke Teman", "rscripts.net/@ZetGames", 6)
     end)
 
-    -- ⭐ MENU BUTTON (PAKAI GAMBAR + SAFE ZONE)
+    -- ⭐ MENU BUTTON (EMOJI 🟢/🔴)
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuButton"
-    ToggleMenuButton.Size = UDim2.new(0, 55, 0, 55)
-    ToggleMenuButton.Position = UDim2.new(0, 120, 0.5, -27)
-    ToggleMenuButton.BackgroundColor3 = Color3.fromRGB(15, 25, 45)
-    ToggleMenuButton.BorderColor3 = THEME.Accent
+    ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
+    ToggleMenuButton.Position = UDim2.new(0, 120, 0.4, 0)
+    ToggleMenuButton.BackgroundColor3 = THEME.ButtonActive
+    ToggleMenuButton.BorderColor3 = Color3.fromRGB(255, 50, 50)
     ToggleMenuButton.BorderSizePixel = 2
-    ToggleMenuButton.Text = "≡"  -- Fallback kalau gambar gak load
-    ToggleMenuButton.TextColor3 = THEME.Text
-    ToggleMenuButton.Font = Enum.Font.Code
-    ToggleMenuButton.TextSize = 28
-    ToggleMenuButton.TextTransparency = 0  -- Akan di-transparent-kan kalau gambar berhasil
+    ToggleMenuButton.Text = "🔴"
+    ToggleMenuButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleMenuButton.Font = Enum.Font.GothamBold
+    ToggleMenuButton.TextSize = 26
+    ToggleMenuButton.TextTransparency = 0
+    ToggleMenuButton.AutoButtonColor = true
+    ToggleMenuButton.Active = true
     ToggleMenuButton.ZIndex = 200
     ToggleMenuButton.Visible = false
     ToggleMenuButton.Parent = ScreenGui
-    Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 27)
+    Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
 
-    -- ⭐ IMAGE LABEL UNTUK LOGO
-    if MENU_ICON_ID ~= "" and MENU_ICON_ID ~= "rbxassetid://0" then
-        local MenuIcon = Instance.new("ImageLabel")
-        MenuIcon.Name = "MenuIcon"
-        MenuIcon.Size = UDim2.new(1, -8, 1, -8)
-        MenuIcon.Position = UDim2.new(0, 4, 0, 4)
-        MenuIcon.BackgroundTransparency = 1
-        MenuIcon.Image = MENU_ICON_ID
-        MenuIcon.ScaleType = Enum.ScaleType.Fit
-        MenuIcon.ZIndex = 201
-        MenuIcon.Parent = ToggleMenuButton
-        Instance.new("UICorner", MenuIcon).CornerRadius = UDim.new(0, 23)
-        
-        -- Sembunyikan text kalau gambar berhasil load
-        MenuIcon.Visible = true
-        ToggleMenuButton.TextTransparency = 1
-        
-        -- Kalau gambar gagal load, tetap tampilkan simbol ≡
-        MenuIcon:GetPropertyChangedSignal("IsLoaded"):Connect(function()
-            if not MenuIcon.IsLoaded then
-                ToggleMenuButton.TextTransparency = 0
-            end
-        end)
+    -- ✅ Update emoji berdasarkan state menu
+    local function updateMenuButtonEmoji()
+        if MenuVisible then
+            ToggleMenuButton.Text = "🟢"
+            ToggleMenuButton.BorderColor3 = Color3.fromRGB(0, 255, 100)
+        else
+            ToggleMenuButton.Text = "🔴"
+            ToggleMenuButton.BorderColor3 = Color3.fromRGB(255, 50, 50)
+        end
     end
 
-    -- ✅ SAFE ZONE: hindari area Leave button
+    -- SAFE ZONE CONFIG
+    local BTN_SIZE = 50
+    local SAFE_TOP = 90
+    local SAFE_LEFT = 100
+    local SAFE_MARGIN = 5
+    local DEFAULT_POS = UDim2.new(0, 120, 0.4, 0)
+
     local menuBtnDragging = false
     local menuBtnDragStart = nil
     local menuBtnStartPos = nil
     local menuBtnMoved = false
     local menuBtnLastTap = 0
-    local DEFAULT_MENU_POS = UDim2.new(0, 120, 0.5, -27)
-
-    -- ✅ ZONA AMAN (hindari Leave button + chat)
-    local SAFE_TOP = 90       -- minimal 90px dari atas
-    local SAFE_LEFT = 100     -- minimal 100px dari kiri
+    local menuBtnHoldTimer = nil
 
     local function clampMenuButtonPos(pos)
         local vp = Camera.ViewportSize
-        local btnSize = 55
-        local margin = 5
-        
         local x = pos.X.Offset
         local y = pos.Y.Offset
-        
-        -- Clamp dengan safe zone
-        x = math.clamp(x, SAFE_LEFT, vp.X - btnSize - margin)
-        y = math.clamp(y, SAFE_TOP, vp.Y - btnSize - margin)
-        
+        x = math.clamp(x, SAFE_LEFT, vp.X - BTN_SIZE - SAFE_MARGIN)
+        y = math.clamp(y, SAFE_TOP, vp.Y - BTN_SIZE - SAFE_MARGIN)
         return UDim2.new(0, x, 0, y)
     end
 
     local function resetMenuButtonPos(silent)
-        local newPos = clampMenuButtonPos(DEFAULT_MENU_POS)
-        TweenService:Create(ToggleMenuButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Position = newPos}):Play()
+        TweenService:Create(ToggleMenuButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Position = DEFAULT_POS}):Play()
         if not silent then Notify("📍 Menu Button", "> Posisi di-reset", 2) end
     end
 
-    -- Auto-check: kalau keluar layar → reset
-    local lastViewportSize = Camera.ViewportSize
+    local lastVp = Camera.ViewportSize
     RunService.Heartbeat:Connect(function()
         local vp = Camera.ViewportSize
-        if vp ~= lastViewportSize then
-            lastViewportSize = vp
+        if vp ~= lastVp then
+            lastVp = vp
             task.wait(0.1)
             resetMenuButtonPos(true)
         end
         local pos = ToggleMenuButton.AbsolutePosition
-        local size = ToggleMenuButton.AbsoluteSize
-        if pos.X < -size.X or pos.Y < -size.Y or pos.X > vp.X + size.X or pos.Y > vp.Y + size.Y then
+        if pos.X < -BTN_SIZE or pos.Y < -BTN_SIZE or pos.X > vp.X or pos.Y > vp.Y then
             resetMenuButtonPos(true)
         end
     end)
@@ -2742,6 +2713,7 @@ local function CreateUI()
             menuBtnMoved = false
             menuBtnDragStart = input.Position
             menuBtnStartPos = ToggleMenuButton.Position
+
             local now = tick()
             if now - menuBtnLastTap < 0.4 then
                 resetMenuButtonPos(false)
@@ -2750,6 +2722,14 @@ local function CreateUI()
                 return
             end
             menuBtnLastTap = now
+
+            if menuBtnHoldTimer then pcall(function() menuBtnHoldTimer:Cancel() end) end
+            menuBtnHoldTimer = task.delay(2, function()
+                if menuBtnDragging and not menuBtnMoved then
+                    resetMenuButtonPos(false)
+                    menuBtnDragging = false
+                end
+            end)
         end
     end)
 
@@ -2757,7 +2737,10 @@ local function CreateUI()
         if not menuBtnDragging then return end
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             local delta = input.Position - menuBtnDragStart
-            if math.abs(delta.X) > 10 or math.abs(delta.Y) > 10 then menuBtnMoved = true end
+            if math.abs(delta.X) > 10 or math.abs(delta.Y) > 10 then
+                menuBtnMoved = true
+                if menuBtnHoldTimer then pcall(function() menuBtnHoldTimer:Cancel() end); menuBtnHoldTimer = nil end
+            end
             if menuBtnMoved then
                 local newPos = UDim2.new(
                     menuBtnStartPos.X.Scale, menuBtnStartPos.X.Offset + delta.X,
@@ -2771,6 +2754,7 @@ local function CreateUI()
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             menuBtnDragging = false
+            if menuBtnHoldTimer then pcall(function() menuBtnHoldTimer:Cancel() end); menuBtnHoldTimer = nil end
         end
     end)
 
@@ -2778,11 +2762,13 @@ local function CreateUI()
         if menuBtnMoved then return end
         MenuVisible = not MenuVisible
         MainHub.Visible = MenuVisible
+        updateMenuButtonEmoji()
     end)
 
     CloseBtn.MouseButton1Click:Connect(function()
         MenuVisible = false
         MainHub.Visible = false
+        updateMenuButtonEmoji()
     end)
 
     UserInputService.InputBegan:Connect(function(input, gp)
@@ -2790,12 +2776,12 @@ local function CreateUI()
         if input.KeyCode == MenuKey and IsLoggedIn then
             MenuVisible = not MenuVisible
             MainHub.Visible = MenuVisible
+            updateMenuButtonEmoji()
         end
     end)
 
     local function MakeDraggable(frame)
-        local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
-        frame.InputBegan:Connect(function(input)
+        local dragging, dragInput, dragStart, startPos = false, nil, nil, nil        frame.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true; dragStart = input.Position; startPos = frame.Position
             end
@@ -2869,6 +2855,7 @@ local function CreateUI()
             MainHub.Visible = true
             ToggleMenuButton.Visible = true
             MenuVisible = true
+            updateMenuButtonEmoji()
             StatusTxt.Text = "> ACCESS GRANTED..."
             Notify("✅ Success", "WELCOME V4.4 RESMI", 3)
             pcall(ActivateAntiKick)
