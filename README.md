@@ -1,8 +1,8 @@
 --[[
-    ZetGames-AimLock-Advanserver | INFO BUILD v4.4
+    ZetGames-AimLock-Advanserver | INFO BUILD v4.4 + CHOICE
     Theme: Red & Black (TESTING)
     Info: Update selesai 30 September 2025 | 19:30 WIB | Rabu
-    No Timer - No Auto Execute - Just Info Display
+    Choice: Ya (Execute) / No (Kick 10 detik)
 --]]
 
 --==============================================================
@@ -28,7 +28,14 @@ local THEME = {
     TextLight = Color3.fromRGB(255, 100, 100),
     WarningColor = Color3.fromRGB(255, 200, 0),
     SuccessColor = Color3.fromRGB(0, 255, 100),
+    YesColor = Color3.fromRGB(0, 150, 0),
+    NoColor = Color3.fromRGB(150, 0, 0),
 }
+
+--==============================================================
+-- CONFIG
+--==============================================================
+local EXECUTE_URL = "https://raw.githubusercontent.com/arkaraffaza387-dotcom/Testing-Update/refs/heads/main/README.md"
 
 --==============================================================
 -- SCREEN GUI (FIXED - MULTIPLE FALLBACK)
@@ -111,11 +118,157 @@ local function Notify(title, message, duration)
 end
 
 --==============================================================
+-- EXECUTE FUNCTION
+--==============================================================
+local function ExecuteNewScript()
+    InfoFrame.Visible = false
+    
+    Notify("System", "> LOADING v4.4 TESTING...", 3)
+    task.wait(1)
+    
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(EXECUTE_URL))()
+    end)
+    
+    if success then
+        Notify("Success", "> v4.4 LOADED", 3)
+    else
+        Notify("Error", "> FAILED TO LOAD", 3)
+        warn("[ZetGames] Execute Error: " .. tostring(err))
+    end
+end
+
+--==============================================================
+-- NO CHOICE — KICK WITH COUNTDOWN
+--==============================================================
+local NoChoiceFrame = nil
+
+local function ShowNoChoiceFrame()
+    -- Sembunyikan InfoFrame
+    InfoFrame.Visible = false
+    
+    -- Tampilkan frame NoChoice
+    NoChoiceFrame = Instance.new("Frame")
+    NoChoiceFrame.Size = UDim2.new(0, 500, 0, 250)
+    NoChoiceFrame.Position = UDim2.new(0.5, -250, 0.5, -125)
+    NoChoiceFrame.BackgroundColor3 = THEME.MainBG
+    NoChoiceFrame.BorderColor3 = THEME.NoColor
+    NoChoiceFrame.BorderSizePixel = 3
+    NoChoiceFrame.ZIndex = 100
+    NoChoiceFrame.Parent = ScreenGui
+    Instance.new("UICorner", NoChoiceFrame).CornerRadius = UDim.new(0, 12)
+
+    -- TOP BAR
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+    TopBar.BorderSizePixel = 0
+    TopBar.ZIndex = 101
+    TopBar.Parent = NoChoiceFrame
+    Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
+
+    local TopTxt = Instance.new("TextLabel")
+    TopTxt.Size = UDim2.new(1, -16, 1, 0)
+    TopTxt.Position = UDim2.new(0, 8, 0, 0)
+    TopTxt.BackgroundTransparency = 1
+    TopTxt.Text = "● ZETGAMES-AIMLOCK"
+    TopTxt.TextColor3 = Color3.fromRGB(255, 80, 80)
+    TopTxt.Font = Enum.Font.Code
+    TopTxt.TextSize = 13
+    TopTxt.TextXAlignment = Enum.TextXAlignment.Left
+    TopTxt.ZIndex = 102
+    TopTxt.Parent = TopBar
+
+    -- WARNING ICON
+    local WarnLbl = Instance.new("TextLabel")
+    WarnLbl.Size = UDim2.new(1, -30, 0, 30)
+    WarnLbl.Position = UDim2.new(0, 15, 0, 50)
+    WarnLbl.BackgroundTransparency = 1
+    WarnLbl.Text = "⚠ AUTO KICK AKTIF ⚠"
+    WarnLbl.TextColor3 = Color3.fromRGB(255, 50, 50)
+    WarnLbl.Font = Enum.Font.Code
+    WarnLbl.TextSize = 18
+    WarnLbl.ZIndex = 102
+    WarnLbl.Parent = NoChoiceFrame
+
+    -- MESSAGE
+    local MsgLbl = Instance.new("TextLabel")
+    MsgLbl.Size = UDim2.new(1, -30, 0, 70)
+    MsgLbl.Position = UDim2.new(0, 15, 0, 85)
+    MsgLbl.BackgroundTransparency = 1
+    MsgLbl.Text = "Baiklah jika anda tidak mau mencoba\nversi Testing saya akan otomatis Kick\nanda dari map dalam waktu 10 Detik"
+    MsgLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MsgLbl.Font = Enum.Font.Code
+    MsgLbl.TextSize = 13
+    MsgLbl.TextWrapped = true
+    MsgLbl.ZIndex = 102
+    MsgLbl.Parent = NoChoiceFrame
+
+    -- COUNTDOWN LABEL
+    local CountdownTitle = Instance.new("TextLabel")
+    CountdownTitle.Size = UDim2.new(1, -30, 0, 20)
+    CountdownTitle.Position = UDim2.new(0, 15, 0, 160)
+    CountdownTitle.BackgroundTransparency = 1
+    CountdownTitle.Text = "> KICK DALAM:"
+    CountdownTitle.TextColor3 = THEME.WarningColor
+    CountdownTitle.Font = Enum.Font.Code
+    CountdownTitle.TextSize = 11
+    CountdownTitle.TextXAlignment = Enum.TextXAlignment.Left
+    CountdownTitle.ZIndex = 102
+    CountdownTitle.Parent = NoChoiceFrame
+
+    -- COUNTDOWN DISPLAY (BIG)
+    local CountdownDisplay = Instance.new("TextLabel")
+    CountdownDisplay.Size = UDim2.new(1, -30, 0, 50)
+    CountdownDisplay.Position = UDim2.new(0, 15, 0, 185)
+    CountdownDisplay.BackgroundTransparency = 1
+    CountdownDisplay.Text = "10"
+    CountdownDisplay.TextColor3 = Color3.fromRGB(255, 0, 0)
+    CountdownDisplay.Font = Enum.Font.Code
+    CountdownDisplay.TextSize = 42
+    CountdownDisplay.TextXAlignment = Enum.TextXAlignment.Center
+    CountdownDisplay.ZIndex = 102
+    CountdownDisplay.Parent = NoChoiceFrame
+
+    -- START COUNTDOWN (REAL 10 DETIK)
+    task.spawn(function()
+        local startTime = tick()
+        local totalSeconds = 10
+        
+        while true do
+            local elapsed = tick() - startTime
+            local remaining = totalSeconds - elapsed
+            
+            if remaining <= 0 then
+                CountdownDisplay.Text = "0"
+                pcall(function()
+                    LocalPlayer:Kick("Anda telah memilih TIDAK.\nAuto Kick setelah 10 detik.")
+                end)
+                break
+            end
+            
+            CountdownDisplay.Text = tostring(math.ceil(remaining))
+            
+            -- Warnanya makin merah kalau mendekati 0
+            if remaining <= 3 then
+                CountdownDisplay.TextColor3 = Color3.fromRGB(255, 0, 0)
+            elseif remaining <= 6 then
+                CountdownDisplay.TextColor3 = Color3.fromRGB(255, 100, 0)
+            else
+                CountdownDisplay.TextColor3 = Color3.fromRGB(255, 180, 0)
+            end
+            
+            task.wait(0.05)  -- Update 20x per detik biar akurat
+        end
+    end)
+end
+
+--==============================================================
 -- INFO FRAME (MAIN UI)
 --==============================================================
 local InfoFrame = Instance.new("Frame")
-InfoFrame.Size = UDim2.new(0, 400, 0, 420)
-InfoFrame.Position = UDim2.new(0.5, -200, 0.5, -210)
+InfoFrame.Size = UDim2.new(0, 400, 0, 540)
+InfoFrame.Position = UDim2.new(0.5, -200, 0.5, -270)
 InfoFrame.BackgroundColor3 = THEME.MainBG
 InfoFrame.BorderColor3 = THEME.AccentColor
 InfoFrame.BorderSizePixel = 3
@@ -171,8 +324,8 @@ MTag.Parent = InfoFrame
 
 -- MAIN INFO BOX
 local InfoBox = Instance.new("Frame")
-InfoBox.Size = UDim2.new(1, -30, 0, 200)
-InfoBox.Position = UDim2.new(0, 15, 0, 125)
+InfoBox.Size = UDim2.new(1, -30, 0, 195)
+InfoBox.Position = UDim2.new(0, 15, 0, 120)
 InfoBox.BackgroundColor3 = THEME.PanelBG
 InfoBox.BorderColor3 = THEME.AccentColor
 InfoBox.BorderSizePixel = 2
@@ -183,7 +336,7 @@ Instance.new("UICorner", InfoBox).CornerRadius = UDim.new(0, 8)
 -- LABEL "UPDATE SELESAI PADA:"
 local InfoTitle = Instance.new("TextLabel")
 InfoTitle.Size = UDim2.new(1, -20, 0, 25)
-InfoTitle.Position = UDim2.new(0, 10, 0, 15)
+InfoTitle.Position = UDim2.new(0, 10, 0, 12)
 InfoTitle.BackgroundTransparency = 1
 InfoTitle.Text = "> UPDATE SELESAI PADA:"
 InfoTitle.TextColor3 = THEME.TextColor
@@ -196,7 +349,7 @@ InfoTitle.Parent = InfoBox
 -- TANGGAL
 local DateLbl = Instance.new("TextLabel")
 DateLbl.Size = UDim2.new(1, -20, 0, 35)
-DateLbl.Position = UDim2.new(0, 10, 0, 45)
+DateLbl.Position = UDim2.new(0, 10, 0, 40)
 DateLbl.BackgroundTransparency = 1
 DateLbl.Text = "30 SEPTEMBER 2025"
 DateLbl.TextColor3 = THEME.WarningColor
@@ -209,7 +362,7 @@ DateLbl.Parent = InfoBox
 -- JAM
 local TimeLbl = Instance.new("TextLabel")
 TimeLbl.Size = UDim2.new(1, -20, 0, 30)
-TimeLbl.Position = UDim2.new(0, 10, 0, 85)
+TimeLbl.Position = UDim2.new(0, 10, 0, 80)
 TimeLbl.BackgroundTransparency = 1
 TimeLbl.Text = "⏰ JAM: 19:30 WIB"
 TimeLbl.TextColor3 = THEME.AccentLight
@@ -222,7 +375,7 @@ TimeLbl.Parent = InfoBox
 -- HARI
 local DayLbl = Instance.new("TextLabel")
 DayLbl.Size = UDim2.new(1, -20, 0, 25)
-DayLbl.Position = UDim2.new(0, 10, 0, 120)
+DayLbl.Position = UDim2.new(0, 10, 0, 115)
 DayLbl.BackgroundTransparency = 1
 DayLbl.Text = "📅 HARI: RABU"
 DayLbl.TextColor3 = THEME.AccentLight
@@ -235,7 +388,7 @@ DayLbl.Parent = InfoBox
 -- SEPARATOR
 local Sep2 = Instance.new("Frame")
 Sep2.Size = UDim2.new(1, -20, 0, 2)
-Sep2.Position = UDim2.new(0, 10, 0, 155)
+Sep2.Position = UDim2.new(0, 10, 0, 150)
 Sep2.BackgroundColor3 = THEME.AccentColor
 Sep2.BorderSizePixel = 0
 Sep2.ZIndex = 13
@@ -244,7 +397,7 @@ Sep2.Parent = InfoBox
 -- STATUS
 local StatusLbl = Instance.new("TextLabel")
 StatusLbl.Size = UDim2.new(1, -20, 0, 25)
-StatusLbl.Position = UDim2.new(0, 10, 0, 165)
+StatusLbl.Position = UDim2.new(0, 10, 0, 160)
 StatusLbl.BackgroundTransparency = 1
 StatusLbl.Text = "> STATUS: DALAM PROSES PATCH..."
 StatusLbl.TextColor3 = THEME.TextLight
@@ -254,27 +407,95 @@ StatusLbl.TextXAlignment = Enum.TextXAlignment.Left
 StatusLbl.ZIndex = 13
 StatusLbl.Parent = InfoBox
 
--- SEPARATOR
-local Sep = Instance.new("Frame")
-Sep.Size = UDim2.new(1, -30, 0, 2)
-Sep.Position = UDim2.new(0, 15, 0, 340)
-Sep.BackgroundColor3 = THEME.AccentColor
-Sep.BorderSizePixel = 0
-Sep.ZIndex = 12
-Sep.Parent = InfoFrame
+-- CHOICE TITLE (BARU)
+local ChoiceTitle = Instance.new("TextLabel")
+ChoiceTitle.Size = UDim2.new(1, -30, 0, 25)
+ChoiceTitle.Position = UDim2.new(0, 15, 0, 325)
+ChoiceTitle.BackgroundTransparency = 1
+ChoiceTitle.Text = "❓ Apakah anda mau coba Versi Testing?"
+ChoiceTitle.TextColor3 = THEME.WarningColor
+ChoiceTitle.Font = Enum.Font.Code
+ChoiceTitle.TextSize = 14
+ChoiceTitle.ZIndex = 12
+ChoiceTitle.Parent = InfoFrame
+
+-- BUTTON CONTAINER
+local ButtonFrame = Instance.new("Frame")
+ButtonFrame.Size = UDim2.new(1, -30, 0, 50)
+ButtonFrame.Position = UDim2.new(0, 15, 0, 360)
+ButtonFrame.BackgroundTransparency = 1
+ButtonFrame.ZIndex = 12
+ButtonFrame.Parent = InfoFrame
+
+-- YES BUTTON
+local YesBtn = Instance.new("TextButton")
+YesBtn.Size = UDim2.new(0.48, -5, 1, 0)
+YesBtn.Position = UDim2.new(0, 0, 0, 0)
+YesBtn.BackgroundColor3 = THEME.YesColor
+YesBtn.BorderColor3 = THEME.SuccessColor
+YesBtn.BorderSizePixel = 2
+YesBtn.Text = "✔ YA ( Auto Execute )"
+YesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+YesBtn.Font = Enum.Font.Code
+YesBtn.TextSize = 12
+YesBtn.ZIndex = 13
+YesBtn.Parent = ButtonFrame
+Instance.new("UICorner", YesBtn).CornerRadius = UDim.new(0, 6)
+
+-- NO BUTTON
+local NoBtn = Instance.new("TextButton")
+NoBtn.Size = UDim2.new(0.48, -5, 1, 0)
+NoBtn.Position = UDim2.new(0.52, 5, 0, 0)
+NoBtn.BackgroundColor3 = THEME.NoColor
+NoBtn.BorderColor3 = THEME.AccentColor
+NoBtn.BorderSizePixel = 2
+NoBtn.Text = "✖ TIDAK ( Kick 10s )"
+NoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoBtn.Font = Enum.Font.Code
+NoBtn.TextSize = 12
+NoBtn.ZIndex = 13
+NoBtn.Parent = ButtonFrame
+Instance.new("UICorner", NoBtn).CornerRadius = UDim.new(0, 6)
 
 -- INFO TAMBAHAN
 local InfoMsg = Instance.new("TextLabel")
-InfoMsg.Size = UDim2.new(1, -30, 0, 60)
-InfoMsg.Position = UDim2.new(0, 15, 0, 350)
+InfoMsg.Size = UDim2.new(1, -30, 0, 70)
+InfoMsg.Position = UDim2.new(0, 15, 0, 425)
 InfoMsg.BackgroundTransparency = 1
-InfoMsg.Text = "> Script akan otomatis tersedia\n> setelah waktu update selesai\n> Mohon tunggu dengan sabar"
+InfoMsg.Text = "> YA = Auto Execute Script + Info Hilang\n> TIDAK = Auto Kick dalam 10 detik\n> Pilih salah satu untuk melanjutkan"
 InfoMsg.TextColor3 = THEME.TextLight
 InfoMsg.Font = Enum.Font.Code
 InfoMsg.TextSize = 10
 InfoMsg.TextXAlignment = Enum.TextXAlignment.Left
 InfoMsg.ZIndex = 12
 InfoMsg.Parent = InfoFrame
+
+--==============================================================
+-- BUTTON ACTIONS
+--==============================================================
+YesBtn.MouseButton1Click:Connect(function()
+    YesBtn.Text = "✔ LOADING..."
+    YesBtn.BackgroundColor3 = THEME.SuccessColor
+    NoBtn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    NoBtn.Text = "✖ DISABLED"
+    NoBtn.Active = false
+    
+    Notify("Choice", "> ANDA MEMILIH: YA", 2)
+    task.wait(0.5)
+    ExecuteNewScript()
+end)
+
+NoBtn.MouseButton1Click:Connect(function()
+    NoBtn.Text = "✖ TUNGGU..."
+    NoBtn.BackgroundColor3 = THEME.AccentColor
+    YesBtn.BackgroundColor3 = Color3.fromRGB(0, 50, 0)
+    YesBtn.Text = "✔ DISABLED"
+    YesBtn.Active = false
+    
+    Notify("Choice", "> ANDA MEMILIH: TIDAK", 2)
+    task.wait(0.3)
+    ShowNoChoiceFrame()
+end)
 
 --==============================================================
 -- DRAGGABLE
@@ -314,7 +535,7 @@ end
 MakeDraggable(InfoFrame)
 
 --==============================================================
--- LOADING SCREEN (MINI)
+-- LOADING SCREEN
 --==============================================================
 local LoadingScreen = Instance.new("Frame")
 LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
@@ -408,7 +629,7 @@ task.spawn(function()
     local loadingMsgs = {
         "> LOADING INFO SYSTEM...",
         "> FETCHING UPDATE DATA...",
-        "> PREPARING DISPLAY...",
+        "> PREPARING CHOICE...",
         "> SYSTEM READY!"
     }
     
@@ -436,8 +657,8 @@ task.spawn(function()
     end)
     
     Notify("ZetGames v4.4", "> INFO BUILD LOADED", 3)
-    Notify("Update Info", "> SELESAI 30 SEPT 2025", 3)
+    Notify("Choice", "> PILIH: YA / TIDAK", 3)
 end)
 
-print("[ZetGames-AimLock] INFO BUILD v4.4 - Loaded Successfully")
+print("[ZetGames-AimLock] INFO BUILD v4.4 + CHOICE - Loaded Successfully")
 print("[ZetGames] Update Release: 30 September 2025 | 19:30 WIB | Rabu")
