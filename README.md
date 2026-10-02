@@ -26,6 +26,7 @@ local SoundService = game:GetService("SoundService")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local VirtualUser = game:GetService("VirtualUser")
+local GuiService = game:GetService("GuiService")
 local Camera = workspace.CurrentCamera
 
 local LocalPlayer = Players.LocalPlayer
@@ -95,7 +96,7 @@ end
 print("[ZET] GUI Parent: " .. tostring(ScreenGui.Parent and ScreenGui.Parent.Name or "NIL"))
 
 --==============================================================
--- STATE
+-- STATE (SEMUA DEFAULT OFF)
 --==============================================================
 local IsLoggedIn = false
 local MenuVisible = true
@@ -109,7 +110,7 @@ local function DisconnectKey(key)
     end
 end
 
--- ✅ VPN (LOCKED ON — tidak bisa dimatikan)
+-- ✅ VPN (LOCKED ON)
 local VPNActive = true
 
 -- 🎯 AIMBOT
@@ -127,7 +128,6 @@ local AimKeybindEnabled = false
 local AimKeybind = Enum.KeyCode.E
 local AimKeyHeld = false
 local TargetPriority = "Closest"
-local OffScreenArrowEnabled = false
 
 -- 👁️ ESP
 local ESPEnabled = false
@@ -136,11 +136,16 @@ local ChamsObjects = {}
 local TracerColor = Color3.fromRGB(0, 150, 255)
 local RainbowESPEnabled = false
 local RainbowHue = 0
+local OffScreenArrowEnabled = false
 
--- Anti-Kick (locked)
+-- ✅ FOV (FIXED: deklarasi dulu)
+local FOVCircleEnabled = false
+local FOVRadius = 250
+
+-- Anti-Kick
 local AntiKickEnabled = true
 
--- FOV Circle (Draw)
+-- ✅ DRAWINGS
 local FOVCircle = nil
 pcall(function()
     FOVCircle = Drawing.new("Circle")
@@ -248,7 +253,7 @@ local function ActivateAntiKick()
 end
 
 --==============================================================
--- FOV LOOP
+-- FOV LOOP (FIXED)
 --==============================================================
 local function EnableFOVLoop()
     DisconnectKey("FOV")
@@ -260,8 +265,12 @@ local function EnableFOVLoop()
         end
         pcall(function()
             FOVCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-            FOVCircle.Radius = AimbotFOV
+            FOVCircle.Radius = FOVRadius
             FOVCircle.Color = THEME.Accent
+            FOVCircle.Thickness = 2
+            FOVCircle.NumSides = 90
+            FOVCircle.Filled = false
+            FOVCircle.Transparency = 1
             FOVCircle.Visible = true
         end)
     end)
@@ -273,7 +282,11 @@ local function DisableFOVLoop()
     if FOVCircle then pcall(function() FOVCircle.Visible = false end) end
 end
 
-local FOVCircleEnabled = false
+-- ✅ Sync FOV Radius → AimbotFOV
+local function SetFOVRadius(radius)
+    FOVRadius = math.clamp(radius, 50, 5000)
+    AimbotFOV = FOVRadius
+end
 
 --==============================================================
 -- OFF-SCREEN ARROW
@@ -612,7 +625,7 @@ end)
 local function CreateUI()
     print("[ZET] Creating UI...")
 
-    -- LOADING
+    -- ============== LOADING SCREEN ==============
     local LoadingScreen = Instance.new("Frame")
     LoadingScreen.Name = "LoadingScreen"
     LoadingScreen.Size = UDim2.new(1, 0, 1, 0)
@@ -717,7 +730,7 @@ local function CreateUI()
     LVersion.ZIndex = 503
     LVersion.Parent = LoadingBg
 
-    -- LOGIN FRAME
+    -- ============== LOGIN FRAME ==============
     local LoginFrame = Instance.new("Frame")
     LoginFrame.Size = UDim2.new(0, 320, 0, 400)
     LoginFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
@@ -854,7 +867,7 @@ local function CreateUI()
     Instr.ZIndex = 102
     Instr.Parent = LoginFrame
 
-    -- MAIN HUB
+    -- ============== MAIN HUB ==============
     local MainHub = Instance.new("Frame")
     MainHub.Size = UDim2.new(0, 360, 0, 500)
     MainHub.Position = UDim2.new(0.5, -180, 0.5, -250)
@@ -919,6 +932,7 @@ local function CreateUI()
     ScrollContent.ZIndex = 101
     ScrollContent.Parent = ScrollFrame
 
+    -- ============== HELPER FUNCTIONS ==============
     local function Section(title, y)
         local f = Instance.new("Frame")
         f.Size = UDim2.new(1, -20, 0, 26)
@@ -1015,11 +1029,11 @@ local function CreateUI()
         return b
     end
 
-    -- ═══════════════ VPN SECTION (LOCKED) ═══════════════
+    -- ============== VPN SECTION ==============
     Section("=== 🔒 VPN AUTO-PROTECT ===", 10)
     LockedToggle("> 🔒 VPN: ON (LOCKED - ANTI BAN)", 42)
 
-    -- ═══════════════ AIMBOT SECTION ═══════════════
+    -- ============== AIMBOT SECTION ==============
     Section("=== 🎯 AIMBOT ===", 90)
 
     local AimbotBtn = Instance.new("TextButton")
@@ -1059,7 +1073,11 @@ local function CreateUI()
         FOVCircleEnabled = not FOVCircleEnabled
         btn.Text = FOVCircleEnabled and "> FOV: ON" or "> FOV: OFF"
         btn.BackgroundColor3 = FOVCircleEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if FOVCircleEnabled then EnableFOVLoop() else DisableFOVLoop() end
+        if FOVCircleEnabled then
+            EnableFOVLoop()
+        else
+            DisableFOVLoop()
+        end
     end)
     Half("> TEAM: OFF", 214, 0.5, function(btn)
         AimbotTeamCheck = not AimbotTeamCheck
@@ -1067,12 +1085,14 @@ local function CreateUI()
         btn.BackgroundColor3 = AimbotTeamCheck and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    local FOVInput = Input("> FOV Radius (50-5000)", 252, tostring(AimbotFOV))
+    local FOVInput = Input("> FOV Radius (50-5000)", 252, tostring(FOVRadius))
     FOVInput.FocusLost:Connect(function(enterPressed)
         if enterPressed then
             local nf = tonumber(FOVInput.Text)
-            if nf then AimbotFOV = math.clamp(nf, 50, 5000) end
-            FOVInput.Text = tostring(AimbotFOV)
+            if nf then
+                SetFOVRadius(nf)
+            end
+            FOVInput.Text = tostring(FOVRadius)
         end
     end)
 
@@ -1088,7 +1108,7 @@ local function CreateUI()
         btn.BackgroundColor3 = AimbotWallCheck and THEME.ButtonActive or THEME.ButtonBG
     end)
 
-    -- ═══════════════ ESP SECTION ═══════════════
+    -- ============== ESP SECTION ==============
     Section("=== 👁️ ESP ===", 376)
 
     Toggle("> ESP MASTER: OFF", 408, function(btn)
@@ -1112,7 +1132,7 @@ local function CreateUI()
         if OffScreenArrowEnabled then EnableOffScreenArrow() else DisableOffScreenArrow() end
     end)
 
-    -- ═══════════════ UPGRADE TO PREMIUM ═══════════════
+    -- ============== UPGRADE PREMIUM SECTION ==============
     Section("=== 🔒 FITUR TERKUNCI ===", 546)
 
     local LockedInfo = Instance.new("TextLabel")
@@ -1131,7 +1151,7 @@ local function CreateUI()
     LockedInfo.Parent = ScrollContent
     Instance.new("UICorner", LockedInfo).CornerRadius = UDim.new(0, 4)
 
-    -- 🔥 UPGRADE NOW BUTTON
+    -- 🔥 UPGRADE NOW
     local UpgradeBtn = Instance.new("TextButton")
     UpgradeBtn.Size = UDim2.new(1, -20, 0, 55)
     UpgradeBtn.Position = UDim2.new(0, 10, 0, 690)
@@ -1146,7 +1166,6 @@ local function CreateUI()
     UpgradeBtn.Parent = ScrollContent
     Instance.new("UICorner", UpgradeBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Animasi pulse pada tombol upgrade
     task.spawn(function()
         while UpgradeBtn.Parent do
             pcall(function()
@@ -1164,7 +1183,7 @@ local function CreateUI()
         Notify("🛒 Buy Now", PremiumWebsite, 8)
     end)
 
-    -- 🛒 BUY BUTTON (langsung buka browser)
+    -- 🛒 BUY BUTTON (FIXED)
     local BuyBtn = Instance.new("TextButton")
     BuyBtn.Size = UDim2.new(1, -20, 0, 50)
     BuyBtn.Position = UDim2.new(0, 10, 0, 754)
@@ -1181,19 +1200,31 @@ local function CreateUI()
 
     BuyBtn.MouseButton1Click:Connect(function()
         Notify("🛒 Membuka Browser...", PremiumWebsite, 5)
-        -- Coba buka browser dengan berbagai metode
+        
+        -- ✅ Copy link dulu (fallback paling reliable)
+        local copied = false
         pcall(function()
-            if setclipboard then setclipboard(PremiumWebsite) end
+            if setclipboard then
+                setclipboard(PremiumWebsite)
+                copied = true
+            end
         end)
-        -- Coba langsung buka
+        
+        -- ✅ Coba buka browser
+        task.wait(0.2)
         pcall(function()
-            game:GetService("GuiService"):OpenBrowserWindow(PremiumWebsite)
+            GuiService:OpenBrowserWindow(PremiumWebsite)
         end)
-        task.wait(0.3)
-        Notify("💳 Website", "Sudah dibuka di browser!\nLink juga di-copy", 6)
+        
+        -- ✅ Fallback: notif
+        task.wait(0.5)
+        if copied then
+            Notify("✅ Link Disalin!", "Paste di browser jika gak auto-buka", 7)
+        else
+            Notify("📋 Copy Manual", PremiumWebsite, 10)
+        end
     end)
 
-    -- Info tambahan
     local InfoLabel = Instance.new("TextLabel")
     InfoLabel.Size = UDim2.new(1, -20, 0, 60)
     InfoLabel.Position = UDim2.new(0, 10, 0, 814)
@@ -1207,7 +1238,7 @@ local function CreateUI()
     InfoLabel.ZIndex = 102
     InfoLabel.Parent = ScrollContent
 
-    -- ═══════════════ USER INFO ═══════════════
+    -- ============== USER INFO ==============
     Section("=== USER INFORMATION ===", 884)
 
     local UIF = Instance.new("Frame")
@@ -1256,7 +1287,7 @@ local function CreateUI()
     BuildLbl.ZIndex = 103
     BuildLbl.Parent = UIF
 
-    -- ═══════════════ MENU BUTTON ═══════════════
+    -- ============== MENU BUTTON ==============
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuButton"
     ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
@@ -1410,7 +1441,7 @@ local function CreateUI()
     MakeDraggable(LoginFrame)
     MakeDraggable(MainHub)
 
-    -- ⭐ AUTO PROMOTE NOTIF (tiap 5 menit)
+    -- ⭐ AUTO PROMOTE NOTIF
     task.spawn(function()
         task.wait(30)
         while task.wait(300) do
