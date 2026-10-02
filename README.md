@@ -1,15 +1,14 @@
 --[[
     ══════════════════════════════════════════════════
-      ZetGames-AimLock V4.4 | OFFICIAL RESMI
+      ZetGames-AimLock V4.4 | PREMIUM EDITION
     ══════════════════════════════════════════════════
       Theme    : 🔵 Blue & Black
       Login    : ✅ WAJIB KEY
-      Night Lock: ✅ ACTIVE (Auto Kick)
-      Anti-Kick: ✅ SAFE MODE
+      Anti-Kick: ✅ SAFE MODE (VPN Locked)
+      Fitur    : 🎯 Aimbot | 👁️ ESP | 🔒 VPN
       
-      ⭐ FOLLOW @ZetGames di rscripts.net
-      ⭐ Link: rscripts.net/@ZetGames
-      ⭐ Update V4.5, V4.6, dst coming soon!
+      🔒 UPGRADE KE PREMIUM untuk fitur lengkap!
+      🛒 Buy: fazxy-store.lovable.app
     ══════════════════════════════════════════════════
 --]]
 
@@ -34,7 +33,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 pcall(function() SoundService.RespectFilteringEnabled = false end)
 
-print("[ZET] Loading V4.4 RESMI...")
+print("[ZET] Loading V4.4 PREMIUM...")
 
 --==============================================================
 -- THEME
@@ -58,6 +57,7 @@ THEME.Shield = Color3.fromRGB(0,255,200)
 THEME.Success = Color3.fromRGB(0,255,200)
 THEME.Locked = Color3.fromRGB(150,150,150)
 THEME.LockedBG = Color3.fromRGB(40,40,40)
+THEME.Gold = Color3.fromRGB(255,215,0)
 
 --==============================================================
 -- HIGH-SECURITY GAMES
@@ -77,12 +77,13 @@ local ValidKeys = {
     ["FreePrem-By-Fazxy"] = {Expiry = 0, Level = "Free"},
 }
 local KeyWebsite = "https://arkaraffaza387-dotcom.github.io/Key-Zero/"
+local PremiumWebsite = "https://fazxy-store.lovable.app"
 
 --==============================================================
 -- SCREEN GUI
 --==============================================================
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZetGamesV44Resmi"
+ScreenGui.Name = "ZetGamesV44Premium"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.IgnoreGuiInset = true
@@ -108,6 +109,10 @@ local function DisconnectKey(key)
     end
 end
 
+-- ✅ VPN (LOCKED ON — tidak bisa dimatikan)
+local VPNActive = true
+
+-- 🎯 AIMBOT
 local AimbotEnabled = false
 local AimbotTargetPart = "Head"
 local AimbotFOV = 250
@@ -124,22 +129,7 @@ local AimKeyHeld = false
 local TargetPriority = "Closest"
 local OffScreenArrowEnabled = false
 
-local FOVCircleEnabled = false
-local FOVRadius = 250
-local FOVMaxRadius = 5000
-local FOVColor = Color3.fromRGB(0, 150, 255)
-local FOVThickness = 2
-local FOVFilled = false
-local FOVFillTransparency = 0.85
-
-local NPCDetectionEnabled = false
-local NPCEspEnabled = false
-local NPCFilterName = ""
-local NPCMaxDistance = 500
-local NPCMaxCount = 50
-local NPCWhitelistKeywords = {"pet", "shop", "vendor", "trainer"}
-local NPCESPObjects = {}
-
+-- 👁️ ESP
 local ESPEnabled = false
 local ESPObjects = {}
 local ChamsObjects = {}
@@ -147,98 +137,22 @@ local TracerColor = Color3.fromRGB(0, 150, 255)
 local RainbowESPEnabled = false
 local RainbowHue = 0
 
-local FlyNormalEnabled = false
-local FlyNormalSpeed = 100
-local FlyNormalMode = "Free"
-local FlyNormalVelocity = nil
-local FlyNormalGyro = nil
-local FlyKeys = {W=false, A=false, S=false, D=false, Space=false, Ctrl=false}
-
-local FlyVoidEnabled = false
-local FlyVoidHideMode = false
-local FlyVoidOriginalY = nil
-local OriginalTransparency = {}
-local OriginalCanCollide = {}
-
-local FullbrightEnabled = false
-local OriginalLighting = {}
-local FPSBoostEnabled = false
-local OriginalSettings = {}
-local SpeedHackEnabled = false
-local SpeedMultiplier = 100
-local MaxSpeed = 500
-local DefaultWalkSpeed = 16
-local NoclipEnabled = false
-local InfiniteJumpEnabled = false
-
-local ChatSpamEnabled = false
-local ChatSpamText = "ZETGAMES-RESMI"
-local ChatSpamDelay = 3
-
-local SoundESPEnabled = false
-local SoundESPRadius = 100
-local SoundESPBeep = nil
-local LastBeepTime = 0
-
-local MusicPlayerEnabled = false
-local MusicSound = nil
-local MusicPlaylist = {
-    {Name = "Kelingan Mantan", ID = "78450316593213"},
-    {Name = "Teh Hijau", ID = "111485011584825"},
-}
-local MusicCurrentIndex = 1
-local MusicVolume = 1
-local MusicShuffle = false
-local MusicRepeatAll = true
-
-local AutoRespawnEnabled = false
-local AntiFlingEnabled = false
-local AntiAFKEnabled = false
-local HitboxEnabled = false
-local HitboxSize = 5
-local DashEnabled = false
-local DashCooldown = 0
-local InvisibleEnabled = false
-local InvisibleOriginalTransparency = {}
-local AutoShootEnabled = false
-local AutoShootDelay = 100
-local DroneModeEnabled = false
-local KillNotifEnabled = false
-local LastPlayerHealth = {}
-local InfoPanelEnabled = false
-local InfoPanelFrame = nil
-local Waypoints = {}
-
+-- Anti-Kick (locked)
 local AntiKickEnabled = true
-local AutoReconnectEnabled = true
-local ReconnectAttempts = 0
-local MaxReconnectAttempts = 5
-local WatchdogLastPing = tick()
-local WatchdogPingThreshold = 60
 
-local NightLockActive = true
-local NightLockKickLog = {}
-local NightLockScanInterval = 1
-local NightLockLastScan = 0
-
-local TeleportPlayerList = {}
-local TeleportListFrame = nil
-local TeleportListContainer = nil
-local SavedLocation = nil
-local ServerHopRunning = false
-
-local FOVCircle
+-- FOV Circle (Draw)
+local FOVCircle = nil
 pcall(function()
     FOVCircle = Drawing.new("Circle")
     FOVCircle.Visible = false
-    FOVCircle.Color = FOVColor
-    FOVCircle.Thickness = FOVThickness
-    FOVCircle.Filled = FOVFilled
+    FOVCircle.Color = Color3.fromRGB(0, 150, 255)
+    FOVCircle.Thickness = 2
+    FOVCircle.Filled = false
     FOVCircle.Transparency = 1
     FOVCircle.NumSides = 90
 end)
 
-local OffScreenArrow
+local OffScreenArrow = nil
 pcall(function()
     OffScreenArrow = Drawing.new("Triangle")
     OffScreenArrow.Visible = false
@@ -302,6 +216,38 @@ local function Notify(title, message, duration)
 end
 
 --==============================================================
+-- ANTI-KICK (LOCKED)
+--==============================================================
+local BlockedKeywords = {"exploit", "cheat", "hack", "aimbot", "ban", "detect", "script", "injector", "banned", "violation", "suspicious", "anti-cheat", "anticheat"}
+local LegitKeywords = {"shutdown", "restart", "update", "maintenance", "rejoin"}
+
+local function ActivateAntiKick()
+    if IsHighSecurityGame() then
+        Notify("🔒 VPN", "> AUTO ON (SAFE)", 3)
+        return
+    end
+    pcall(function()
+        if not _G._ZET_OrigKick then _G._ZET_OrigKick = LocalPlayer.Kick end
+        LocalPlayer.Kick = function(self, message)
+            if not AntiKickEnabled then return _G._ZET_OrigKick(self, message) end
+            if not message then return end
+            local msgLower = string.lower(tostring(message))
+            for _, kw in ipairs(LegitKeywords) do
+                if string.find(msgLower, kw, 1, true) then return _G._ZET_OrigKick(self, message) end
+            end
+            for _, kw in ipairs(BlockedKeywords) do
+                if string.find(msgLower, kw, 1, true) then
+                    Notify("🔒 VPN", "> Blocked: " .. kw, 3)
+                    return
+                end
+            end
+            return _G._ZET_OrigKick(self, message)
+        end
+    end)
+    Notify("🔒 VPN", "> ACTIVE (SAFE)", 2)
+end
+
+--==============================================================
 -- FOV LOOP
 --==============================================================
 local function EnableFOVLoop()
@@ -314,12 +260,8 @@ local function EnableFOVLoop()
         end
         pcall(function()
             FOVCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-            FOVCircle.Radius = FOVRadius
-            FOVCircle.Color = FOVColor
-            FOVCircle.Thickness = FOVThickness
-            FOVCircle.Filled = FOVFilled
-            FOVCircle.Transparency = FOVFilled and FOVFillTransparency or 1
-            FOVCircle.NumSides = 90
+            FOVCircle.Radius = AimbotFOV
+            FOVCircle.Color = THEME.Accent
             FOVCircle.Visible = true
         end)
     end)
@@ -330,6 +272,8 @@ local function DisableFOVLoop()
     DisconnectKey("FOV")
     if FOVCircle then pcall(function() FOVCircle.Visible = false end) end
 end
+
+local FOVCircleEnabled = false
 
 --==============================================================
 -- OFF-SCREEN ARROW
@@ -368,7 +312,7 @@ local function EnableOffScreenArrow()
                         OffScreenArrow.PointA = Vector2.new(px, py - 15)
                         OffScreenArrow.PointB = Vector2.new(px - 10, py + 5)
                         OffScreenArrow.PointC = Vector2.new(px + 10, py + 5)
-                        OffScreenArrow.Color = Color3.fromRGB(0, 150, 255)
+                        OffScreenArrow.Color = THEME.Accent
                         OffScreenArrow.Visible = true
                     end)
                 else
@@ -386,676 +330,6 @@ local function DisableOffScreenArrow()
     DisconnectKey("OffScreenArrow")
     if OffScreenArrow then pcall(function() OffScreenArrow.Visible = false end) end
 end
-
---==============================================================
--- ANTI-KICK
---==============================================================
-local BlockedKeywords = {"exploit", "cheat", "hack", "aimbot", "ban", "detect", "script", "injector", "banned", "violation", "suspicious", "anti-cheat", "anticheat"}
-local LegitKeywords = {"shutdown", "restart", "update", "maintenance", "rejoin"}
-
-local function ActivateAntiKick()
-    if IsHighSecurityGame() then
-        Notify("🛡️ Anti-Kick", "> SKIP (game AC kuat)", 3)
-        return
-    end
-    pcall(function()
-        if not _G._ZET_OrigKick then _G._ZET_OrigKick = LocalPlayer.Kick end
-        LocalPlayer.Kick = function(self, message)
-            if not AntiKickEnabled then return _G._ZET_OrigKick(self, message) end
-            if not message then return end
-            local msgLower = string.lower(tostring(message))
-            for _, kw in ipairs(LegitKeywords) do
-                if string.find(msgLower, kw, 1, true) then return _G._ZET_OrigKick(self, message) end
-            end
-            for _, kw in ipairs(BlockedKeywords) do
-                if string.find(msgLower, kw, 1, true) then
-                    Notify("🛡️ Anti-Kick", "> Kick diblokir: " .. kw, 3)
-                    return
-                end
-            end
-            return _G._ZET_OrigKick(self, message)
-        end
-    end)
-    Notify("🛡️ Anti-Kick", "> ACTIVE (SAFE)", 2)
-end
-
---==============================================================
--- AUTO-RECONNECT
---==============================================================
-local function AttemptReconnect()
-    if ReconnectAttempts >= MaxReconnectAttempts then ReconnectAttempts = 0; return end
-    ReconnectAttempts = ReconnectAttempts + 1
-    pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer) end)
-end
-
-local function ActivateAutoReconnect()
-    DisconnectKey("AutoReconnect")
-    WatchdogLastPing = tick()
-    local conn = RunService.Heartbeat:Connect(function()
-        if not AutoReconnectEnabled then return end
-        local now = tick()
-        if now - WatchdogLastPing > WatchdogPingThreshold then
-            WatchdogLastPing = now
-            AttemptReconnect()
-        else WatchdogLastPing = now end
-    end)
-    ActiveConnections["AutoReconnect"] = conn
-end
-
---==============================================================
--- NIGHT LOCK
---==============================================================
-local function ActivateNightLock()
-    DisconnectKey("NightLock")
-    NightLockActive = true
-    local conn = RunService.Heartbeat:Connect(function()
-        if not NightLockActive then return end
-        local now = tick()
-        if now - NightLockLastScan < NightLockScanInterval then return end
-        NightLockLastScan = now
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer then
-                local name = string.lower(plr.Name)
-                local sus, reason = false, ""
-                if string.find(name, "bot", 1, true) then sus=true; reason="Name:bot" end
-                if string.find(name, "exploit", 1, true) then sus=true; reason="Name:exploit" end
-                if string.find(name, "hack", 1, true) then sus=true; reason="Name:hack" end
-                if string.find(name, "cheat", 1, true) then sus=true; reason="Name:cheat" end
-                if string.find(name, "aimbot", 1, true) then sus=true; reason="Name:aimbot" end
-                if plr.Character then
-                    local root = plr.Character:FindFirstChild("HumanoidRootPart")
-                    local hum = plr.Character:FindFirstChild("Humanoid")
-                    if root and hum then
-                        if root.AssemblyLinearVelocity.Magnitude > 1000 then sus=true; reason="Fling" end
-                        if hum.WalkSpeed > 200 then sus=true; reason="Speed:"..math.floor(hum.WalkSpeed) end
-                    end
-                end
-                if sus and not NightLockKickLog[plr.UserId] then
-                    NightLockKickLog[plr.UserId] = true
-                    Notify("🔒 NIGHT LOCK", "> " .. plr.Name .. " | " .. reason, 5)
-                    task.wait(0.5)
-                    pcall(function()
-                        LocalPlayer:Kick("[NIGHT LOCK] " .. plr.Name .. " | " .. reason .. "\nOfficial Build V4.4")
-                    end)
-                    break
-                end
-            end
-        end
-    end)
-    ActiveConnections["NightLock"] = conn
-    Notify("🔒 Night Lock", "> ACTIVE (AUTO KICK)", 3)
-end
-
---==============================================================
--- NPC DETECTION
---==============================================================
-local function IsNPC(model)
-    if not model or not model:IsA("Model") then return false end
-    if Players:GetPlayerFromCharacter(model) then return false end
-    if model == LocalPlayer.Character then return false end
-    if not model:FindFirstChild("Humanoid") then return false end
-    if not model:FindFirstChild("HumanoidRootPart") then return false end
-    if model.Humanoid.Health <= 0 then return false end
-    local nameLower = string.lower(model.Name)
-    for _, keyword in ipairs(NPCWhitelistKeywords) do
-        if string.find(nameLower, keyword, 1, true) then return false end
-    end
-    if NPCFilterName ~= "" then
-        if not string.find(nameLower, string.lower(NPCFilterName), 1, true) then return false end
-    end
-    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    local npcRoot = model:FindFirstChild("HumanoidRootPart")
-    if myRoot and npcRoot and (npcRoot.Position - myRoot.Position).Magnitude > NPCMaxDistance then return false end
-    return true
-end
-
-local function GetNPCs()
-    local list, count = {}, 0
-    for _, obj in pairs(Workspace:GetChildren()) do
-        if IsNPC(obj) then table.insert(list, obj); count = count + 1; if count >= NPCMaxCount then break end end
-    end
-    return list
-end
-
---==============================================================
--- FLY NORMAL
---==============================================================
-local function EnableFlyNormal()
-    DisconnectKey("FlyNormal")
-    if FlyNormalVelocity then pcall(function() FlyNormalVelocity:Destroy() end); FlyNormalVelocity = nil end
-    if FlyNormalGyro then pcall(function() FlyNormalGyro:Destroy() end); FlyNormalGyro = nil end
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    FlyNormalVelocity = Instance.new("BodyVelocity")
-    FlyNormalVelocity.Velocity = Vector3.new(0,0,0)
-    FlyNormalVelocity.MaxForce = Vector3.new(1e9,1e9,1e9)
-    FlyNormalVelocity.P = 1e5
-    FlyNormalVelocity.Parent = root
-    FlyNormalGyro = Instance.new("BodyGyro")
-    FlyNormalGyro.MaxTorque = Vector3.new(1e9,1e9,1e9)
-    FlyNormalGyro.P = 1e5
-    FlyNormalGyro.CFrame = root.CFrame
-    FlyNormalGyro.Parent = root
-    local conn = RunService.RenderStepped:Connect(function()
-        if not FlyNormalEnabled then return end
-        local c = LocalPlayer.Character
-        if not c then return end
-        local r = c:FindFirstChild("HumanoidRootPart")
-        local h = c:FindFirstChild("Humanoid")
-        if not r or not h then return end
-        if FlyNormalVelocity and FlyNormalVelocity.Parent ~= r then FlyNormalVelocity.Parent = r end
-        if FlyNormalGyro and FlyNormalGyro.Parent ~= r then FlyNormalGyro.Parent = r end
-        local camCF = Camera.CFrame
-        local dir = Vector3.new(0,0,0)
-        if FlyKeys.W then dir = dir + camCF.LookVector end
-        if FlyKeys.S then dir = dir - camCF.LookVector end
-        if FlyKeys.A then dir = dir - camCF.RightVector end
-        if FlyKeys.D then dir = dir + camCF.RightVector end
-        if FlyKeys.Space then dir = dir + Vector3.new(0,1,0) end
-        if FlyKeys.Ctrl then dir = dir - Vector3.new(0,1,0) end
-        if h.MoveDirection.Magnitude > 0 then dir = dir + h.MoveDirection end
-        local moveDir = dir.Magnitude > 0 and dir.Unit * FlyNormalSpeed or Vector3.new(0,0,0)
-        FlyNormalVelocity.Velocity = moveDir
-        FlyNormalGyro.CFrame = CFrame.new(r.Position, r.Position + camCF.LookVector)
-    end)
-    ActiveConnections["FlyNormal"] = conn
-end
-
-local function DisableFlyNormal()
-    DisconnectKey("FlyNormal")
-    if FlyNormalVelocity then pcall(function() FlyNormalVelocity:Destroy() end); FlyNormalVelocity = nil end
-    if FlyNormalGyro then pcall(function() FlyNormalGyro:Destroy() end); FlyNormalGyro = nil end
-end
-
---==============================================================
--- FLY VOID
---==============================================================
-local function EnableFlyVoid()
-    DisconnectKey("FlyVoid")
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    FlyVoidOriginalY = root.Position.Y
-    local rp = RaycastParams.new()
-    rp.FilterType = Enum.RaycastFilterType.Blacklist
-    rp.FilterDescendantsInstances = {char}
-    local ray = workspace:Raycast(Vector3.new(root.Position.X, 1000, root.Position.Z), Vector3.new(0,-3000,0), rp)
-    local floorY = ray and ray.Position.Y or -60
-    local targetY = floorY - 5
-    pcall(function() root.CFrame = CFrame.new(root.Position.X, targetY, root.Position.Z) end)
-    local conn = RunService.Heartbeat:Connect(function()
-        if not FlyVoidEnabled then return end
-        local c = LocalPlayer.Character
-        if not c then return end
-        local r = c:FindFirstChild("HumanoidRootPart")
-        local h = c:FindFirstChild("Humanoid")
-        if not r or not h then return end
-        local pos = r.Position
-        if pos.Y > targetY + 2 then
-            pcall(function()
-                r.CFrame = CFrame.new(pos.X, targetY, pos.Z)
-                r.AssemblyLinearVelocity = Vector3.new(r.AssemblyLinearVelocity.X, 0, r.AssemblyLinearVelocity.Z)
-            end)
-        end
-        if pos.Y < targetY - 15 then
-            pcall(function()
-                r.CFrame = CFrame.new(pos.X, targetY, pos.Z)
-                r.AssemblyLinearVelocity = Vector3.new(0,0,0)
-            end)
-        end
-        if math.abs(r.AssemblyLinearVelocity.Y) > 5 then
-            pcall(function()
-                r.AssemblyLinearVelocity = Vector3.new(r.AssemblyLinearVelocity.X, 0, r.AssemblyLinearVelocity.Z)
-            end)
-        end
-        if h.Health <= 0 then pcall(function() LocalPlayer:LoadCharacter() end) end
-        if FlyVoidHideMode then
-            for _, part in pairs(c:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    if not OriginalTransparency[part] then
-                        OriginalTransparency[part] = part.Transparency
-                        OriginalCanCollide[part] = part.CanCollide
-                    end
-                    part.Transparency = 0.85
-                    part.CanCollide = false
-                end
-            end
-        end
-    end)
-    ActiveConnections["FlyVoid"] = conn
-end
-
-local function DisableFlyVoid()
-    DisconnectKey("FlyVoid")
-    local char = LocalPlayer.Character
-    if char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                if OriginalTransparency[part] then part.Transparency = OriginalTransparency[part] end
-                if OriginalCanCollide[part] ~= nil then part.CanCollide = OriginalCanCollide[part] end
-            end
-        end
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if root then
-            pcall(function()
-                local rp = RaycastParams.new()
-                rp.FilterType = Enum.RaycastFilterType.Blacklist
-                rp.FilterDescendantsInstances = {char}
-                local ray = workspace:Raycast(Vector3.new(root.Position.X, 1000, root.Position.Z), Vector3.new(0,-3000,0), rp)
-                if ray then root.CFrame = CFrame.new(ray.Position.X, ray.Position.Y + 5, ray.Position.Z)
-                elseif FlyVoidOriginalY then root.CFrame = CFrame.new(root.Position.X, FlyVoidOriginalY, root.Position.Z) end
-            end)
-        end
-    end
-    OriginalTransparency = {}
-    OriginalCanCollide = {}
-    FlyVoidOriginalY = nil
-end
-
---==============================================================
--- FULLBRIGHT / FPS
---==============================================================
-local function EnableFullbright()
-    OriginalLighting.Ambient = Lighting.Ambient
-    OriginalLighting.OutdoorAmbient = Lighting.OutdoorAmbient
-    OriginalLighting.Brightness = Lighting.Brightness
-    OriginalLighting.ClockTime = Lighting.ClockTime
-    OriginalLighting.FogEnd = Lighting.FogEnd
-    OriginalLighting.FogStart = Lighting.FogStart
-    OriginalLighting.GlobalShadows = Lighting.GlobalShadows
-    Lighting.Ambient = Color3.fromRGB(255,255,255)
-    Lighting.OutdoorAmbient = Color3.fromRGB(255,255,255)
-    Lighting.Brightness = 3
-    Lighting.ClockTime = 12
-    Lighting.FogEnd = 100000
-    Lighting.FogStart = 0
-    Lighting.GlobalShadows = false
-end
-
-local function DisableFullbright()
-    pcall(function()
-        if OriginalLighting.Ambient then Lighting.Ambient = OriginalLighting.Ambient end
-        if OriginalLighting.OutdoorAmbient then Lighting.OutdoorAmbient = OriginalLighting.OutdoorAmbient end
-        if OriginalLighting.Brightness then Lighting.Brightness = OriginalLighting.Brightness end
-        if OriginalLighting.ClockTime then Lighting.ClockTime = OriginalLighting.ClockTime end
-        if OriginalLighting.FogEnd then Lighting.FogEnd = OriginalLighting.FogEnd end
-        if OriginalLighting.FogStart then Lighting.FogStart = OriginalLighting.FogStart end
-        if OriginalLighting.GlobalShadows ~= nil then Lighting.GlobalShadows = OriginalLighting.GlobalShadows end
-    end)
-end
-
-local function EnableFPSBoost()
-    OriginalSettings.Shadows = Lighting.GlobalShadows
-    OriginalSettings.FogEnd = Lighting.FogEnd
-    OriginalSettings.Brightness = Lighting.Brightness
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 100000
-    Lighting.Brightness = 2
-    for _, effect in pairs(Lighting:GetChildren()) do
-        if effect:IsA("PostEffect") then pcall(function() effect.Enabled = false end) end
-    end
-end
-
-local function DisableFPSBoost()
-    pcall(function()
-        if OriginalSettings.Shadows ~= nil then Lighting.GlobalShadows = OriginalSettings.Shadows end
-        if OriginalSettings.FogEnd ~= nil then Lighting.FogEnd = OriginalSettings.FogEnd end
-        if OriginalSettings.Brightness ~= nil then Lighting.Brightness = OriginalSettings.Brightness end
-    end)
-end
-
---==============================================================
--- NOCLIP
---==============================================================
-local function EnableNoclip()
-    DisconnectKey("Noclip")
-    local conn = RunService.Stepped:Connect(function()
-        if not NoclipEnabled then return end
-        local char = LocalPlayer.Character
-        if not char then return end
-        for _, p in pairs(char:GetDescendants()) do
-            if p:IsA("BasePart") then p.CanCollide = false end
-        end
-    end)
-    ActiveConnections["Noclip"] = conn
-end
-
-local function DisableNoclip()
-    DisconnectKey("Noclip")
-    NoclipEnabled = false
-    task.wait(0.1)
-    local char = LocalPlayer.Character
-    if char then
-        for _, p in pairs(char:GetDescendants()) do
-            if p:IsA("BasePart") then
-                pcall(function()
-                    if p.Name == "HumanoidRootPart" then
-                        p.CanCollide = false
-                    else
-                        p.CanCollide = true
-                    end
-                end)
-            end
-        end
-    end
-end
-
---==============================================================
--- SPEED / JUMP / DASH / INVISIBLE
---==============================================================
-local function EnableSpeedHack()
-    DisconnectKey("Speed")
-    local conn = RunService.Heartbeat:Connect(function()
-        if not SpeedHackEnabled then return end
-        local char = LocalPlayer.Character
-        if not char then return end
-        local hum = char:FindFirstChild("Humanoid")
-        if hum then hum.WalkSpeed = SpeedMultiplier end
-    end)
-    ActiveConnections["Speed"] = conn
-end
-
-local function DisableSpeedHack()
-    DisconnectKey("Speed")
-    SpeedHackEnabled = false
-    task.wait(0.05)
-    local char = LocalPlayer.Character
-    if char then
-        local hum = char:FindFirstChild("Humanoid")
-        if hum then hum.WalkSpeed = DefaultWalkSpeed end
-    end
-end
-
-local function EnableInfiniteJump()
-    DisconnectKey("Jump")
-    local conn = UserInputService.JumpRequest:Connect(function()
-        if not InfiniteJumpEnabled then return end
-        if LocalPlayer.Character then
-            local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-        end
-    end)
-    ActiveConnections["Jump"] = conn
-end
-
-local function DisableInfiniteJump()
-    DisconnectKey("Jump")
-    InfiniteJumpEnabled = false
-end
-
-local function PerformDash()
-    if not DashEnabled then return end
-    local now = tick()
-    if now - DashCooldown < 2 then return end
-    DashCooldown = now
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    local camDir = Camera.CFrame.LookVector
-    local dashVel = Instance.new("BodyVelocity")
-    dashVel.Velocity = Vector3.new(camDir.X * 150, 0, camDir.Z * 150)
-    dashVel.MaxForce = Vector3.new(1e9,0,1e9)
-    dashVel.P = 1e5
-    dashVel.Parent = root
-    game:GetService("Debris"):AddItem(dashVel, 0.2)
-end
-
-local function EnableInvisible()
-    DisconnectKey("Invisible")
-    local char = LocalPlayer.Character
-    if not char then return end
-    for _, part in pairs(char:GetDescendants()) do
-        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-            if not InvisibleOriginalTransparency[part] then InvisibleOriginalTransparency[part] = part.Transparency end
-            part.Transparency = 0.95
-        elseif part:IsA("Decal") then
-            if not InvisibleOriginalTransparency[part] then InvisibleOriginalTransparency[part] = part.Transparency end
-            part.Transparency = 1
-        end
-    end
-end
-
-local function DisableInvisible()
-    DisconnectKey("Invisible")
-    InvisibleEnabled = false
-    local char = LocalPlayer.Character
-    if char then
-        for _, part in pairs(char:GetDescendants()) do
-            if InvisibleOriginalTransparency[part] then part.Transparency = InvisibleOriginalTransparency[part] end
-        end
-    end
-    InvisibleOriginalTransparency = {}
-end
-
---==============================================================
--- HITBOX
---==============================================================
-local function ApplyHitbox(player)
-    if not player.Character then return end
-    local head = player.Character:FindFirstChild("Head")
-    local hrp = player.Character:FindFirstChild("HumanoidRootPart")
-    if not head or not hrp then return end
-    if not head:GetAttribute("OriginalSize") then
-        head:SetAttribute("OriginalSize", head.Size)
-        hrp:SetAttribute("OriginalSize", hrp.Size)
-    end
-    if HitboxEnabled then
-        head.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
-        head.Transparency = 1
-        head.CanCollide = false
-        hrp.Size = Vector3.new(HitboxSize, HitboxSize, HitboxSize)
-        hrp.Transparency = 1
-        hrp.CanCollide = false
-    else
-        local os = head:GetAttribute("OriginalSize")
-        local oh = hrp:GetAttribute("OriginalSize")
-        if os then head.Size = os end
-        if oh then hrp.Size = oh end
-        head.Transparency = 0
-        head.CanCollide = true
-        hrp.Transparency = 1
-    end
-end
-
-local function EnableHitboxExpander()
-    DisconnectKey("Hitbox")
-    local conn = RunService.Heartbeat:Connect(function()
-        if not HitboxEnabled then return end
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then pcall(ApplyHitbox, player) end
-        end
-    end)
-    ActiveConnections["Hitbox"] = conn
-end
-
-local function DisableHitboxExpander()
-    DisconnectKey("Hitbox")
-    HitboxEnabled = false
-    task.wait(0.05)
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            local head = player.Character:FindFirstChild("Head")
-            local hrp = player.Character:FindFirstChild("HumanoidRootPart")
-            if head and head:GetAttribute("OriginalSize") then
-                head.Size = head:GetAttribute("OriginalSize")
-                head.Transparency = 0
-                head.CanCollide = true
-            end
-            if hrp and hrp:GetAttribute("OriginalSize") then
-                hrp.Size = hrp:GetAttribute("OriginalSize")
-            end
-        end
-    end
-end
-
---==============================================================
--- CHAT / SOUND / MUSIC
---==============================================================
-local function SendChatMessage(message)
-    pcall(function()
-        local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
-        if chatEvents then
-            local sayReq = chatEvents:FindFirstChild("SayMessageRequest")
-            if sayReq then sayReq:FireServer(message, "All") end
-        end
-    end)
-end
-
-local function EnableChatSpam()
-    DisconnectKey("ChatSpam")
-    task.spawn(function()
-        while ChatSpamEnabled do
-            task.wait(ChatSpamDelay)
-            if not ChatSpamEnabled then break end
-            SendChatMessage(ChatSpamText)
-        end
-    end)
-end
-
-local function DisableChatSpam()
-    DisconnectKey("ChatSpam")
-    ChatSpamEnabled = false
-end
-
-local function EnableSoundESP()
-    DisconnectKey("SoundESP")
-    if SoundESPBeep then pcall(function() SoundESPBeep:Destroy() end) end
-    SoundESPBeep = Instance.new("Sound")
-    SoundESPBeep.SoundId = "rbxassetid://4790566870"
-    SoundESPBeep.Volume = 1
-    SoundESPBeep.Parent = SoundService
-    local conn = RunService.Heartbeat:Connect(function()
-        if not SoundESPEnabled then return end
-        local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-        local myPos = char.HumanoidRootPart.Position
-        local nearestDist = math.huge
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
-                local d = (player.Character.HumanoidRootPart.Position - myPos).Magnitude
-                if d < nearestDist then nearestDist = d end
-            end
-        end
-        if nearestDist <= SoundESPRadius then
-            local now = tick()
-            local cooldown = math.clamp(nearestDist / 85, 0.15, 1.2)
-            if now - LastBeepTime >= cooldown then
-                LastBeepTime = now
-                pcall(function()
-                    SoundESPBeep.Volume = math.clamp(1 - (nearestDist / SoundESPRadius) + 0.3, 0.3, 1)
-                    SoundESPBeep:Play()
-                end)
-            end
-        end
-    end)
-    ActiveConnections["SoundESP"] = conn
-end
-
-local function DisableSoundESP()
-    DisconnectKey("SoundESP")
-    SoundESPEnabled = false
-    if SoundESPBeep then pcall(function() SoundESPBeep:Destroy() end); SoundESPBeep = nil end
-end
-
-local function PlayMusic()
-    if MusicSound then pcall(function() MusicSound:Stop(); MusicSound:Destroy() end); MusicSound = nil end
-    local track = MusicPlaylist[MusicCurrentIndex]
-    if not track then return end
-    MusicSound = Instance.new("Sound")
-    MusicSound.SoundId = "rbxassetid://" .. track.ID
-    MusicSound.Volume = MusicVolume
-    MusicSound.Parent = SoundService
-    pcall(function() MusicSound:Play() end)
-end
-
-local function StopMusic()
-    if MusicSound then pcall(function() MusicSound:Stop(); MusicSound:Destroy() end); MusicSound = nil end
-end
-
-local function NextMusic()
-    if MusicShuffle then MusicCurrentIndex = math.random(1, #MusicPlaylist)
-    else MusicCurrentIndex = MusicCurrentIndex + 1; if MusicCurrentIndex > #MusicPlaylist then MusicCurrentIndex = 1 end end
-    if MusicPlayerEnabled then PlayMusic() end
-end
-
-local function PrevMusic()
-    MusicCurrentIndex = MusicCurrentIndex - 1
-    if MusicCurrentIndex < 1 then MusicCurrentIndex = #MusicPlaylist end
-    if MusicPlayerEnabled then PlayMusic() end
-end
-
---==============================================================
--- INPUT
---==============================================================
-UserInputService.InputBegan:Connect(function(input, gp)
-    if gp then return end
-    if input.KeyCode == Enum.KeyCode.W then FlyKeys.W = true end
-    if input.KeyCode == Enum.KeyCode.A then FlyKeys.A = true end
-    if input.KeyCode == Enum.KeyCode.S then FlyKeys.S = true end
-    if input.KeyCode == Enum.KeyCode.D then FlyKeys.D = true end
-    if input.KeyCode == Enum.KeyCode.Space then FlyKeys.Space = true end
-    if input.KeyCode == Enum.KeyCode.LeftControl then FlyKeys.Ctrl = true end
-    if AimKeybindEnabled and input.KeyCode == AimKeybind then AimKeyHeld = true end
-    if DashEnabled and input.KeyCode == Enum.KeyCode.LeftShift then PerformDash() end
-end)
-
-UserInputService.InputEnded:Connect(function(input, gp)
-    if input.KeyCode == Enum.KeyCode.W then FlyKeys.W = false end
-    if input.KeyCode == Enum.KeyCode.A then FlyKeys.A = false end
-    if input.KeyCode == Enum.KeyCode.S then FlyKeys.S = false end
-    if input.KeyCode == Enum.KeyCode.D then FlyKeys.D = false end
-    if input.KeyCode == Enum.KeyCode.Space then FlyKeys.Space = false end
-    if input.KeyCode == Enum.KeyCode.LeftControl then FlyKeys.Ctrl = false end
-    if input.KeyCode == AimKeybind then AimKeyHeld = false end
-end)
-
---==============================================================
--- SURVIVAL
---==============================================================
-local function EnableAutoRespawn()
-    DisconnectKey("AutoRespawn")
-    local conn = RunService.Heartbeat:Connect(function()
-        if not AutoRespawnEnabled then return end
-        if LocalPlayer.Character then
-            local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if hum and hum.Health <= 0 then pcall(function() LocalPlayer:LoadCharacter() end) end
-        end
-    end)
-    ActiveConnections["AutoRespawn"] = conn
-end
-local function DisableAutoRespawn() DisconnectKey("AutoRespawn"); AutoRespawnEnabled = false end
-
-local function EnableAntiFling()
-    DisconnectKey("AntiFling")
-    local conn = RunService.Heartbeat:Connect(function()
-        if not AntiFlingEnabled then return end
-        if LocalPlayer.Character then
-            local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if root and root.AssemblyLinearVelocity.Magnitude > 500 then
-                pcall(function() root.AssemblyLinearVelocity = Vector3.new(0,0,0) end)
-            end
-        end
-    end)
-    ActiveConnections["AntiFling"] = conn
-end
-local function DisableAntiFling() DisconnectKey("AntiFling"); AntiFlingEnabled = false end
-
-local function EnableAntiAFK()
-    DisconnectKey("AntiAFK")
-    local conn = RunService.Heartbeat:Connect(function()
-        if not AntiAFKEnabled then return end
-        pcall(function()
-            VirtualUser:CaptureController()
-            VirtualUser:ClickButton2(Vector2.new())
-        end)
-    end)
-    ActiveConnections["AntiAFK"] = conn
-end
-local function DisableAntiAFK() DisconnectKey("AntiAFK"); AntiAFKEnabled = false end
 
 --==============================================================
 -- ESP
@@ -1147,24 +421,6 @@ local function RemoveChams(player)
     end
 end
 
-local function CreateNPCEsp(model)
-    if NPCESPObjects[model] then return end
-    if not Drawing then return end
-    local d = {}
-    d.Box = Drawing.new("Square"); d.Box.Visible = false; d.Box.Color = THEME.YellowDot; d.Box.Thickness = 2; d.Box.Filled = false; d.Box.Transparency = 1
-    d.Name = Drawing.new("Text"); d.Name.Visible = false; d.Name.Color = THEME.YellowDot; d.Name.Size = 11; d.Name.Center = true; d.Name.Outline = true; d.Name.OutlineColor = Color3.fromRGB(0,0,0)
-    d.Distance = Drawing.new("Text"); d.Distance.Visible = false; d.Distance.Color = THEME.YellowDot; d.Distance.Size = 9; d.Distance.Center = true; d.Distance.Outline = true; d.Distance.OutlineColor = Color3.fromRGB(0,0,0)
-    NPCESPObjects[model] = d
-end
-
-local function RemoveNPCEsp(model)
-    if NPCESPObjects[model] then
-        local d = NPCESPObjects[model]
-        for _, v in pairs(d) do pcall(function() v:Remove() end) end
-        NPCESPObjects[model] = nil
-    end
-end
-
 local function UpdateESP()
     if not ESPEnabled then
         for _, d in pairs(ESPObjects) do
@@ -1214,51 +470,9 @@ local function UpdateESP()
     end
 end
 
-local function UpdateNPCEsp()
-    if not NPCEspEnabled then
-        for model, _ in pairs(NPCESPObjects) do RemoveNPCEsp(model) end
-        return
-    end
-    local npcs = GetNPCs()
-    local seen = {}
-    for _, model in ipairs(npcs) do
-        seen[model] = true
-        local root = model:FindFirstChild("HumanoidRootPart")
-        local hum = model:FindFirstChild("Humanoid")
-        if root and hum and hum.Health > 0 then
-            if not NPCESPObjects[model] then CreateNPCEsp(model) end
-            local d = NPCESPObjects[model]
-            if not d then continue end
-            local sp, on = Camera:WorldToViewportPoint(root.Position)
-            if on then
-                local dist = (root.Position - Camera.CFrame.Position).Magnitude
-                local bSize = Vector2.new(2000/dist, 3500/dist)
-                local bX, bY = sp.X - bSize.X/2, sp.Y - bSize.Y/2
-                d.Box.Visible = true
-                d.Box.Position = Vector2.new(bX, bY)
-                d.Box.Size = bSize
-                d.Name.Visible = true
-                d.Name.Text = "[NPC] " .. model.Name
-                d.Name.Position = Vector2.new(sp.X, bY-15)
-                d.Distance.Visible = true
-                d.Distance.Text = math.floor(dist).."m"
-                d.Distance.Position = Vector2.new(sp.X, bY+bSize.Y+5)
-            else
-                for _, v in pairs(d) do pcall(function() v.Visible = false end) end
-            end
-        else RemoveNPCEsp(model) end
-    end
-    for model, _ in pairs(NPCESPObjects) do
-        if not seen[model] then RemoveNPCEsp(model) end
-    end
-end
-
 local function EnableESPLoop()
     DisconnectKey("ESPLoop")
-    local conn = RunService.RenderStepped:Connect(function()
-        UpdateESP()
-        UpdateNPCEsp()
-    end)
+    local conn = RunService.RenderStepped:Connect(UpdateESP)
     ActiveConnections["ESPLoop"] = conn
 end
 
@@ -1268,7 +482,6 @@ local function DisableESPLoop()
     for _, d in pairs(ESPObjects) do
         for _, v in pairs(d) do pcall(function() v.Visible = false end) end
     end
-    for model, _ in pairs(NPCESPObjects) do RemoveNPCEsp(model) end
     for p, _ in pairs(ChamsObjects) do RemoveChams(p) end
 end
 
@@ -1294,7 +507,7 @@ local function HasWallBetween(camPos, targetPos, targetChar)
 end
 
 local function FindTarget()
-    local bestTarget, bestScore, bestType = nil, math.huge, nil
+    local bestTarget, bestScore = nil, math.huge
     local screenCenter = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
     local camPos = Camera.CFrame.Position
     for _, player in pairs(Players:GetPlayers()) do
@@ -1308,62 +521,29 @@ local function FindTarget()
                     if on then
                         local screenDist = (Vector2.new(sp.X, sp.Y) - screenCenter).Magnitude
                         local hp = hum.Health / hum.MaxHealth
-                        local score = math.huge
-                        if TargetPriority == "Closest" then score = screenDist
-                        elseif TargetPriority == "Lowest" then score = hp
-                        elseif TargetPriority == "Farthest" then score = -screenDist
-                        elseif TargetPriority == "Crosshair" then score = screenDist end
+                        local score = screenDist
+                        if TargetPriority == "Lowest" then score = hp
+                        elseif TargetPriority == "Farthest" then score = -screenDist end
                         if screenDist <= AimbotFOV and score < bestScore then
-                            bestTarget = player; bestScore = score; bestType = "player"
+                            bestTarget = player; bestScore = score
                         end
                     end
                 end
             end
         end
     end
-    if NPCDetectionEnabled then
-        for _, model in ipairs(GetNPCs()) do
-            local hum = model:FindFirstChild("Humanoid")
-            local root = model:FindFirstChild("HumanoidRootPart")
-            if hum and root and hum.Health > 0 then
-                local part = model:FindFirstChild(AimbotTargetPart) or root
-                if part and not HasWallBetween(camPos, part.Position, model) then
-                    local sp, on = Camera:WorldToViewportPoint(part.Position)
-                    if on then
-                        local screenDist = (Vector2.new(sp.X, sp.Y) - screenCenter).Magnitude
-                        if screenDist <= AimbotFOV and screenDist < bestScore then
-                            bestTarget = model; bestScore = screenDist; bestType = "npc"
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return bestTarget, bestType
+    return bestTarget
 end
 
-local function IsTargetValid(target, targetType)
-    if not target or not target.Parent then return false end
-    if targetType == "player" then
-        local char = target.Character
-        if not char then return false end
-        local hum = char:FindFirstChild("Humanoid")
-        return hum and hum.Health > 0
-    elseif targetType == "npc" then
-        local hum = target:FindFirstChild("Humanoid")
-        return hum and hum.Health > 0
-    end
-    return false
+local function IsTargetValid(target)
+    if not target or not target.Parent or not target.Character then return false end
+    local hum = target.Character:FindFirstChild("Humanoid")
+    return hum and hum.Health > 0
 end
 
-local function GetTargetPart(target, targetType)
-    if targetType == "player" then
-        if not target.Character then return nil end
-        return target.Character:FindFirstChild(AimbotTargetPart) or target.Character:FindFirstChild("HumanoidRootPart")
-    elseif targetType == "npc" then
-        return target:FindFirstChild(AimbotTargetPart) or target:FindFirstChild("HumanoidRootPart")
-    end
-    return nil
+local function GetTargetPart(target)
+    if not target or not target.Character then return nil end
+    return target.Character:FindFirstChild(AimbotTargetPart) or target.Character:FindFirstChild("HumanoidRootPart")
 end
 
 local function RunAimbot()
@@ -1371,26 +551,24 @@ local function RunAimbot()
     if AimKeybindEnabled and not AimKeyHeld then return end
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-    if AimbotStickyTarget and IsTargetValid(AimbotStickyTarget, AimbotStickyType) then
+    if AimbotStickyTarget and IsTargetValid(AimbotStickyTarget) then
         if AimbotWallCheck then
-            local tPart = GetTargetPart(AimbotStickyTarget, AimbotStickyType)
-            local tChar = AimbotStickyType == "player" and AimbotStickyTarget.Character or AimbotStickyTarget
-            if tPart and HasWallBetween(Camera.CFrame.Position, tPart.Position, tChar) then
-                AimbotStickyTarget = nil; AimbotStickyType = nil
+            local tPart = GetTargetPart(AimbotStickyTarget)
+            if tPart and HasWallBetween(Camera.CFrame.Position, tPart.Position, AimbotStickyTarget.Character) then
+                AimbotStickyTarget = nil
             end
         end
     else
-        AimbotStickyTarget = nil; AimbotStickyType = nil
+        AimbotStickyTarget = nil
     end
     if not AimbotStickyTarget then
-        local t, tType = FindTarget()
-        AimbotStickyTarget = t; AimbotStickyType = tType
+        AimbotStickyTarget = FindTarget()
     end
     if not AimbotStickyTarget then return end
-    if not IsTargetValid(AimbotStickyTarget, AimbotStickyType) then
-        AimbotStickyTarget = nil; AimbotStickyType = nil; return
+    if not IsTargetValid(AimbotStickyTarget) then
+        AimbotStickyTarget = nil; return
     end
-    local targetPart = GetTargetPart(AimbotStickyTarget, AimbotStickyType)
+    local targetPart = GetTargetPart(AimbotStickyTarget)
     if not targetPart then return end
     local camPos = Camera.CFrame.Position
     local dir = (targetPart.Position - camPos).Unit
@@ -1408,292 +586,25 @@ local function RunAimbot()
     end
 end
 
-local function TryAutoShoot()
-    if not AutoShootEnabled then return end
-    local char = LocalPlayer.Character
-    if not char then return end
-    local tool = char:FindFirstChildOfClass("Tool")
-    if not tool then return end
-    local screenCenter = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            local hum = player.Character:FindFirstChild("Humanoid")
-            local root = player.Character:FindFirstChild("HumanoidRootPart")
-            if hum and root and hum.Health > 0 then
-                local sp, on = Camera:WorldToViewportPoint(root.Position)
-                if on then
-                    local dist = (Vector2.new(sp.X, sp.Y) - screenCenter).Magnitude
-                    if dist < 50 then
-                        pcall(function() tool:Activate() end)
-                        break
-                    end
-                end
-            end
-        end
-    end
-end
-
-local AutoShootLast = 0
 local function EnableAimbotLoop()
     DisconnectKey("Aimbot")
     local conn = RunService.RenderStepped:Connect(function()
         if AimbotEnabled then RunAimbot() end
-        if AutoShootEnabled then
-            local now = tick()
-            if now - AutoShootLast >= AutoShootDelay/1000 then
-                AutoShootLast = now
-                TryAutoShoot()
-            end
-        end
     end)
     ActiveConnections["Aimbot"] = conn
 end
 
 --==============================================================
--- DRONE MODE
+-- INPUT
 --==============================================================
-local function EnableDroneMode()
-    DisconnectKey("DroneMode")
-    local conn = RunService.RenderStepped:Connect(function()
-        if not DroneModeEnabled then return end
-        if not LocalPlayer.Character then return end
-        local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        pcall(function()
-            Camera.CameraSubject = nil
-            Camera.CameraType = Enum.CameraType.Scriptable
-            Camera.CFrame = CFrame.new(root.Position + Vector3.new(0, 30, 0), root.Position)
-        end)
-    end)
-    ActiveConnections["DroneMode"] = conn
-end
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if AimKeybindEnabled and input.KeyCode == AimKeybind then AimKeyHeld = true end
+end)
 
-local function DisableDroneMode()
-    DisconnectKey("DroneMode")
-    DroneModeEnabled = false
-    pcall(function()
-        Camera.CameraSubject = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
-        Camera.CameraType = Enum.CameraType.Custom
-    end)
-end
-
---==============================================================
--- KILL NOTIF
---==============================================================
-local function EnableKillNotif()
-    DisconnectKey("KillNotif")
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            local hum = player.Character:FindFirstChild("Humanoid")
-            if hum then LastPlayerHealth[player] = hum.Health end
-        end
-    end
-    local conn = RunService.Heartbeat:Connect(function()
-        if not KillNotifEnabled then return end
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
-                local hum = player.Character:FindFirstChild("Humanoid")
-                if hum then
-                    local lastHp = LastPlayerHealth[player] or 100
-                    if hum.Health <= 0 and lastHp > 0 then
-                        Notify("💀 KILL", "> " .. player.Name .. " mati!", 3)
-                    end
-                    LastPlayerHealth[player] = hum.Health
-                end
-            end
-        end
-    end)
-    ActiveConnections["KillNotif"] = conn
-end
-local function DisableKillNotif() DisconnectKey("KillNotif"); KillNotifEnabled = false end
-
---==============================================================
--- INFO PANEL
---==============================================================
-local function CreateInfoPanel()
-    if InfoPanelFrame then pcall(function() InfoPanelFrame:Destroy() end) end
-    InfoPanelFrame = Instance.new("Frame")
-    InfoPanelFrame.Name = "ZetInfoPanel"
-    InfoPanelFrame.Size = UDim2.new(0, 180, 0, 70)
-    InfoPanelFrame.Position = UDim2.new(1, -190, 1, -80)
-    InfoPanelFrame.BackgroundColor3 = THEME.PanelBG
-    InfoPanelFrame.BackgroundTransparency = 0.2
-    InfoPanelFrame.BorderColor3 = THEME.Accent
-    InfoPanelFrame.BorderSizePixel = 2
-    InfoPanelFrame.ZIndex = 100
-    InfoPanelFrame.Parent = ScreenGui
-    Instance.new("UICorner", InfoPanelFrame).CornerRadius = UDim.new(0, 8)
-
-    local InfoPanelLabel = Instance.new("TextLabel")
-    InfoPanelLabel.Size = UDim2.new(1, -10, 1, -10)
-    InfoPanelLabel.Position = UDim2.new(0, 5, 0, 5)
-    InfoPanelLabel.BackgroundTransparency = 1
-    InfoPanelLabel.Text = "Ping: -- | Players: --\nTime: --"
-    InfoPanelLabel.TextColor3 = THEME.Text
-    InfoPanelLabel.Font = Enum.Font.Code
-    InfoPanelLabel.TextSize = 10
-    InfoPanelLabel.TextXAlignment = Enum.TextXAlignment.Left
-    InfoPanelLabel.TextYAlignment = Enum.TextYAlignment.Top
-    InfoPanelLabel.ZIndex = 101
-    InfoPanelLabel.Parent = InfoPanelFrame
-
-    task.spawn(function()
-        while task.wait(1) do
-            if not InfoPanelFrame or not InfoPanelFrame.Parent then break end
-            pcall(function()
-                local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
-                local pc = #Players:GetPlayers()
-                local time = os.date("%H:%M:%S")
-                InfoPanelLabel.Text = "Ping: " .. ping .. "ms | Players: " .. pc .. "\nTime: " .. time
-            end)
-        end
-    end)
-end
-
-local function DestroyInfoPanel()
-    if InfoPanelFrame then
-        pcall(function() InfoPanelFrame:Destroy() end)
-        InfoPanelFrame = nil
-    end
-end
-
---==============================================================
--- SERVER HOP / TELEPORT
---==============================================================
-local function FetchServerList(placeId)
-    local servers, cursor = {}, ""
-    for i = 1, 2 do
-        local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
-        if cursor ~= "" then url = url .. "&cursor=" .. cursor end
-        local ok, result = pcall(function() return HttpService:JSONDecode(game:HttpGet(url)) end)
-        if ok and result and result.data then
-            for _, srv in ipairs(result.data) do
-                if srv.playing and srv.maxPlayers and srv.playing < srv.maxPlayers and srv.id ~= game.JobId then
-                    table.insert(servers, srv)
-                end
-            end
-            cursor = result.nextPageCursor or ""
-            if cursor == "" then break end
-        else break end
-    end
-    return #servers > 0, servers
-end
-
-local function DoServerHop()
-    if ServerHopRunning then return end
-    ServerHopRunning = true
-    Notify("Server Hop", "> MENCARI...", 3)
-    task.spawn(function()
-        local ok, servers = FetchServerList(game.PlaceId)
-        if not ok then Notify("Server Hop", "> GAGAL", 3); ServerHopRunning = false; return end
-        local target = servers[math.random(1, #servers)]
-        pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, target.id, LocalPlayer) end)
-    end)
-end
-
-local function DoBestServerHop()
-    if ServerHopRunning then return end
-    ServerHopRunning = true
-    task.spawn(function()
-        local ok, servers = FetchServerList(game.PlaceId)
-        if not ok then Notify("Server Hop", "> TIDAK ADA", 3); ServerHopRunning = false; return end
-        table.sort(servers, function(a, b) return (a.playing or 0) < (b.playing or 0) end)
-        pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[1].id, LocalPlayer) end)
-    end)
-end
-
-local function DoRejoin()
-    pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer) end)
-end
-
-local function TeleportToPlayer(targetPlayer)
-    if not targetPlayer or not targetPlayer.Character then return end
-    local tRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    local lRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not tRoot or not lRoot then return end
-    pcall(function()
-        lRoot.CFrame = CFrame.new(tRoot.Position + Vector3.new(0, 3, 0))
-        Notify("Teleport", "> TO: " .. targetPlayer.Name, 2)
-    end)
-end
-
-local function RefreshTeleportList()
-    if not TeleportListContainer then return end
-    for _, item in pairs(TeleportPlayerList) do pcall(function() item:Destroy() end) end
-    TeleportPlayerList = {}
-    local y = 0
-    local count = 0
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, 0, 0, 28)
-            btn.Position = UDim2.new(0, 0, 0, y)
-            btn.BackgroundColor3 = THEME.ButtonBG
-            btn.BorderColor3 = THEME.Accent
-            btn.BorderSizePixel = 1
-            btn.Text = "> " .. player.Name
-            btn.TextColor3 = THEME.Text
-            btn.Font = Enum.Font.Code
-            btn.TextSize = 11
-            btn.TextXAlignment = Enum.TextXAlignment.Left
-            btn.ZIndex = 14
-            btn.Parent = TeleportListContainer
-            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 3)
-            btn.MouseButton1Click:Connect(function() TeleportToPlayer(player) end)
-            table.insert(TeleportPlayerList, btn)
-            y = y + 32
-            count = count + 1
-        end
-    end
-    if count == 0 then
-        local empty = Instance.new("TextLabel")
-        empty.Size = UDim2.new(1, 0, 0, 28)
-        empty.BackgroundTransparency = 1
-        empty.Text = "> Tidak ada player lain"
-        empty.TextColor3 = THEME.TextLight
-        empty.Font = Enum.Font.Code
-        empty.TextSize = 10
-        empty.ZIndex = 14
-        empty.Parent = TeleportListContainer
-        y = 32
-    end
-    if TeleportListFrame then TeleportListFrame.CanvasSize = UDim2.new(0, 0, 0, y + 10) end
-end
-
-local function TeleportToMouse()
-    if not LocalPlayer.Character then return end
-    local r = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not r then return end
-    local hit = Mouse.Hit
-    if hit then
-        pcall(function()
-            r.CFrame = CFrame.new(hit.Position + Vector3.new(0, 3, 0))
-            Notify("Teleport", "> TO MOUSE", 2)
-        end)
-    end
-end
-
-local function SaveLocation()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        SavedLocation = LocalPlayer.Character.HumanoidRootPart.CFrame
-        Notify("Save", "> SAVED", 2)
-    end
-end
-
-local function LoadLocation()
-    if SavedLocation and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        pcall(function()
-            LocalPlayer.Character.HumanoidRootPart.CFrame = SavedLocation
-            Notify("Save", "> TELEPORTED", 2)
-        end)
-    else Notify("Save", "> NO SAVED", 2) end
-end
-
-local function AddWaypoint(name)
-    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
-    table.insert(Waypoints, {Name = name, CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame})
-    Notify("Waypoint", "> Added: " .. name, 2)
-end
+UserInputService.InputEnded:Connect(function(input, gp)
+    if input.KeyCode == AimKeybind then AimKeyHeld = false end
+end)
 
 --==============================================================
 -- UI BUILDER
@@ -1711,14 +622,6 @@ local function CreateUI()
     LoadingScreen.ZIndex = 500
     LoadingScreen.Parent = ScreenGui
 
-    local BgPattern = Instance.new("Frame")
-    BgPattern.Size = UDim2.new(1, 0, 1, 0)
-    BgPattern.BackgroundColor3 = Color3.fromRGB(0, 5, 15)
-    BgPattern.BackgroundTransparency = 0.3
-    BgPattern.BorderSizePixel = 0
-    BgPattern.ZIndex = 501
-    BgPattern.Parent = LoadingScreen
-
     local LoadingBg = Instance.new("Frame")
     LoadingBg.Size = UDim2.new(0, 400, 0, 240)
     LoadingBg.Position = UDim2.new(0.5, -200, 0.5, -120)
@@ -1733,8 +636,8 @@ local function CreateUI()
     LTitle.Size = UDim2.new(1, -20, 0, 36)
     LTitle.Position = UDim2.new(0, 10, 0, 20)
     LTitle.BackgroundTransparency = 1
-    LTitle.Text = "ZETGAMES V4.4 RESMI"
-    LTitle.TextColor3 = THEME.Text
+    LTitle.Text = "ZETGAMES V4.4 PREMIUM"
+    LTitle.TextColor3 = THEME.Accent
     LTitle.Font = Enum.Font.Code
     LTitle.TextSize = 20
     LTitle.ZIndex = 503
@@ -1744,8 +647,8 @@ local function CreateUI()
     LTag.Size = UDim2.new(1, -20, 0, 20)
     LTag.Position = UDim2.new(0, 10, 0, 58)
     LTag.BackgroundTransparency = 1
-    LTag.Text = "[ OFFICIAL RELEASE ]"
-    LTag.TextColor3 = Color3.fromRGB(0, 255, 200)
+    LTag.Text = "[ PREMIUM EDITION V4.4 ]"
+    LTag.TextColor3 = THEME.Gold
     LTag.Font = Enum.Font.Code
     LTag.TextSize = 10
     LTag.ZIndex = 503
@@ -1807,8 +710,8 @@ local function CreateUI()
     LVersion.Size = UDim2.new(1, -20, 0, 18)
     LVersion.Position = UDim2.new(0, 10, 0, 205)
     LVersion.BackgroundTransparency = 1
-    LVersion.Text = "V4.4 | rscripts.net/@ZetGames"
-    LVersion.TextColor3 = Color3.fromRGB(60, 100, 140)
+    LVersion.Text = "V4.4 PREMIUM | rscripts.net/@ZetGames"
+    LVersion.TextColor3 = THEME.Gold
     LVersion.Font = Enum.Font.Code
     LVersion.TextSize = 9
     LVersion.ZIndex = 503
@@ -1838,8 +741,8 @@ local function CreateUI()
     LTopTxt.Size = UDim2.new(1, -16, 1, 0)
     LTopTxt.Position = UDim2.new(0, 8, 0, 0)
     LTopTxt.BackgroundTransparency = 1
-    LTopTxt.Text = "● ZETGAMES-AIMLOCK V4.4"
-    LTopTxt.TextColor3 = THEME.Text
+    LTopTxt.Text = "● ZETGAMES V4.4 PREMIUM"
+    LTopTxt.TextColor3 = THEME.Accent
     LTopTxt.Font = Enum.Font.Code
     LTopTxt.TextSize = 11
     LTopTxt.TextXAlignment = Enum.TextXAlignment.Left
@@ -1861,8 +764,8 @@ local function CreateUI()
     LTag2.Size = UDim2.new(1, -30, 0, 18)
     LTag2.Position = UDim2.new(0, 15, 0, 82)
     LTag2.BackgroundTransparency = 1
-    LTag2.Text = "[ RESMI + NIGHT LOCK ACTIVE ]"
-    LTag2.TextColor3 = Color3.fromRGB(0, 255, 200)
+    LTag2.Text = "[ PREMIUM + VPN AUTO-ON ]"
+    LTag2.TextColor3 = THEME.Gold
     LTag2.Font = Enum.Font.Code
     LTag2.TextSize = 9
     LTag2.TextXAlignment = Enum.TextXAlignment.Left
@@ -1975,8 +878,8 @@ local function CreateUI()
     TitleText.Size = UDim2.new(1, -50, 1, 0)
     TitleText.Position = UDim2.new(0, 10, 0, 0)
     TitleText.BackgroundTransparency = 1
-    TitleText.Text = "● V4.4 RESMI [NIGHT LOCK]"
-    TitleText.TextColor3 = THEME.Text
+    TitleText.Text = "● V4.4 PREMIUM [VPN ON]"
+    TitleText.TextColor3 = THEME.Gold
     TitleText.Font = Enum.Font.Code
     TitleText.TextSize = 10
     TitleText.TextXAlignment = Enum.TextXAlignment.Left
@@ -2004,14 +907,14 @@ local function CreateUI()
     ScrollFrame.BorderSizePixel = 0
     ScrollFrame.ScrollBarThickness = 6
     ScrollFrame.ScrollBarImageColor3 = THEME.Accent
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 5600)
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 1500)
     ScrollFrame.ScrollingEnabled = true
     ScrollFrame.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
     ScrollFrame.ZIndex = 101
     ScrollFrame.Parent = MainHub
 
     local ScrollContent = Instance.new("Frame")
-    ScrollContent.Size = UDim2.new(1, 0, 0, 5600)
+    ScrollContent.Size = UDim2.new(1, 0, 0, 1500)
     ScrollContent.BackgroundTransparency = 1
     ScrollContent.ZIndex = 101
     ScrollContent.Parent = ScrollFrame
@@ -2071,7 +974,7 @@ local function CreateUI()
         btn.ZIndex = 102
         btn.Parent = ScrollContent
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
-        btn.MouseButton1Click:Connect(function() Notify("🔒 Locked", "> Tidak bisa dimatiin", 2) end)
+        btn.MouseButton1Click:Connect(function() Notify("🔒 VPN Locked", "> Tidak bisa dimatiin (Anti-Ban)", 2) end)
         return btn
     end
 
@@ -2112,68 +1015,204 @@ local function CreateUI()
         return b
     end
 
-    -- SAFE MODE
-    Section("=== 🛡️ SAFE MODE (LOCKED) ===", 10)
-    LockedToggle("> 🛡️ ANTI-KICK: ON (SAFE)", 42)
-    LockedToggle("> 🔄 AUTO-RECONNECT: ON", 82)
-    LockedToggle("> 🔒 NIGHT LOCK: ON (AUTO KICK)", 122)
+    -- ═══════════════ VPN SECTION (LOCKED) ═══════════════
+    Section("=== 🔒 VPN AUTO-PROTECT ===", 10)
+    LockedToggle("> 🔒 VPN: ON (LOCKED - ANTI BAN)", 42)
 
-    -- THEME
-    Section("=== 🎨 THEME SWITCHER ===", 170)
-    local ThemeLbl = Instance.new("TextLabel")
-    ThemeLbl.Size = UDim2.new(1, -20, 0, 18)
-    ThemeLbl.Position = UDim2.new(0, 10, 0, 202)
-    ThemeLbl.BackgroundTransparency = 1
-    ThemeLbl.Text = "> THEME: BIRU"
-    ThemeLbl.TextColor3 = THEME.Text
-    ThemeLbl.Font = Enum.Font.Code
-    ThemeLbl.TextSize = 10
-    ThemeLbl.TextXAlignment = Enum.TextXAlignment.Left
-    ThemeLbl.ZIndex = 102
-    ThemeLbl.Parent = ScrollContent
+    -- ═══════════════ AIMBOT SECTION ═══════════════
+    Section("=== 🎯 AIMBOT ===", 90)
 
-    local ThemeBtnFrame = Instance.new("Frame")
-    ThemeBtnFrame.Size = UDim2.new(1, -20, 0, 30)
-    ThemeBtnFrame.Position = UDim2.new(0, 10, 0, 224)
-    ThemeBtnFrame.BackgroundTransparency = 1
-    ThemeBtnFrame.ZIndex = 102
-    ThemeBtnFrame.Parent = ScrollContent
+    local AimbotBtn = Instance.new("TextButton")
+    AimbotBtn.Size = UDim2.new(1, -20, 0, 42)
+    AimbotBtn.Position = UDim2.new(0, 10, 0, 122)
+    AimbotBtn.BackgroundColor3 = THEME.ButtonBG
+    AimbotBtn.BorderColor3 = THEME.Accent
+    AimbotBtn.BorderSizePixel = 2
+    AimbotBtn.Text = "> AIMBOT: OFF"
+    AimbotBtn.TextColor3 = THEME.Text
+    AimbotBtn.Font = Enum.Font.Code
+    AimbotBtn.TextSize = 13
+    AimbotBtn.ZIndex = 102
+    AimbotBtn.Parent = ScrollContent
+    Instance.new("UICorner", AimbotBtn).CornerRadius = UDim.new(0, 5)
+    AimbotBtn.MouseButton1Click:Connect(function()
+        AimbotEnabled = not AimbotEnabled
+        if AimbotEnabled then
+            AimbotBtn.Text = "> AIMBOT: ON"
+            AimbotBtn.BackgroundColor3 = THEME.ButtonActive
+            EnableAimbotLoop()
+        else
+            AimbotBtn.Text = "> AIMBOT: OFF"
+            AimbotBtn.BackgroundColor3 = THEME.ButtonBG
+            AimbotStickyTarget = nil
+            DisconnectKey("Aimbot")
+        end
+    end)
 
-    local function ThemeBtn(text, themeName, xPos)
-        local b = Instance.new("TextButton")
-        b.Size = UDim2.new(0.19, 0, 1, 0)
-        b.Position = UDim2.new(xPos, 0, 0, 0)
-        b.BackgroundColor3 = THEME.ButtonBG
-        b.BorderColor3 = THEME.Accent
-        b.BorderSizePixel = 1
-        b.Text = text
-        b.TextColor3 = THEME.Text
-        b.Font = Enum.Font.Code
-        b.TextSize = 9
-        b.ZIndex = 103
-        b.Parent = ThemeBtnFrame
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 3)
-        b.MouseButton1Click:Connect(function()
-            local preset = ThemePresets[themeName]
-            if preset then
-                for k, v in pairs(preset) do THEME[k] = v end
-                CurrentThemeName = themeName
-                ThemeLbl.Text = "> THEME: " .. string.upper(themeName)
-                Notify("Theme", "> " .. themeName, 2)
-            end
+    Toggle("> 🎯 SILENT AIM: OFF", 174, function(btn)
+        SilentAimEnabled = not SilentAimEnabled
+        btn.Text = SilentAimEnabled and "> 🎯 SILENT AIM: ON" or "> 🎯 SILENT AIM: OFF"
+        btn.BackgroundColor3 = SilentAimEnabled and THEME.ButtonActive or THEME.ButtonBG
+    end)
+
+    Half("> FOV: OFF", 214, 0, function(btn)
+        FOVCircleEnabled = not FOVCircleEnabled
+        btn.Text = FOVCircleEnabled and "> FOV: ON" or "> FOV: OFF"
+        btn.BackgroundColor3 = FOVCircleEnabled and THEME.ButtonActive or THEME.ButtonBG
+        if FOVCircleEnabled then EnableFOVLoop() else DisableFOVLoop() end
+    end)
+    Half("> TEAM: OFF", 214, 0.5, function(btn)
+        AimbotTeamCheck = not AimbotTeamCheck
+        btn.Text = AimbotTeamCheck and "> TEAM: ON" or "> TEAM: OFF"
+        btn.BackgroundColor3 = AimbotTeamCheck and THEME.ButtonActive or THEME.ButtonBG
+    end)
+
+    local FOVInput = Input("> FOV Radius (50-5000)", 252, tostring(AimbotFOV))
+    FOVInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            local nf = tonumber(FOVInput.Text)
+            if nf then AimbotFOV = math.clamp(nf, 50, 5000) end
+            FOVInput.Text = tostring(AimbotFOV)
+        end
+    end)
+
+    Toggle("> KEYBIND AIMBOT (E): OFF", 288, function(btn)
+        AimKeybindEnabled = not AimKeybindEnabled
+        btn.Text = AimKeybindEnabled and "> KEYBIND (E): ON" or "> KEYBIND (E): OFF"
+        btn.BackgroundColor3 = AimKeybindEnabled and THEME.ButtonActive or THEME.ButtonBG
+    end)
+
+    Toggle("> WALL CHECK: OFF", 328, function(btn)
+        AimbotWallCheck = not AimbotWallCheck
+        btn.Text = AimbotWallCheck and "> WALL: ON" or "> WALL: OFF"
+        btn.BackgroundColor3 = AimbotWallCheck and THEME.ButtonActive or THEME.ButtonBG
+    end)
+
+    -- ═══════════════ ESP SECTION ═══════════════
+    Section("=== 👁️ ESP ===", 376)
+
+    Toggle("> ESP MASTER: OFF", 408, function(btn)
+        ESPEnabled = not ESPEnabled
+        btn.Text = ESPEnabled and "> ESP MASTER: ON" or "> ESP MASTER: OFF"
+        btn.BackgroundColor3 = ESPEnabled and THEME.ButtonActive or THEME.ButtonBG
+        if ESPEnabled then EnableESPLoop() else DisableESPLoop() end
+    end)
+
+    Toggle("> 🌈 RAINBOW ESP: OFF", 448, function(btn)
+        RainbowESPEnabled = not RainbowESPEnabled
+        btn.Text = RainbowESPEnabled and "> 🌈 RAINBOW: ON" or "> 🌈 RAINBOW: OFF"
+        btn.BackgroundColor3 = RainbowESPEnabled and THEME.ButtonActive or THEME.ButtonBG
+        if RainbowESPEnabled then EnableRainbowESP() else DisableRainbowESP() end
+    end)
+
+    Toggle("> 📡 OFF-SCREEN ARROW: OFF", 488, function(btn)
+        OffScreenArrowEnabled = not OffScreenArrowEnabled
+        btn.Text = OffScreenArrowEnabled and "> OFF-ARROW: ON" or "> OFF-ARROW: OFF"
+        btn.BackgroundColor3 = OffScreenArrowEnabled and THEME.ButtonActive or THEME.ButtonBG
+        if OffScreenArrowEnabled then EnableOffScreenArrow() else DisableOffScreenArrow() end
+    end)
+
+    -- ═══════════════ UPGRADE TO PREMIUM ═══════════════
+    Section("=== 🔒 FITUR TERKUNCI ===", 546)
+
+    local LockedInfo = Instance.new("TextLabel")
+    LockedInfo.Size = UDim2.new(1, -20, 0, 100)
+    LockedInfo.Position = UDim2.new(0, 10, 0, 578)
+    LockedInfo.BackgroundColor3 = THEME.PanelBG
+    LockedInfo.BorderColor3 = THEME.Locked
+    LockedInfo.BorderSizePixel = 1
+    LockedInfo.Text = "> ❌ Speed Hack\n> ❌ Fly / Fly-Void\n> ❌ Noclip + InfJump\n> ❌ Hitbox Expander\n> ❌ Fullbright + FPS Boost\n> ❌ Server Hop + Teleport\n> ❌ Music Player + Sound ESP"
+    LockedInfo.TextColor3 = THEME.Locked
+    LockedInfo.Font = Enum.Font.Code
+    LockedInfo.TextSize = 10
+    LockedInfo.TextXAlignment = Enum.TextXAlignment.Left
+    LockedInfo.TextYAlignment = Enum.TextYAlignment.Top
+    LockedInfo.ZIndex = 102
+    LockedInfo.Parent = ScrollContent
+    Instance.new("UICorner", LockedInfo).CornerRadius = UDim.new(0, 4)
+
+    -- 🔥 UPGRADE NOW BUTTON
+    local UpgradeBtn = Instance.new("TextButton")
+    UpgradeBtn.Size = UDim2.new(1, -20, 0, 55)
+    UpgradeBtn.Position = UDim2.new(0, 10, 0, 690)
+    UpgradeBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
+    UpgradeBtn.BorderColor3 = THEME.Gold
+    UpgradeBtn.BorderSizePixel = 3
+    UpgradeBtn.Text = "🔥 UPGRADE SEKARANG KE PREMIUM 🔥"
+    UpgradeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    UpgradeBtn.Font = Enum.Font.GothamBold
+    UpgradeBtn.TextSize = 13
+    UpgradeBtn.ZIndex = 102
+    UpgradeBtn.Parent = ScrollContent
+    Instance.new("UICorner", UpgradeBtn).CornerRadius = UDim.new(0, 6)
+
+    -- Animasi pulse pada tombol upgrade
+    task.spawn(function()
+        while UpgradeBtn.Parent do
+            pcall(function()
+                TweenService:Create(UpgradeBtn, TweenInfo.new(0.8), {BackgroundColor3 = Color3.fromRGB(255, 200, 0)}):Play()
+                task.wait(0.8)
+                TweenService:Create(UpgradeBtn, TweenInfo.new(0.8), {BackgroundColor3 = Color3.fromRGB(200, 150, 0)}):Play()
+                task.wait(0.8)
+            end)
+        end
+    end)
+
+    UpgradeBtn.MouseButton1Click:Connect(function()
+        Notify("🔥 Upgrade Premium", "Unlock 15+ fitur eksklusif!", 4)
+        task.wait(1)
+        Notify("🛒 Buy Now", PremiumWebsite, 8)
+    end)
+
+    -- 🛒 BUY BUTTON (langsung buka browser)
+    local BuyBtn = Instance.new("TextButton")
+    BuyBtn.Size = UDim2.new(1, -20, 0, 50)
+    BuyBtn.Position = UDim2.new(0, 10, 0, 754)
+    BuyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+    BuyBtn.BorderColor3 = Color3.fromRGB(0, 255, 150)
+    BuyBtn.BorderSizePixel = 2
+    BuyBtn.Text = "🛒 BUY PREMIUM NOW - $5"
+    BuyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    BuyBtn.Font = Enum.Font.GothamBold
+    BuyBtn.TextSize = 13
+    BuyBtn.ZIndex = 102
+    BuyBtn.Parent = ScrollContent
+    Instance.new("UICorner", BuyBtn).CornerRadius = UDim.new(0, 6)
+
+    BuyBtn.MouseButton1Click:Connect(function()
+        Notify("🛒 Membuka Browser...", PremiumWebsite, 5)
+        -- Coba buka browser dengan berbagai metode
+        pcall(function()
+            if setclipboard then setclipboard(PremiumWebsite) end
         end)
-    end
-    ThemeBtn("BIRU", "Biru", 0)
-    ThemeBtn("MERAH", "Merah", 0.205)
-    ThemeBtn("HIJAU", "Hijau", 0.41)
-    ThemeBtn("UNGU", "Ungu", 0.615)
-    ThemeBtn("KUNING", "Kuning", 0.82)
+        -- Coba langsung buka
+        pcall(function()
+            game:GetService("GuiService"):OpenBrowserWindow(PremiumWebsite)
+        end)
+        task.wait(0.3)
+        Notify("💳 Website", "Sudah dibuka di browser!\nLink juga di-copy", 6)
+    end)
 
-    -- USER INFO
-    Section("=== USER INFORMATION ===", 268)
+    -- Info tambahan
+    local InfoLabel = Instance.new("TextLabel")
+    InfoLabel.Size = UDim2.new(1, -20, 0, 60)
+    InfoLabel.Position = UDim2.new(0, 10, 0, 814)
+    InfoLabel.BackgroundTransparency = 1
+    InfoLabel.Text = "> Premium: 15+ fitur lengkap\n> Support: 24/7\n> Payment: All methods"
+    InfoLabel.TextColor3 = THEME.TextLight
+    InfoLabel.Font = Enum.Font.Code
+    InfoLabel.TextSize = 9
+    InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+    InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
+    InfoLabel.ZIndex = 102
+    InfoLabel.Parent = ScrollContent
+
+    -- ═══════════════ USER INFO ═══════════════
+    Section("=== USER INFORMATION ===", 884)
+
     local UIF = Instance.new("Frame")
     UIF.Size = UDim2.new(1, -20, 0, 80)
-    UIF.Position = UDim2.new(0, 10, 0, 300)
+    UIF.Position = UDim2.new(0, 10, 0, 916)
     UIF.BackgroundColor3 = THEME.PanelBG
     UIF.BorderColor3 = THEME.Accent
     UIF.BorderSizePixel = 1
@@ -2209,432 +1248,15 @@ local function CreateUI()
     BuildLbl.Size = UDim2.new(1, -15, 0, 22)
     BuildLbl.Position = UDim2.new(0, 10, 0, 51)
     BuildLbl.BackgroundTransparency = 1
-    BuildLbl.Text = "> BUILD: V4.4 RESMI"
-    BuildLbl.TextColor3 = Color3.fromRGB(0, 255, 200)
+    BuildLbl.Text = "> BUILD: V4.4 PREMIUM"
+    BuildLbl.TextColor3 = THEME.Gold
     BuildLbl.Font = Enum.Font.Code
     BuildLbl.TextSize = 11
     BuildLbl.TextXAlignment = Enum.TextXAlignment.Left
     BuildLbl.ZIndex = 103
     BuildLbl.Parent = UIF
 
-    -- MAIN FEATURES
-    Section("=== MAIN FEATURES ===", 393)
-
-    Toggle("> FPS BOOST: OFF", 425, function(btn)
-        FPSBoostEnabled = not FPSBoostEnabled
-        btn.Text = FPSBoostEnabled and "> FPS BOOST: ON" or "> FPS BOOST: OFF"
-        btn.BackgroundColor3 = FPSBoostEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if FPSBoostEnabled then EnableFPSBoost() else DisableFPSBoost() end
-    end)
-
-    Toggle("> FULLBRIGHT: OFF", 465, function(btn)
-        FullbrightEnabled = not FullbrightEnabled
-        btn.Text = FullbrightEnabled and "> FULLBRIGHT: ON" or "> FULLBRIGHT: OFF"
-        btn.BackgroundColor3 = FullbrightEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if FullbrightEnabled then EnableFullbright() else DisableFullbright() end
-    end)
-
-    Toggle("> SPEED HACK: OFF", 505, function(btn)
-        SpeedHackEnabled = not SpeedHackEnabled
-        btn.Text = SpeedHackEnabled and "> SPEED HACK: ON" or "> SPEED HACK: OFF"
-        btn.BackgroundColor3 = SpeedHackEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if SpeedHackEnabled then EnableSpeedHack() else DisableSpeedHack() end
-    end)
-
-    local SpeedInput = Input("> Speed (16-500)", 545, tostring(SpeedMultiplier))
-    SpeedInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local ns = tonumber(SpeedInput.Text)
-            if ns then SpeedMultiplier = math.clamp(ns, 16, MaxSpeed) end
-            SpeedInput.Text = tostring(SpeedMultiplier)
-        end
-    end)
-
-    Toggle("> INFINITE JUMP: OFF", 581, function(btn)
-        InfiniteJumpEnabled = not InfiniteJumpEnabled
-        btn.Text = InfiniteJumpEnabled and "> INFINITE JUMP: ON" or "> INFINITE JUMP: OFF"
-        btn.BackgroundColor3 = InfiniteJumpEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if InfiniteJumpEnabled then EnableInfiniteJump() else DisableInfiniteJump() end
-    end)
-
-    Toggle("> NOCLIP: OFF", 621, function(btn)
-        NoclipEnabled = not NoclipEnabled
-        btn.Text = NoclipEnabled and "> NOCLIP: ON" or "> NOCLIP: OFF"
-        btn.BackgroundColor3 = NoclipEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if NoclipEnabled then EnableNoclip() else DisableNoclip() end
-    end)
-
-    Toggle("> 👻 INVISIBLE: OFF", 661, function(btn)
-        InvisibleEnabled = not InvisibleEnabled
-        btn.Text = InvisibleEnabled and "> 👻 INVISIBLE: ON" or "> 👻 INVISIBLE: OFF"
-        btn.BackgroundColor3 = InvisibleEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if InvisibleEnabled then EnableInvisible() else DisableInvisible() end
-    end)
-
-    Toggle("> ⚡ DASH: OFF (SHIFT)", 701, function(btn)
-        DashEnabled = not DashEnabled
-        btn.Text = DashEnabled and "> ⚡ DASH: ON (SHIFT)" or "> ⚡ DASH: OFF (SHIFT)"
-        btn.BackgroundColor3 = DashEnabled and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    -- FLY NORMAL
-    Section("=== 🛫 FLY NORMAL ===", 749)
-    Toggle("> FLY NORMAL: OFF", 781, function(btn)
-        FlyNormalEnabled = not FlyNormalEnabled
-        if FlyNormalEnabled then btn.Text = "> FLY NORMAL: ON"; btn.BackgroundColor3 = THEME.ButtonActive; EnableFlyNormal()
-        else btn.Text = "> FLY NORMAL: OFF"; btn.BackgroundColor3 = THEME.ButtonBG; DisableFlyNormal() end
-    end)
-    Half("> MODE: FREE", 821, 0, function(btn)
-        FlyNormalMode = FlyNormalMode == "Free" and "Hover" or "Free"
-        btn.Text = "> MODE: " .. string.upper(FlyNormalMode)
-    end)
-    Half("> KEY: WASD", 821, 0.5, function(btn) Notify("Fly", "> WASD + Space", 2) end)
-    local FlySpeedInput = Input("> Fly Speed (10-500)", 857, tostring(FlyNormalSpeed))
-    FlySpeedInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local ns = tonumber(FlySpeedInput.Text)
-            if ns then FlyNormalSpeed = math.clamp(ns, 10, 500) end
-            FlySpeedInput.Text = tostring(FlyNormalSpeed)
-        end
-    end)
-
-    -- AIMBOT
-    Section("=== 🎯 AIMBOT + FOV + SILENT ===", 901)
-
-    local AimbotBtn = Instance.new("TextButton")
-    AimbotBtn.Size = UDim2.new(1, -20, 0, 42)
-    AimbotBtn.Position = UDim2.new(0, 10, 0, 933)
-    AimbotBtn.BackgroundColor3 = THEME.ButtonBG
-    AimbotBtn.BorderColor3 = THEME.Accent
-    AimbotBtn.BorderSizePixel = 2
-    AimbotBtn.Text = "> AIMBOT: OFF"
-    AimbotBtn.TextColor3 = THEME.Text
-    AimbotBtn.Font = Enum.Font.Code
-    AimbotBtn.TextSize = 13
-    AimbotBtn.ZIndex = 102
-    AimbotBtn.Parent = ScrollContent
-    Instance.new("UICorner", AimbotBtn).CornerRadius = UDim.new(0, 5)
-    AimbotBtn.MouseButton1Click:Connect(function()
-        AimbotEnabled = not AimbotEnabled
-        if AimbotEnabled then AimbotBtn.Text = "> AIMBOT: ON"; AimbotBtn.BackgroundColor3 = THEME.ButtonActive; EnableAimbotLoop()
-        else AimbotBtn.Text = "> AIMBOT: OFF"; AimbotBtn.BackgroundColor3 = THEME.ButtonBG; AimbotStickyTarget = nil; AimbotStickyType = nil; DisconnectKey("Aimbot") end
-    end)
-
-    Toggle("> 🎯 SILENT AIM: OFF", 985, function(btn)
-        SilentAimEnabled = not SilentAimEnabled
-        btn.Text = SilentAimEnabled and "> 🎯 SILENT AIM: ON" or "> 🎯 SILENT AIM: OFF"
-        btn.BackgroundColor3 = SilentAimEnabled and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    Half("> FOV: OFF", 1025, 0, function(btn)
-        FOVCircleEnabled = not FOVCircleEnabled
-        btn.Text = FOVCircleEnabled and "> FOV: ON" or "> FOV: OFF"
-        btn.BackgroundColor3 = FOVCircleEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if FOVCircleEnabled then EnableFOVLoop() else DisableFOVLoop() end
-    end)
-    Half("> TEAM: OFF", 1025, 0.5, function(btn)
-        AimbotTeamCheck = not AimbotTeamCheck
-        btn.Text = AimbotTeamCheck and "> TEAM: ON" or "> TEAM: OFF"
-        btn.BackgroundColor3 = AimbotTeamCheck and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    local FOVInput = Input("> FOV Radius (50-5000)", 1063, tostring(FOVRadius))
-    FOVInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local nf = tonumber(FOVInput.Text)
-            if nf then FOVRadius = math.clamp(nf, 50, FOVMaxRadius); AimbotFOV = FOVRadius end
-            FOVInput.Text = tostring(FOVRadius)
-        end
-    end)
-
-    Toggle("> KEYBIND AIMBOT (E): OFF", 1099, function(btn)
-        AimKeybindEnabled = not AimKeybindEnabled
-        btn.Text = AimKeybindEnabled and "> KEYBIND (E): ON" or "> KEYBIND (E): OFF"
-        btn.BackgroundColor3 = AimKeybindEnabled and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    Toggle("> WALL CHECK: OFF", 1139, function(btn)
-        AimbotWallCheck = not AimbotWallCheck
-        btn.Text = AimbotWallCheck and "> WALL: ON" or "> WALL: OFF"
-        btn.BackgroundColor3 = AimbotWallCheck and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    Toggle("> 🔫 AUTO SHOOT: OFF", 1179, function(btn)
-        AutoShootEnabled = not AutoShootEnabled
-        btn.Text = AutoShootEnabled and "> AUTO SHOOT: ON" or "> AUTO SHOOT: OFF"
-        btn.BackgroundColor3 = AutoShootEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AutoShootEnabled then EnableAimbotLoop() end
-    end)
-
-    Toggle("> 📡 OFF-SCREEN ARROW: OFF", 1219, function(btn)
-        OffScreenArrowEnabled = not OffScreenArrowEnabled
-        btn.Text = OffScreenArrowEnabled and "> OFF-ARROW: ON" or "> OFF-ARROW: OFF"
-        btn.BackgroundColor3 = OffScreenArrowEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if OffScreenArrowEnabled then EnableOffScreenArrow() else DisableOffScreenArrow() end
-    end)
-
-    -- ESP
-    Section("=== 👁️ FULL ESP ===", 1267)
-    Toggle("> ESP MASTER: OFF", 1299, function(btn)
-        ESPEnabled = not ESPEnabled
-        btn.Text = ESPEnabled and "> ESP MASTER: ON" or "> ESP MASTER: OFF"
-        btn.BackgroundColor3 = ESPEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if ESPEnabled then EnableESPLoop() else DisableESPLoop() end
-    end)
-    Toggle("> 🌈 RAINBOW ESP: OFF", 1339, function(btn)
-        RainbowESPEnabled = not RainbowESPEnabled
-        btn.Text = RainbowESPEnabled and "> 🌈 RAINBOW: ON" or "> 🌈 RAINBOW: OFF"
-        btn.BackgroundColor3 = RainbowESPEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if RainbowESPEnabled then EnableRainbowESP() else DisableRainbowESP() end
-    end)
-    Toggle("> NPC ESP: OFF", 1379, function(btn)
-        NPCEspEnabled = not NPCEspEnabled
-        btn.Text = NPCEspEnabled and "> NPC ESP: ON" or "> NPC ESP: OFF"
-        btn.BackgroundColor3 = NPCEspEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if not NPCEspEnabled then for model, _ in pairs(NPCESPObjects) do RemoveNPCEsp(model) end end
-    end)
-    Toggle("> NPC DETECTION: OFF", 1419, function(btn)
-        NPCDetectionEnabled = not NPCDetectionEnabled
-        btn.Text = NPCDetectionEnabled and "> NPC DETECTION: ON" or "> NPC DETECTION: OFF"
-        btn.BackgroundColor3 = NPCDetectionEnabled and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    -- HITBOX
-    Section("=== 🎯 HITBOX ===", 1467)
-    Toggle("> HITBOX: OFF", 1499, function(btn)
-        HitboxEnabled = not HitboxEnabled
-        if HitboxEnabled then btn.Text = "> HITBOX: ON"; btn.BackgroundColor3 = THEME.ButtonActive; EnableHitboxExpander()
-        else btn.Text = "> HITBOX: OFF"; btn.BackgroundColor3 = THEME.ButtonBG; DisableHitboxExpander() end
-    end)
-    local HitboxInput = Input("> Size (1-1000)", 1539, tostring(HitboxSize))
-    HitboxInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local nh = tonumber(HitboxInput.Text)
-            if nh then HitboxSize = math.clamp(nh, 1, 1000) end
-            HitboxInput.Text = tostring(HitboxSize)
-        end
-    end)
-
-    -- DRONE
-    Section("=== 🚁 DRONE MODE ===", 1585)
-    Toggle("> DRONE CAMERA: OFF", 1617, function(btn)
-        DroneModeEnabled = not DroneModeEnabled
-        btn.Text = DroneModeEnabled and "> DRONE: ON" or "> DRONE: OFF"
-        btn.BackgroundColor3 = DroneModeEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if DroneModeEnabled then EnableDroneMode() else DisableDroneMode() end
-    end)
-
-    -- SURVIVAL
-    Section("=== SURVIVAL ===", 1665)
-    Toggle("> AUTO RESPAWN: OFF", 1697, function(btn)
-        AutoRespawnEnabled = not AutoRespawnEnabled
-        btn.Text = AutoRespawnEnabled and "> AUTO RESPAWN: ON" or "> AUTO RESPAWN: OFF"
-        btn.BackgroundColor3 = AutoRespawnEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AutoRespawnEnabled then EnableAutoRespawn() else DisableAutoRespawn() end
-    end)
-    Toggle("> ANTI-FLING: OFF", 1737, function(btn)
-        AntiFlingEnabled = not AntiFlingEnabled
-        btn.Text = AntiFlingEnabled and "> ANTI-FLING: ON" or "> ANTI-FLING: OFF"
-        btn.BackgroundColor3 = AntiFlingEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AntiFlingEnabled then EnableAntiFling() else DisableAntiFling() end
-    end)
-    Toggle("> ANTI-AFK: OFF", 1777, function(btn)
-        AntiAFKEnabled = not AntiAFKEnabled
-        btn.Text = AntiAFKEnabled and "> ANTI-AFK: ON" or "> ANTI-AFK: OFF"
-        btn.BackgroundColor3 = AntiAFKEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if AntiAFKEnabled then EnableAntiAFK() else DisableAntiAFK() end
-    end)
-
-    -- FLY-VOID
-    Section("=== 🕳️ FLY-VOID V2 ===", 1825)
-    Toggle("> FLY-VOID: OFF", 1857, function(btn)
-        FlyVoidEnabled = not FlyVoidEnabled
-        if FlyVoidEnabled then btn.Text = "> FLY-VOID: ON"; btn.BackgroundColor3 = THEME.ButtonActive; EnableFlyVoid()
-        else btn.Text = "> FLY-VOID: OFF"; btn.BackgroundColor3 = THEME.ButtonBG; DisableFlyVoid() end
-    end)
-    Half("> HIDE: OFF", 1897, 0, function(btn)
-        FlyVoidHideMode = not FlyVoidHideMode
-        btn.Text = FlyVoidHideMode and "> HIDE: ON" or "> HIDE: OFF"
-        btn.BackgroundColor3 = FlyVoidHideMode and THEME.ButtonActive or THEME.ButtonBG
-    end)
-    Half("> KEY: V", 1897, 0.5, function(btn) Notify("Fly-Void", "> Tekan V", 2) end)
-
-    -- SOUND
-    Section("=== SOUND ESP ===", 1945)
-    Toggle("> SOUND ESP: OFF", 1977, function(btn)
-        SoundESPEnabled = not SoundESPEnabled
-        btn.Text = SoundESPEnabled and "> SOUND ESP: ON" or "> SOUND ESP: OFF"
-        btn.BackgroundColor3 = SoundESPEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if SoundESPEnabled then EnableSoundESP() else DisableSoundESP() end
-    end)
-
-    -- MUSIC
-    Section("=== 🎵 MUSIC PLAYLIST V2 ===", 2025)
-    Toggle("> MUSIC: OFF", 2057, function(btn)
-        MusicPlayerEnabled = not MusicPlayerEnabled
-        btn.Text = MusicPlayerEnabled and "> MUSIC: ON" or "> MUSIC: OFF"
-        btn.BackgroundColor3 = MusicPlayerEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if MusicPlayerEnabled then PlayMusic() else StopMusic() end
-    end)
-    Half("> ⏮ PREV", 2097, 0, function(btn) PrevMusic() end)
-    Half("> ⏭ NEXT", 2097, 0.5, function(btn) NextMusic() end)
-    Half("> SHUFFLE: OFF", 2134, 0, function(btn)
-        MusicShuffle = not MusicShuffle
-        btn.Text = MusicShuffle and "> SHUFFLE: ON" or "> SHUFFLE: OFF"
-        btn.BackgroundColor3 = MusicShuffle and THEME.ButtonActive or THEME.ButtonBG
-    end)
-    Half("> REPEAT: ON", 2134, 0.5, function(btn)
-        MusicRepeatAll = not MusicRepeatAll
-        btn.Text = MusicRepeatAll and "> REPEAT: ON" or "> REPEAT: OFF"
-        btn.BackgroundColor3 = MusicRepeatAll and THEME.ButtonActive or THEME.ButtonBG
-    end)
-
-    -- KILL NOTIF
-    Section("=== 🔔 KILL/DEATH NOTIF ===", 2182)
-    Toggle("> KILL NOTIF: OFF", 2214, function(btn)
-        KillNotifEnabled = not KillNotifEnabled
-        btn.Text = KillNotifEnabled and "> KILL NOTIF: ON" or "> KILL NOTIF: OFF"
-        btn.BackgroundColor3 = KillNotifEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if KillNotifEnabled then EnableKillNotif() else DisableKillNotif() end
-    end)
-
-    -- INFO PANEL
-    Section("=== 📊 INFO PANEL ===", 2262)
-    Toggle("> INFO PANEL: OFF", 2294, function(btn)
-        InfoPanelEnabled = not InfoPanelEnabled
-        btn.Text = InfoPanelEnabled and "> INFO PANEL: ON" or "> INFO PANEL: OFF"
-        btn.BackgroundColor3 = InfoPanelEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if InfoPanelEnabled then CreateInfoPanel() else DestroyInfoPanel() end
-    end)
-
-    -- WAYPOINT
-    Section("=== 🗺️ WAYPOINT ===", 2342)
-    local WPInput = Input("> Waypoint name", 2374, "Base")
-    Toggle("> ➕ ADD WAYPOINT", 2411, function(btn) AddWaypoint(WPInput.Text) end)
-
-    -- CHAT SPAM
-    Section("=== CHAT SPAM ===", 2459)
-    Toggle("> CHAT SPAM: OFF", 2491, function(btn)
-        ChatSpamEnabled = not ChatSpamEnabled
-        btn.Text = ChatSpamEnabled and "> CHAT SPAM: ON" or "> CHAT SPAM: OFF"
-        btn.BackgroundColor3 = ChatSpamEnabled and THEME.ButtonActive or THEME.ButtonBG
-        if ChatSpamEnabled then EnableChatSpam() else DisableChatSpam() end
-    end)
-    local ChatInput = Input("> Message", 2531, ChatSpamText)
-    ChatInput.FocusLost:Connect(function(enterPressed)
-        if enterPressed and ChatInput.Text ~= "" then ChatSpamText = ChatInput.Text end
-    end)
-
-    -- SERVER HOP
-    Section("=== 🌐 SERVER HOP ===", 2577)
-    Toggle("> 🌐 SERVER HOP (RANDOM)", 2609, function(btn) DoServerHop() end)
-    Half("> 🎯 BEST SERVER", 2649, 0, function(btn) DoBestServerHop() end)
-    Half("> 🔄 REJOIN", 2649, 0.5, function(btn) DoRejoin() end)
-
-    -- TELEPORT KE ORANG
-    Section("=== 🆕 TELEPORT KE ORANG ===", 2697)
-    TeleportListFrame = Instance.new("ScrollingFrame")
-    TeleportListFrame.Size = UDim2.new(1, -20, 0, 130)
-    TeleportListFrame.Position = UDim2.new(0, 10, 0, 2729)
-    TeleportListFrame.BackgroundColor3 = THEME.PanelBG
-    TeleportListFrame.BorderColor3 = THEME.Accent
-    TeleportListFrame.BorderSizePixel = 1
-    TeleportListFrame.ScrollBarThickness = 5
-    TeleportListFrame.ScrollBarImageColor3 = THEME.Accent
-    TeleportListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    TeleportListFrame.ZIndex = 102
-    TeleportListFrame.Parent = ScrollContent
-    Instance.new("UICorner", TeleportListFrame).CornerRadius = UDim.new(0, 4)
-    TeleportListContainer = Instance.new("Frame")
-    TeleportListContainer.Size = UDim2.new(1, -10, 1, -10)
-    TeleportListContainer.Position = UDim2.new(0, 5, 0, 5)
-    TeleportListContainer.BackgroundTransparency = 1
-    TeleportListContainer.ZIndex = 103
-    TeleportListContainer.Parent = TeleportListFrame
-    task.spawn(function()
-        while task.wait(2) do
-            if IsLoggedIn then RefreshTeleportList() end
-        end
-    end)
-
-    -- TELEPORT
-    Section("=== TELEPORT ===", 2879)
-    Toggle("> TELEPORT TO MOUSE", 2911, function(btn) TeleportToMouse() end)
-    Half("> SAVE LOC", 2951, 0, function(btn) SaveLocation() end)
-    Half("> LOAD LOC", 2951, 0.5, function(btn) LoadLocation() end)
-
-    -- ⭐ SOCIAL SECTION
-    Section("=== ⭐ ZETGAMES OFFICIAL ===", 2999)
-
-    local SocialInfo = Instance.new("TextLabel")
-    SocialInfo.Size = UDim2.new(1, -20, 0, 60)
-    SocialInfo.Position = UDim2.new(0, 10, 0, 3031)
-    SocialInfo.BackgroundColor3 = THEME.PanelBG
-    SocialInfo.BorderColor3 = THEME.Accent
-    SocialInfo.BorderSizePixel = 1
-    SocialInfo.Text = "> Follow: rscripts.net/@ZetGames\n> Update tiap 2 minggu\n> V4.5 coming soon!"
-    SocialInfo.TextColor3 = THEME.TextLight
-    SocialInfo.Font = Enum.Font.Code
-    SocialInfo.TextSize = 10
-    SocialInfo.TextXAlignment = Enum.TextXAlignment.Left
-    SocialInfo.TextYAlignment = Enum.TextYAlignment.Top
-    SocialInfo.ZIndex = 102
-    SocialInfo.Parent = ScrollContent
-    Instance.new("UICorner", SocialInfo).CornerRadius = UDim.new(0, 4)
-
-    local PromoteBtn = Instance.new("TextButton")
-    PromoteBtn.Size = UDim2.new(1, -20, 0, 42)
-    PromoteBtn.Position = UDim2.new(0, 10, 0, 3097)
-    PromoteBtn.BackgroundColor3 = Color3.fromRGB(30, 100, 200)
-    PromoteBtn.BorderColor3 = Color3.fromRGB(100, 200, 255)
-    PromoteBtn.BorderSizePixel = 2
-    PromoteBtn.Text = "⭐ FOLLOW @ZetGames NOW"
-    PromoteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    PromoteBtn.Font = Enum.Font.Code
-    PromoteBtn.TextSize = 13
-    PromoteBtn.ZIndex = 102
-    PromoteBtn.Parent = ScrollContent
-    Instance.new("UICorner", PromoteBtn).CornerRadius = UDim.new(0, 5)
-    PromoteBtn.MouseButton1Click:Connect(function()
-        Notify("⭐ ZetGames", "rscripts.net/@ZetGames", 8)
-        Notify("💙 Thanks!", "Dukung creator biar update terus", 6)
-    end)
-
-    local PromoteBtn2 = Instance.new("TextButton")
-    PromoteBtn2.Size = UDim2.new(0.5, -15, 0, 34)
-    PromoteBtn2.Position = UDim2.new(0, 10, 0, 3147)
-    PromoteBtn2.BackgroundColor3 = Color3.fromRGB(100, 30, 150)
-    PromoteBtn2.BorderColor3 = Color3.fromRGB(180, 100, 255)
-    PromoteBtn2.BorderSizePixel = 1
-    PromoteBtn2.Text = "🎁 BONUS"
-    PromoteBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
-    PromoteBtn2.Font = Enum.Font.Code
-    PromoteBtn2.TextSize = 11
-    PromoteBtn2.ZIndex = 102
-    PromoteBtn2.Parent = ScrollContent
-    Instance.new("UICorner", PromoteBtn2).CornerRadius = UDim.new(0, 4)
-    PromoteBtn2.MouseButton1Click:Connect(function()
-        Notify("🎁 Bonus Follower", "Follower dapet preview V4.5!", 5)
-    end)
-
-    local PromoteBtn3 = Instance.new("TextButton")
-    PromoteBtn3.Size = UDim2.new(0.5, -15, 0, 34)
-    PromoteBtn3.Position = UDim2.new(0.5, 5, 0, 3147)
-    PromoteBtn3.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
-    PromoteBtn3.BorderColor3 = Color3.fromRGB(255, 100, 100)
-    PromoteBtn3.BorderSizePixel = 1
-    PromoteBtn3.Text = "📢 SHARE"
-    PromoteBtn3.TextColor3 = Color3.fromRGB(255, 255, 255)
-    PromoteBtn3.Font = Enum.Font.Code
-    PromoteBtn3.TextSize = 11
-    PromoteBtn3.ZIndex = 102
-    PromoteBtn3.Parent = ScrollContent
-    Instance.new("UICorner", PromoteBtn3).CornerRadius = UDim.new(0, 4)
-    PromoteBtn3.MouseButton1Click:Connect(function()
-        Notify("📢 Share ke Teman", "rscripts.net/@ZetGames", 6)
-    end)
-
-    -- ⭐ MENU BUTTON (SIMPLE ≡ + SAFE ZONE)
+    -- ═══════════════ MENU BUTTON ═══════════════
     local ToggleMenuButton = Instance.new("TextButton")
     ToggleMenuButton.Name = "ZetMenuButton"
     ToggleMenuButton.Size = UDim2.new(0, 50, 0, 50)
@@ -2653,7 +1275,7 @@ local function CreateUI()
     ToggleMenuButton.Parent = ScreenGui
     Instance.new("UICorner", ToggleMenuButton).CornerRadius = UDim.new(0, 25)
 
-    -- ✅ SAFE ZONE
+    -- SAFE ZONE
     local BTN_SIZE = 50
     local SAFE_TOP = 90
     local SAFE_LEFT = 100
@@ -2804,10 +1426,10 @@ local function CreateUI()
         local startTime = tick()
         local messages = {
             "> Menginisialisasi sistem...",
-            "> Memuat resource...",
+            "> Memuat VPN...",
             "> Menghubungkan ke server...",
             "> Memuat konfigurasi...",
-            "> Memverifikasi build...",
+            "> Verifikasi premium...",
             "> Menyiapkan UI...",
             "> Memuat fitur...",
             "> Sinkronisasi data...",
@@ -2828,7 +1450,7 @@ local function CreateUI()
         LoadingScreen.Visible = false
         LoadingScreen:Destroy()
         LoginFrame.Visible = true
-        Notify("V4.4 RESMI", "> Silakan login dengan key", 3)
+        Notify("V4.4 PREMIUM", "> Silakan login dengan key", 3)
     end)
 
     -- LOGIN LOGIC
@@ -2842,17 +1464,11 @@ local function CreateUI()
             ToggleMenuButton.Visible = true
             MenuVisible = true
             StatusTxt.Text = "> ACCESS GRANTED..."
-            Notify("✅ Success", "WELCOME V4.4 RESMI", 3)
+            Notify("✅ Success", "WELCOME V4.4 PREMIUM", 3)
             pcall(ActivateAntiKick)
-            pcall(ActivateAutoReconnect)
-            pcall(ActivateNightLock)
-            Notify("🔒 NIGHT LOCK", "> AUTO KICK ACTIVE", 3)
+            Notify("🔒 VPN", "> AUTO-PROTECT ACTIVE", 3)
             task.wait(0.5)
-            Notify("⭐ ZetGames", "Follow rscripts.net/@ZetGames", 6)
-            task.wait(1)
-            Notify("🎁 Bonus", "Update V4.5 coming soon!", 5)
-            task.wait(0.3)
-            RefreshTeleportList()
+            Notify("🔥 Premium", "Upgrade untuk 15+ fitur!", 5)
         else
             StatusTxt.Text = "> ERROR: KEY INVALID"
             Notify("❌ Failed", "> KEY INVALID", 2)
@@ -2872,4 +1488,4 @@ end
 --==============================================================
 print("[ZET] Starting UI...")
 pcall(CreateUI)
-print("[ZET] V4.4 RESMI loaded!")
+print("[ZET] V4.4 PREMIUM loaded!")
